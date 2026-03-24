@@ -1,0 +1,60 @@
+{
+  "query": "SELECT m.lineDescription, m.matchedItemName, m.confidence, m.matchMethod FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NOT NULL;\nSELECT DISTINCT m.lineDescription FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NULL LIMIT 30;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT m.lineDescription, m.matchedItemName, m.confidence, m.matchMethod FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NOT NULL;\nSELECT DISTINCT m.lineDescription FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NULL LIMIT 30;",
+  "rows": [
+    {
+      "lineDescription": "FL TOFU FERME",
+      "matchedItemName": "Tofu",
+      "confidence": "50.00",
+      "matchMethod": "fuzzy"
+    },
+    {
+      "lineDescription": "BAC PL 15X20X7PO BL",
+      "matchedItemName": "Bacon",
+      "confidence": "50.00",
+      "matchMethod": "fuzzy"
+    },
+    {
+      "lineDescription": "MAYONNAISE",
+      "matchedItemName": "Mayo",
+      "confidence": "100.00",
+      "matchMethod": "fuzzy"
+    }
+  ],
+  "messages": [
+    "lineDescription",
+    "NUTELLA 2 x 3 kg",
+    "PAPIER SULFURISÉ EN SILICONE 16 X 24 - 1 000 unités",
+    "BACON CUIT 15-17 TR/PO READY CRISP FR",
+    "CHEESE CREAM SPREAD M. RIVIER",
+    "CHIPS REGULAR RIPPLE MENU",
+    "SAUCE SRIRACHA F/GLU KIKKO (6",
+    "SOFT DRINK COKE CAN",
+    "GRAINE DE SÉSAME INDIEN 99.98% PUR - 50 lbs - 22.68 kg",
+    "FARINE À PÂTISSERIE \" MONARCH \" -20 kg",
+    "MÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 kg",
+    "FARINE DE BLÉ-ENTIER BRUNETTE - LES MOULINS DE SOULANGES 20 kg RECOLTE 2024",
+    "FRUIT DRIED RAISIN SULT MAISON",
+    "CANNELLE MOULUE - 2.27 kg",
+    "SUCRE DE CANNE EXTRA-LIGHT BIOLOGIQUE DE LA COLOMBIE - 25 kg",
+    "ROMARIN ENTIER 2.27 kg",
+    "NOIX DE GRENOBLE EN PETIT MORCEAUX 30 lb",
+    "FARINE DE BLÉ ENTIER 20 kg",
+    "HUILE DE CANOLA RAFFINÉE, BLANCHIE ET DÉSODORISÉE - 16 litres",
+    "DOUGH PUFF PASTRY SHEET 10X15IN V/F",
+    "LID PLAST DOME WH 10-12-16OZ",
+    "CHEESE CREAM PHILADELPHIA",
+    "NAPKIN MEALMATES 1 PLY KRAFT",
+    "OIL CANOLA BOX 0/TRANS/FAT",
+    "CASSONADE FONCÉE - REDPATH 20 kg",
+    "CHILI BROYÉ - 2.27kg",
+    "BEV ICED TEA CAN FUZE",
+    "WATER NATURAL SPRING ESKA",
+    "NOIX DE GRENOBLE DE CALIFORNIE DEMIES ET MORCEAUX - 25 lb",
+    "GRAINE DE SÉSAME DÉCORTIQUÉE 99.98% PUR Inde - 50 lbs - 22.68 kg",
+    "FC00215382"
+  ],
+  "stdout": "lineDescription\tmatchedItemName\tconfidence\tmatchMethod\nFL TOFU FERME\tTofu\t50.00\tfuzzy\nBAC PL 15X20X7PO BL\tBacon\t50.00\tfuzzy\nMAYONNAISE\tMayo\t100.00\tfuzzy\nlineDescription\nNUTELLA 2 x 3 kg\nPAPIER SULFURISÉ EN SILICONE 16 X 24 - 1 000 unités\nBACON CUIT 15-17 TR/PO READY CRISP FR\nCHEESE CREAM SPREAD M. RIVIER\nCHIPS REGULAR RIPPLE MENU\nSAUCE SRIRACHA F/GLU KIKKO (6\nSOFT DRINK COKE CAN\nGRAINE DE SÉSAME INDIEN 99.98% PUR - 50 lbs - 22.68 kg\nFARINE À PÂTISSERIE \" MONARCH \" -20 kg\nMÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 kg\nFARINE DE BLÉ-ENTIER BRUNETTE - LES MOULINS DE SOULANGES 20 kg RECOLTE 2024\nFRUIT DRIED RAISIN SULT MAISON\nCANNELLE MOULUE - 2.27 kg\nSUCRE DE CANNE EXTRA-LIGHT BIOLOGIQUE DE LA COLOMBIE - 25 kg\nROMARIN ENTIER 2.27 kg\nNOIX DE GRENOBLE EN PETIT MORCEAUX 30 lb\nFARINE DE BLÉ ENTIER 20 kg\nHUILE DE CANOLA RAFFINÉE, BLANCHIE ET DÉSODORISÉE - 16 litres\nDOUGH PUFF PASTRY SHEET 10X15IN V/F\nLID PLAST DOME WH 10-12-16OZ\nCHEESE CREAM PHILADELPHIA\nNAPKIN MEALMATES 1 PLY KRAFT\nOIL CANOLA BOX 0/TRANS/FAT\nCASSONADE FONCÉE - REDPATH 20 kg\nCHILI BROYÉ - 2.27kg\nBEV ICED TEA CAN FUZE\nWATER NATURAL SPRING ESKA\nNOIX DE GRENOBLE DE CALIFORNIE DEMIES ET MORCEAUX - 25 lb\nGRAINE DE SÉSAME DÉCORTIQUÉE 99.98% PUR Inde - 50 lbs - 22.68 kg\nFC00215382\n",
+  "stderr": "",
+  "execution_time_ms": 67
+}

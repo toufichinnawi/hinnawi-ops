@@ -1,0 +1,4 @@
+The sidebar shows items up to "Progress Report" and then the user profile at the bottom. 
+The "Email Inbox" and "Integrations" items should be below "Progress Report" but may require scrolling.
+The sidebar has scrollable content so this is expected behavior.
+TypeScript: 0 errors. All 200 tests passing. Server running.

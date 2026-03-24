@@ -1,0 +1,27 @@
+{
+  "query": "SELECT ds.*, l.name as locationName FROM dailySales ds LEFT JOIN locations l ON ds.locationId = l.id WHERE ds.saleDate = '2026-03-12' AND ds.locationId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT ds.*, l.name as locationName FROM dailySales ds LEFT JOIN locations l ON ds.locationId = l.id WHERE ds.saleDate = '2026-03-12' AND ds.locationId = 1;",
+  "rows": [
+    {
+      "id": "31142",
+      "locationId": "1",
+      "saleDate": "2026-03-12",
+      "taxExemptSales": "1809.18",
+      "taxableSales": "951.10",
+      "totalSales": "1809.18",
+      "gstCollected": "47.56",
+      "qstCollected": "94.87",
+      "totalDeposit": "1951.61",
+      "tipsCollected": "176.79",
+      "merchantFees": "0.00",
+      "createdAt": "2026-03-15 04:46:07",
+      "labourCost": "653.31",
+      "orderCount": "278",
+      "locationName": "President Kennedy"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tlocationId\tsaleDate\ttaxExemptSales\ttaxableSales\ttotalSales\tgstCollected\tqstCollected\ttotalDeposit\ttipsCollected\tmerchantFees\tcreatedAt\tlabourCost\torderCount\tlocationName\n31142\t1\t2026-03-12\t1809.18\t951.10\t1809.18\t47.56\t94.87\t1951.61\t176.79\t0.00\t2026-03-15 04:46:07\t653.31\t278\tPresident Kennedy\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

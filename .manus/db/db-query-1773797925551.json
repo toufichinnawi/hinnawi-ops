@@ -1,0 +1,90 @@
+{
+  "query": "SELECT UPPER(m.lineDescription) as d, COUNT(*) as c FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NULL GROUP BY d ORDER BY c DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT UPPER(m.lineDescription) as d, COUNT(*) as c FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NULL GROUP BY d ORDER BY c DESC LIMIT 20;",
+  "rows": [
+    {
+      "d": "FRAIS DE CARBURANT",
+      "c": "35"
+    },
+    {
+      "d": "FARINE THREE STARS NON BLANCHIE AA40 - 20 KG",
+      "c": "32"
+    },
+    {
+      "d": "MILK 3.25% LACTANTIA",
+      "c": "29"
+    },
+    {
+      "d": "SUCRE FIN - REDPATH - 20 KG",
+      "c": "26"
+    },
+    {
+      "d": "CREAM 10% LACTANTIA (16)",
+      "c": "25"
+    },
+    {
+      "d": "FARINE DE BLÉ ENTIER - MAXIMA 20 KG",
+      "c": "25"
+    },
+    {
+      "d": "GRAINE DE SÉSAME INDIEN 99.98% PUR - 50 LBS - 22.68 KG",
+      "c": "24"
+    },
+    {
+      "d": "FARINE MALT NO 05505 - 20 KG",
+      "c": "18"
+    },
+    {
+      "d": "FARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER'S HAND 20 KG",
+      "c": "15"
+    },
+    {
+      "d": "MÉLANGE DE 12 GRAINS - FARINART 20 KG",
+      "c": "14"
+    },
+    {
+      "d": "LEVURE FRAÎCHE - LALLEMAND 20 X 2 LBS - 18.14 KG",
+      "c": "14"
+    },
+    {
+      "d": "SUCRE FIN - REDPATH 20 KG",
+      "c": "12"
+    },
+    {
+      "d": "AIL ÉMINCÉ DÉSHYDRATÉ - 2.27 KG",
+      "c": "10"
+    },
+    {
+      "d": "LEVURE FRAÎCHE - LALLEMAND 2 LBS - 0.908 KG",
+      "c": "10"
+    },
+    {
+      "d": "CASSONADE FONCÉE - REDPATH 20 KG",
+      "c": "10"
+    },
+    {
+      "d": "CHOCOLAT DE COUVERTURE NOIR 64% PURETÉ EXTRA-BITTER GUAYAQUIL - CACAO BARRY 20 KG",
+      "c": "8"
+    },
+    {
+      "d": "LEVURE FRAÎCHE - LALLEMAND 10 X 2 LBS - 9.07 KG",
+      "c": "8"
+    },
+    {
+      "d": "LALTISAN FRESH - CONDITIONNEUR POUR PAINS FRAIS 10 KG",
+      "c": "8"
+    },
+    {
+      "d": "HUILE DE CANOLA LA PERLA 16 LITRES",
+      "c": "7"
+    },
+    {
+      "d": "GRAINE DE SÉSAME DÉCORTIQUÉE 99.98% PUR INDE - 50 LBS - 22.68 KG",
+      "c": "6"
+    }
+  ],
+  "messages": [],
+  "stdout": "d\tc\nFRAIS DE CARBURANT\t35\nFARINE THREE STARS NON BLANCHIE AA40 - 20 KG\t32\nMILK 3.25% LACTANTIA\t29\nSUCRE FIN - REDPATH - 20 KG\t26\nCREAM 10% LACTANTIA (16)\t25\nFARINE DE BLÉ ENTIER - MAXIMA 20 KG\t25\nGRAINE DE SÉSAME INDIEN 99.98% PUR - 50 LBS - 22.68 KG\t24\nFARINE MALT NO 05505 - 20 KG\t18\nFARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER'S HAND 20 KG\t15\nMÉLANGE DE 12 GRAINS - FARINART 20 KG\t14\nLEVURE FRAÎCHE - LALLEMAND 20 X 2 LBS - 18.14 KG\t14\nSUCRE FIN - REDPATH 20 KG\t12\nAIL ÉMINCÉ DÉSHYDRATÉ - 2.27 KG\t10\nLEVURE FRAÎCHE - LALLEMAND 2 LBS - 0.908 KG\t10\nCASSONADE FONCÉE - REDPATH 20 KG\t10\nCHOCOLAT DE COUVERTURE NOIR 64% PURETÉ EXTRA-BITTER GUAYAQUIL - CACAO BARRY 20 KG\t8\nLEVURE FRAÎCHE - LALLEMAND 10 X 2 LBS - 9.07 KG\t8\nLALTISAN FRESH - CONDITIONNEUR POUR PAINS FRAIS 10 KG\t8\nHUILE DE CANOLA LA PERLA 16 LITRES\t7\nGRAINE DE SÉSAME DÉCORTIQUÉE 99.98% PUR INDE - 50 LBS - 22.68 KG\t6\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

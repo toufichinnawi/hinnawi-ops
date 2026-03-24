@@ -1,0 +1,38 @@
+{
+  "query": "\n-- Recalculate Ham cost from valid matches only\nUPDATE inventoryItems SET \n  lastCost = (SELECT unitPrice FROM invoiceLineItemMatches WHERE matchedItemName = 'Ham' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1),\n  avgCost = (SELECT AVG(unitPrice) FROM invoiceLineItemMatches WHERE matchedItemName = 'Ham' AND matchStatus = 'auto_matched'),\n  costPerUsableUnit = (SELECT unitPrice FROM invoiceLineItemMatches WHERE matchedItemName = 'Ham' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1) / (yieldPct / 100),\n  updatedAt = NOW()\nWHERE name = 'Ham';\n\n-- Recalculate Mozzarella cost from valid matches\nUPDATE inventoryItems SET \n  lastCost = (SELECT unitPrice FROM invoiceLineItemMatches WHERE matchedItemName = 'Mozzarella' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1),\n  avgCost = (SELECT AVG(unitPrice) FROM invoiceLineItemMatches WHERE matchedItemName = 'Mozzarella' AND matchStatus = 'auto_matched'),\n  costPerUsableUnit = (SELECT unitPrice FROM invoiceLineItemMatches WHERE matchedItemName = 'Mozzarella' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1) / (yieldPct / 100),\n  updatedAt = NOW()\nWHERE name = 'Mozzarella';\n\n-- Recalculate Peppers cost (now with purchaseAmount=5, need to re-divide)\n-- The unitPrice in matches was already divided by old purchaseAmount (1), so we need to use raw invoice prices\n-- Actually the match unitPrice = invoiceUnitPrice / purchaseAmount, and old purchaseAmount was 1\n-- So match unitPrice IS the invoice case price. Now purchaseAmount=5, so real per-kg = match_unitPrice / 5\n-- But we can't easily fix this without re-running. Let's just update the avg from what we know\nUPDATE inventoryItems SET \n  lastCost = (SELECT unitPrice / 5 FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1),\n  avgCost = (SELECT AVG(unitPrice / 5) FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched'),\n  costPerUsableUnit = (SELECT unitPrice / 5 FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1) / (yieldPct / 100),\n  updatedAt = NOW()\nWHERE name = 'Peppers';\n\nSELECT name, lastCost, avgCost, costPerUsableUnit, purchaseAmount FROM inventoryItems WHERE name IN ('Ham', 'Mozzarella', 'Peppers', 'Olive oil');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute \n-- Recalculate Ham cost from valid matches only\nUPDATE inventoryItems SET \n  lastCost = (SELECT unitPrice FROM invoiceLineItemMatches WHERE matchedItemName = 'Ham' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1),\n  avgCost = (SELECT AVG(unitPrice) FROM invoiceLineItemMatches WHERE matchedItemName = 'Ham' AND matchStatus = 'auto_matched'),\n  costPerUsableUnit = (SELECT unitPrice FROM invoiceLineItemMatches WHERE matchedItemName = 'Ham' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1) / (yieldPct / 100),\n  updatedAt = NOW()\nWHERE name = 'Ham';\n\n-- Recalculate Mozzarella cost from valid matches\nUPDATE inventoryItems SET \n  lastCost = (SELECT unitPrice FROM invoiceLineItemMatches WHERE matchedItemName = 'Mozzarella' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1),\n  avgCost = (SELECT AVG(unitPrice) FROM invoiceLineItemMatches WHERE matchedItemName = 'Mozzarella' AND matchStatus = 'auto_matched'),\n  costPerUsableUnit = (SELECT unitPrice FROM invoiceLineItemMatches WHERE matchedItemName = 'Mozzarella' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1) / (yieldPct / 100),\n  updatedAt = NOW()\nWHERE name = 'Mozzarella';\n\n-- Recalculate Peppers cost (now with purchaseAmount=5, need to re-divide)\n-- The unitPrice in matches was already divided by old purchaseAmount (1), so we need to use raw invoice prices\n-- Actually the match unitPrice = invoiceUnitPrice / purchaseAmount, and old purchaseAmount was 1\n-- So match unitPrice IS the invoice case price. Now purchaseAmount=5, so real per-kg = match_unitPrice / 5\n-- But we can't easily fix this without re-running. Let's just update the avg from what we know\nUPDATE inventoryItems SET \n  lastCost = (SELECT unitPrice / 5 FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1),\n  avgCost = (SELECT AVG(unitPrice / 5) FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched'),\n  costPerUsableUnit = (SELECT unitPrice / 5 FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched' ORDER BY invoiceId DESC LIMIT 1) / (yieldPct / 100),\n  updatedAt = NOW()\nWHERE name = 'Peppers';\n\nSELECT name, lastCost, avgCost, costPerUsableUnit, purchaseAmount FROM inventoryItems WHERE name IN ('Ham', 'Mozzarella', 'Peppers', 'Olive oil');\n",
+  "rows": [
+    {
+      "name": "Ham",
+      "lastCost": "5.7609",
+      "avgCost": "5.8247",
+      "costPerUsableUnit": "6.0641",
+      "purchaseAmount": "2.300"
+    },
+    {
+      "name": "Mozzarella",
+      "lastCost": "12.3576",
+      "avgCost": "11.1403",
+      "costPerUsableUnit": "13.0080",
+      "purchaseAmount": "18.400"
+    },
+    {
+      "name": "Peppers",
+      "lastCost": "0.0172",
+      "avgCost": "1.1547",
+      "costPerUsableUnit": "0.0191",
+      "purchaseAmount": "5.000"
+    },
+    {
+      "name": "Olive oil",
+      "lastCost": "12.7436",
+      "avgCost": "39.7260",
+      "costPerUsableUnit": "12.7436",
+      "purchaseAmount": "2.730"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\tlastCost\tavgCost\tcostPerUsableUnit\tpurchaseAmount\nHam\t5.7609\t5.8247\t6.0641\t2.300\nMozzarella\t12.3576\t11.1403\t13.0080\t18.400\nPeppers\t0.0172\t1.1547\t0.0191\t5.000\nOlive oil\t12.7436\t39.7260\t12.7436\t2.730\n",
+  "stderr": "",
+  "execution_time_ms": 167
+}

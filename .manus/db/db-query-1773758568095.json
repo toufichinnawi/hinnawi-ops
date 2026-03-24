@@ -1,0 +1,18 @@
+{
+  "query": "SELECT 'dailySales' as tbl, COUNT(*) as cnt FROM dailySales WHERE saleDate >= '2026-03-14' UNION ALL SELECT 'productSales', COUNT(*) FROM productSales WHERE periodStart >= '2026-03-14';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT 'dailySales' as tbl, COUNT(*) as cnt FROM dailySales WHERE saleDate >= '2026-03-14' UNION ALL SELECT 'productSales', COUNT(*) FROM productSales WHERE periodStart >= '2026-03-14';",
+  "rows": [
+    {
+      "tbl": "dailySales",
+      "cnt": "13"
+    },
+    {
+      "tbl": "productSales",
+      "cnt": "398"
+    }
+  ],
+  "messages": [],
+  "stdout": "tbl\tcnt\ndailySales\t13\nproductSales\t398\n",
+  "stderr": "",
+  "execution_time_ms": 67
+}

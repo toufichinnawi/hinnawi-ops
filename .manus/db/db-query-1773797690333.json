@@ -1,0 +1,37 @@
+{
+  "query": "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = 'invoiceLineItems' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = 'invoiceLineItems' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "invoiceId"
+    },
+    {
+      "COLUMN_NAME": "productCode"
+    },
+    {
+      "COLUMN_NAME": "description"
+    },
+    {
+      "COLUMN_NAME": "quantity"
+    },
+    {
+      "COLUMN_NAME": "unitPrice"
+    },
+    {
+      "COLUMN_NAME": "amount"
+    },
+    {
+      "COLUMN_NAME": "glAccount"
+    },
+    {
+      "COLUMN_NAME": "createdAt"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nid\ninvoiceId\nproductCode\ndescription\nquantity\nunitPrice\namount\nglAccount\ncreatedAt\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

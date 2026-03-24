@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE inventoryItems SET lastCost = 49.4000, avgCost = 49.6957, costPerUsableUnit = ROUND(49.4000 / (yieldPct/100), 4) WHERE name = 'Salmon';\nUPDATE inventoryItems SET purchaseAmount = 1 WHERE name = 'Vanilla Extract';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute UPDATE inventoryItems SET lastCost = 49.4000, avgCost = 49.6957, costPerUsableUnit = ROUND(49.4000 / (yieldPct/100), 4) WHERE name = 'Salmon';\nUPDATE inventoryItems SET purchaseAmount = 1 WHERE name = 'Vanilla Extract';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 74
+}

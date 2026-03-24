@@ -1,0 +1,31 @@
+Revenue Bug - Root Cause Analysis
+===================================
+
+PROBLEM:
+- totalSales in dailySales table shows only taxExemptSales instead of taxExemptSales + taxableSales
+- Bug started March 10, 2026. March 8-9 were correct.
+
+ROOT CAUSE (koomiScraper.ts lines 492-509 and 539-555):
+- The scraper maps "Total Net Sales" from Koomi to totalNet variable
+- But Koomi's "Total Net Sales" is the TAX-EXEMPT portion only (food items not subject to tax)
+- The scraper then sets: totalSales = totalNet (line 509 and 555)
+- This means totalSales = taxExemptSales ONLY, missing the taxableSales portion
+
+WHY IT WORKED BEFORE:
+- Before March 10, the data was likely imported via a different method or the Koomi report format changed
+- March 8-9 show correct totalSales = taxExemptSales + taxableSales
+- From March 10 onwards, the scraper was used and it maps incorrectly
+
+THE FIX:
+Both buildDailySalesFromBlocks() and buildDailySalesFromConsolidated() need:
+  totalSales = (taxExempt + taxable).toFixed(2)  // instead of totalNet.toFixed(2)
+
+Also need to:
+1. Fix the scraper code
+2. Recalculate ALL affected dailySales records in the DB where totalSales = taxExemptSales
+3. Verify the dashboard, reports, JE generation all use totalSales correctly
+4. Check if any Revenue JEs were generated with wrong amounts
+
+AFFECTED STORES: PK (1), Mackay (2), Tunnel (4)
+Ontario (3) uses Lightspeed, not Koomi - different issue
+AFFECTED DATES: March 10, 2026 onwards

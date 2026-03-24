@@ -1,0 +1,15 @@
+{
+  "query": "SELECT COUNT(*) as total, MIN(periodStart) as earliest, MAX(periodEnd) as latest FROM productSales;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COUNT(*) as total, MIN(periodStart) as earliest, MAX(periodEnd) as latest FROM productSales;",
+  "rows": [
+    {
+      "total": "9079",
+      "earliest": "2025-01-01",
+      "latest": "2026-03-17"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tearliest\tlatest\n9079\t2025-01-01\t2026-03-17\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

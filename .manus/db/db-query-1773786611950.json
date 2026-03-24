@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(*) as total, SUM(CASE WHEN taxableSales > 0 AND ABS(totalSales - (taxExemptSales + taxableSales)) > 0.02 THEN 1 ELSE 0 END) as mismatches FROM dailySales WHERE saleDate BETWEEN '2026-03-08' AND '2026-03-16';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COUNT(*) as total, SUM(CASE WHEN taxableSales > 0 AND ABS(totalSales - (taxExemptSales + taxableSales)) > 0.02 THEN 1 ELSE 0 END) as mismatches FROM dailySales WHERE saleDate BETWEEN '2026-03-08' AND '2026-03-16';",
+  "rows": [
+    {
+      "total": "35",
+      "mismatches": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tmismatches\n35\t0\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

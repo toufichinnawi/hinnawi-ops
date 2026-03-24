@@ -1,0 +1,16 @@
+{
+  "query": "SHOW TABLES LIKE '%bank%'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SHOW TABLES LIKE '%bank%'",
+  "rows": [
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx (%bank%)": "bankAccounts"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx (%bank%)": "bankTransactions"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_h46y7gAGiyBszkHNcCdSHx (%bank%)\nbankAccounts\nbankTransactions\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

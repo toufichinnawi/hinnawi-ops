@@ -1,0 +1,70 @@
+{
+  "query": "SELECT * FROM locations; SELECT locationId, COUNT(*) as cnt, SUM(CAST(labourCost AS DECIMAL(12,2))) as totalLabour, MIN(saleDate) as minDate, MAX(saleDate) as maxDate FROM dailySales GROUP BY locationId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT * FROM locations; SELECT locationId, COUNT(*) as cnt, SUM(CAST(labourCost AS DECIMAL(12,2))) as totalLabour, MIN(saleDate) as minDate, MAX(saleDate) as maxDate FROM dailySales GROUP BY locationId;",
+  "rows": [
+    {
+      "id": "1",
+      "code": "PK",
+      "name": "President Kennedy",
+      "entityName": "9427-0659 Quebec INC",
+      "address": "NULL",
+      "laborTarget": "18.00",
+      "foodCostTarget": "30.00",
+      "isActive": "1",
+      "createdAt": "2026-03-14 19:22:20"
+    },
+    {
+      "id": "2",
+      "code": "MK",
+      "name": "Mackay",
+      "entityName": "9536-7900 Quebec Inc.",
+      "address": "NULL",
+      "laborTarget": "23.00",
+      "foodCostTarget": "30.00",
+      "isActive": "1",
+      "createdAt": "2026-03-14 19:22:20"
+    },
+    {
+      "id": "3",
+      "code": "ONT",
+      "name": "Ontario",
+      "entityName": "9287-8982 Quebec Inc",
+      "address": "NULL",
+      "laborTarget": "28.00",
+      "foodCostTarget": "31.00",
+      "isActive": "1",
+      "createdAt": "2026-03-14 19:22:20"
+    },
+    {
+      "id": "4",
+      "code": "CT",
+      "name": "Cathcart Tunnel",
+      "entityName": "9364-1009 Quebec INC",
+      "address": "NULL",
+      "laborTarget": "24.00",
+      "foodCostTarget": "29.00",
+      "isActive": "1",
+      "createdAt": "2026-03-14 19:22:20"
+    },
+    {
+      "id": "5",
+      "code": "FAC",
+      "name": "Factory",
+      "entityName": "Hinnawi Bros Bagel & Cafe",
+      "address": "NULL",
+      "laborTarget": "20.00",
+      "foodCostTarget": "28.00",
+      "isActive": "1",
+      "createdAt": "2026-03-14 19:22:20"
+    }
+  ],
+  "messages": [
+    "locationId\tcnt\ttotalLabour\tminDate\tmaxDate",
+    "4\t309\t0.00\t2025-01-03\t2026-03-13",
+    "1\t432\t0.00\t2025-01-02\t2026-03-13",
+    "2\t431\t0.00\t2025-01-02\t2026-03-13"
+  ],
+  "stdout": "id\tcode\tname\tentityName\taddress\tlaborTarget\tfoodCostTarget\tisActive\tcreatedAt\n1\tPK\tPresident Kennedy\t9427-0659 Quebec INC\tNULL\t18.00\t30.00\t1\t2026-03-14 19:22:20\n2\tMK\tMackay\t9536-7900 Quebec Inc.\tNULL\t23.00\t30.00\t1\t2026-03-14 19:22:20\n3\tONT\tOntario\t9287-8982 Quebec Inc\tNULL\t28.00\t31.00\t1\t2026-03-14 19:22:20\n4\tCT\tCathcart Tunnel\t9364-1009 Quebec INC\tNULL\t24.00\t29.00\t1\t2026-03-14 19:22:20\n5\tFAC\tFactory\tHinnawi Bros Bagel & Cafe\tNULL\t20.00\t28.00\t1\t2026-03-14 19:22:20\nlocationId\tcnt\ttotalLabour\tminDate\tmaxDate\n4\t309\t0.00\t2025-01-03\t2026-03-13\n1\t432\t0.00\t2025-01-02\t2026-03-13\n2\t431\t0.00\t2025-01-02\t2026-03-13\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

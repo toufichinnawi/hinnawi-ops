@@ -1,0 +1,25 @@
+{
+  "query": "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = 'recipes' AND COLUMN_NAME IN ('totalCost', 'profit', 'foodCostPct');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COLUMN_NAME, DATA_TYPE, COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = 'recipes' AND COLUMN_NAME IN ('totalCost', 'profit', 'foodCostPct');",
+  "rows": [
+    {
+      "COLUMN_NAME": "totalCost",
+      "DATA_TYPE": "decimal",
+      "COLUMN_TYPE": "decimal(10,4)"
+    },
+    {
+      "COLUMN_NAME": "foodCostPct",
+      "DATA_TYPE": "decimal",
+      "COLUMN_TYPE": "decimal(5,2)"
+    },
+    {
+      "COLUMN_NAME": "profit",
+      "DATA_TYPE": "decimal",
+      "COLUMN_TYPE": "decimal(10,4)"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\tCOLUMN_TYPE\ntotalCost\tdecimal\tdecimal(10,4)\nfoodCostPct\tdecimal\tdecimal(5,2)\nprofit\tdecimal\tdecimal(10,4)\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

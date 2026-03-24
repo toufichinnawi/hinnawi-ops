@@ -1,0 +1,18 @@
+{
+  "query": "SELECT importType, COUNT(*) as cnt FROM importLogs GROUP BY importType",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT importType, COUNT(*) as cnt FROM importLogs GROUP BY importType",
+  "rows": [
+    {
+      "importType": "pos_sales",
+      "cnt": "58"
+    },
+    {
+      "importType": "product_sales",
+      "cnt": "45"
+    }
+  ],
+  "messages": [],
+  "stdout": "importType\tcnt\npos_sales\t58\nproduct_sales\t45\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

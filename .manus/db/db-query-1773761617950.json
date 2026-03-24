@@ -1,0 +1,41 @@
+{
+  "query": "SELECT locationId, COUNT(*) as days, MIN(saleDate) as earliest, MAX(saleDate) as latest, ROUND(SUM(CAST(totalSales AS DECIMAL(10,2))),2) as totalRevenue FROM dailySales GROUP BY locationId ORDER BY locationId; SELECT COUNT(*) as totalProducts, COUNT(DISTINCT locationId) as stores FROM productSales WHERE periodStart >= '2026-03-10';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT locationId, COUNT(*) as days, MIN(saleDate) as earliest, MAX(saleDate) as latest, ROUND(SUM(CAST(totalSales AS DECIMAL(10,2))),2) as totalRevenue FROM dailySales GROUP BY locationId ORDER BY locationId; SELECT COUNT(*) as totalProducts, COUNT(DISTINCT locationId) as stores FROM productSales WHERE periodStart >= '2026-03-10';",
+  "rows": [
+    {
+      "locationId": "1",
+      "days": "436",
+      "earliest": "2025-01-02",
+      "latest": "2026-03-17",
+      "totalRevenue": "1289557.91"
+    },
+    {
+      "locationId": "2",
+      "days": "435",
+      "earliest": "2025-01-02",
+      "latest": "2026-03-17",
+      "totalRevenue": "748330.69"
+    },
+    {
+      "locationId": "3",
+      "days": "438",
+      "earliest": "2025-01-01",
+      "latest": "2026-03-16",
+      "totalRevenue": "251228.72"
+    },
+    {
+      "locationId": "4",
+      "days": "311",
+      "earliest": "2025-01-03",
+      "latest": "2026-03-17",
+      "totalRevenue": "288334.46"
+    }
+  ],
+  "messages": [
+    "totalProducts\tstores",
+    "530\t3"
+  ],
+  "stdout": "locationId\tdays\tearliest\tlatest\ttotalRevenue\n1\t436\t2025-01-02\t2026-03-17\t1289557.91\n2\t435\t2025-01-02\t2026-03-17\t748330.69\n3\t438\t2025-01-01\t2026-03-16\t251228.72\n4\t311\t2025-01-03\t2026-03-17\t288334.46\ntotalProducts\tstores\n530\t3\n",
+  "stderr": "",
+  "execution_time_ms": 80
+}

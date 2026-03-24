@@ -1,0 +1,23 @@
+{
+  "query": "SELECT id, name FROM suppliers ORDER BY id; SELECT id, name, shortCode FROM locations ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name FROM suppliers ORDER BY id; SELECT id, name, shortCode FROM locations ORDER BY id;",
+  "returncode": 1,
+  "logs": [
+    "id\tname",
+    "1\tGordon Food Service",
+    "2\tFarinex Distribution",
+    "3\tDubé Loiselle",
+    "4\tJG Rive-Sud",
+    "5\tNantel Distribution",
+    "6\tCostco Wholesale",
+    "7\tLes Touriers",
+    "8\tLightspeed Commerce",
+    "9\tHydro-Québec",
+    "10\tKoomi POS",
+    "11\tPure Tea",
+    "30002\tPortebleue",
+    "30003\tUniFirst Canada",
+    "30004\tRosalyn Sales-Operations",
+    "ERROR 1054 (42S22) at line 1: Unknown column 'shortcode' in 'field list'"
+  ]
+}

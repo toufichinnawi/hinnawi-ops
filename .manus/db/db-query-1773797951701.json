@@ -1,0 +1,70 @@
+{
+  "query": "SELECT li.description, li.quantity, li.unitPrice FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND UPPER(li.description) IN ('FARINE THREE STARS NON BLANCHIE AA40 - 20 KG', 'SUCRE FIN - REDPATH - 20 KG', 'GRAINE DE SÉSAME INDIEN 99.98% PUR - 50 LBS - 22.68 KG', 'FARINE MALT NO 05505 - 20 KG', 'LEVURE FRAÎCHE - LALLEMAND 20 X 2 LBS - 18.14 KG', 'HUILE DE CANOLA LA PERLA 16 LITRES') LIMIT 12;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT li.description, li.quantity, li.unitPrice FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND UPPER(li.description) IN ('FARINE THREE STARS NON BLANCHIE AA40 - 20 KG', 'SUCRE FIN - REDPATH - 20 KG', 'GRAINE DE SÉSAME INDIEN 99.98% PUR - 50 LBS - 22.68 KG', 'FARINE MALT NO 05505 - 20 KG', 'LEVURE FRAÎCHE - LALLEMAND 20 X 2 LBS - 18.14 KG', 'HUILE DE CANOLA LA PERLA 16 LITRES') LIMIT 12;",
+  "rows": [
+    {
+      "description": "FARINE MALT No 05505 - 20 kg",
+      "quantity": "0.000",
+      "unitPrice": "49.8500"
+    },
+    {
+      "description": "FARINE THREE STARS NON BLANCHIE AA40 - 20 kg",
+      "quantity": "50.000",
+      "unitPrice": "20.5000"
+    },
+    {
+      "description": "GRAINE DE SÉSAME INDIEN 99.98% PUR - 50 lbs - 22.68 kg",
+      "quantity": "5.000",
+      "unitPrice": "96.1000"
+    },
+    {
+      "description": "LEVURE FRAÎCHE - LALLEMAND 20 x 2 lbs - 18.14 kg",
+      "quantity": "1.000",
+      "unitPrice": "100.5900"
+    },
+    {
+      "description": "FARINE THREE STARS NON BLANCHIE AA40 - 20 kg",
+      "quantity": "25.000",
+      "unitPrice": "20.5000"
+    },
+    {
+      "description": "GRAINE DE SÉSAME INDIEN 99.98% PUR - 50 lbs - 22.68 kg",
+      "quantity": "3.000",
+      "unitPrice": "96.1000"
+    },
+    {
+      "description": "FARINE THREE STARS NON BLANCHIE AA40 - 20 kg",
+      "quantity": "50.000",
+      "unitPrice": "20.5000"
+    },
+    {
+      "description": "LEVURE FRAÎCHE - LALLEMAND 20 x 2 lbs - 18.14 kg",
+      "quantity": "1.000",
+      "unitPrice": "100.5900"
+    },
+    {
+      "description": "FARINE THREE STARS NON BLANCHIE AA40 - 20 kg",
+      "quantity": "-50.000",
+      "unitPrice": "20.5000"
+    },
+    {
+      "description": "FARINE THREE STARS NON BLANCHIE AA40 - 20 kg",
+      "quantity": "50.000",
+      "unitPrice": "20.5000"
+    },
+    {
+      "description": "GRAINE DE SÉSAME INDIEN 99.98% PUR - 50 lbs - 22.68 kg",
+      "quantity": "3.000",
+      "unitPrice": "96.1000"
+    },
+    {
+      "description": "SUCRE FIN - REDPATH - 20 kg",
+      "quantity": "3.000",
+      "unitPrice": "33.4700"
+    }
+  ],
+  "messages": [],
+  "stdout": "description\tquantity\tunitPrice\nFARINE MALT No 05505 - 20 kg\t0.000\t49.8500\nFARINE THREE STARS NON BLANCHIE AA40 - 20 kg\t50.000\t20.5000\nGRAINE DE SÉSAME INDIEN 99.98% PUR - 50 lbs - 22.68 kg\t5.000\t96.1000\nLEVURE FRAÎCHE - LALLEMAND 20 x 2 lbs - 18.14 kg\t1.000\t100.5900\nFARINE THREE STARS NON BLANCHIE AA40 - 20 kg\t25.000\t20.5000\nGRAINE DE SÉSAME INDIEN 99.98% PUR - 50 lbs - 22.68 kg\t3.000\t96.1000\nFARINE THREE STARS NON BLANCHIE AA40 - 20 kg\t50.000\t20.5000\nLEVURE FRAÎCHE - LALLEMAND 20 x 2 lbs - 18.14 kg\t1.000\t100.5900\nFARINE THREE STARS NON BLANCHIE AA40 - 20 kg\t-50.000\t20.5000\nFARINE THREE STARS NON BLANCHIE AA40 - 20 kg\t50.000\t20.5000\nGRAINE DE SÉSAME INDIEN 99.98% PUR - 50 lbs - 22.68 kg\t3.000\t96.1000\nSUCRE FIN - REDPATH - 20 kg\t3.000\t33.4700\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

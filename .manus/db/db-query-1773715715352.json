@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO bankAccounts (name, bankName, accountNumber, locationId, accountType, currency) VALUES\n('7553-CIBC PK', 'CIBC', '7553', 1, 'checking', 'CAD'),\n('720-BMO MK', 'BMO', '720', 2, 'checking', 'CAD'),\n('Desjardins-Tunnel', 'Desjardins', NULL, 4, 'checking', 'CAD'),\n('615-CIBC Ontario', 'CIBC', '615', 3, 'checking', 'CAD'),\n('811-CIBC CK', 'CIBC', '811', 5, 'checking', 'CAD');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute INSERT INTO bankAccounts (name, bankName, accountNumber, locationId, accountType, currency) VALUES\n('7553-CIBC PK', 'CIBC', '7553', 1, 'checking', 'CAD'),\n('720-BMO MK', 'BMO', '720', 2, 'checking', 'CAD'),\n('Desjardins-Tunnel', 'Desjardins', NULL, 4, 'checking', 'CAD'),\n('615-CIBC Ontario', 'CIBC', '615', 3, 'checking', 'CAD'),\n('811-CIBC CK', 'CIBC', '811', 5, 'checking', 'CAD');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 66
+}

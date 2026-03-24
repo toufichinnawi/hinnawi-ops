@@ -1,0 +1,35 @@
+{
+  "query": "-- Check what the actual Peppers match prices look like\nSELECT lineDescription, unitPrice, quantity FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched'\nORDER BY invoiceId DESC LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute -- Check what the actual Peppers match prices look like\nSELECT lineDescription, unitPrice, quantity FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched'\nORDER BY invoiceId DESC LIMIT 5",
+  "rows": [
+    {
+      "lineDescription": "Peppermint TB Peppermint / Tea bag / compostable",
+      "unitPrice": "0.0860",
+      "quantity": "100.000"
+    },
+    {
+      "lineDescription": "Peppermint TB Peppermint / Teabag / compostable",
+      "unitPrice": "0.0860",
+      "quantity": "50.000"
+    },
+    {
+      "lineDescription": "Poivron rouge 5kg (Mexique-Ontario-Hollande)",
+      "unitPrice": "5.8800",
+      "quantity": "3.000"
+    },
+    {
+      "lineDescription": "Poivron rouge 5kg (Mexique-Ontario)",
+      "unitPrice": "5.8800",
+      "quantity": "2.000"
+    },
+    {
+      "lineDescription": "Poivron rouge 5kg (Mexique-Ontario)",
+      "unitPrice": "3.5200",
+      "quantity": "3.000"
+    }
+  ],
+  "messages": [],
+  "stdout": "lineDescription\tunitPrice\tquantity\nPeppermint TB Peppermint / Tea bag / compostable\t0.0860\t100.000\nPeppermint TB Peppermint / Teabag / compostable\t0.0860\t50.000\nPoivron rouge 5kg (Mexique-Ontario-Hollande)\t5.8800\t3.000\nPoivron rouge 5kg (Mexique-Ontario)\t5.8800\t2.000\nPoivron rouge 5kg (Mexique-Ontario)\t3.5200\t3.000\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

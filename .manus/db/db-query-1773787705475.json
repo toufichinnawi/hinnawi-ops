@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, name FROM locations ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name FROM locations ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "President Kennedy"
+    },
+    {
+      "id": "2",
+      "name": "Mackay"
+    },
+    {
+      "id": "3",
+      "name": "Ontario"
+    },
+    {
+      "id": "4",
+      "name": "Cathcart Tunnel"
+    },
+    {
+      "id": "5",
+      "name": "Factory"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n1\tPresident Kennedy\n2\tMackay\n3\tOntario\n4\tCathcart Tunnel\n5\tFactory\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

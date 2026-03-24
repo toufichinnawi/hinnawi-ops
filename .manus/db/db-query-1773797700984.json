@@ -1,0 +1,353 @@
+{
+  "query": "SELECT li.description, li.quantity, li.unitPrice, li.amount, m.matchedItemName FROM invoiceLineItems li JOIN invoiceLineItemMatches m ON m.invoiceLineItemId = li.id WHERE m.matchedItemName IN ('Egg', 'Chicken', 'CC Philadelphia', 'CC Riviera', 'Salmon') AND m.invoiceId BETWEEN 60012 AND 60131;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT li.description, li.quantity, li.unitPrice, li.amount, m.matchedItemName FROM invoiceLineItems li JOIN invoiceLineItemMatches m ON m.invoiceLineItemId = li.id WHERE m.matchedItemName IN ('Egg', 'Chicken', 'CC Philadelphia', 'CC Riviera', 'Salmon') AND m.invoiceId BETWEEN 60012 AND 60131;",
+  "rows": [
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "1.000",
+      "unitPrice": "41.5000",
+      "amount": "41.50",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "CHICKEN BREA GRIL COOK HAL FL",
+      "quantity": "1.000",
+      "unitPrice": "90.8500",
+      "amount": "90.85",
+      "matchedItemName": "Chicken"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "2.000",
+      "unitPrice": "30.0000",
+      "amount": "60.00",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "CHICKEN BREA GRIL COOK HAL FL",
+      "quantity": "2.000",
+      "unitPrice": "90.8500",
+      "amount": "181.70",
+      "matchedItemName": "Chicken"
+    },
+    {
+      "description": "EGG REF BULK MEDIUM",
+      "quantity": "2.000",
+      "unitPrice": "51.7000",
+      "amount": "103.40",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "CHICKEN BREA GRIL COOK HAL FL",
+      "quantity": "1.000",
+      "unitPrice": "90.8500",
+      "amount": "90.85",
+      "matchedItemName": "Chicken"
+    },
+    {
+      "description": "EGG REF BULK MEDIUM",
+      "quantity": "1.000",
+      "unitPrice": "51.7000",
+      "amount": "51.70",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "5.340",
+      "unitPrice": "45.8500",
+      "amount": "244.61",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "4.000",
+      "unitPrice": "42.3000",
+      "amount": "169.20",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "CHEESE CREAM PHILADELPHIA",
+      "quantity": "3.000",
+      "unitPrice": "51.0000",
+      "amount": "153.00",
+      "matchedItemName": "CC Philadelphia"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "3.000",
+      "unitPrice": "42.3000",
+      "amount": "126.90",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "CHICKEN BREA GRIL COOK HAL FL",
+      "quantity": "2.000",
+      "unitPrice": "90.8500",
+      "amount": "181.70",
+      "matchedItemName": "Chicken"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "4.000",
+      "unitPrice": "42.3000",
+      "amount": "169.20",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "1.000",
+      "unitPrice": "42.3000",
+      "amount": "42.30",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "2.000",
+      "unitPrice": "42.3000",
+      "amount": "84.60",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "4.000",
+      "unitPrice": "42.3000",
+      "amount": "169.20",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "3.000",
+      "unitPrice": "42.3000",
+      "amount": "126.90",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "4.240",
+      "unitPrice": "45.8500",
+      "amount": "194.45",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "4.000",
+      "unitPrice": "42.3000",
+      "amount": "169.20",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "5.410",
+      "unitPrice": "45.8500",
+      "amount": "248.05",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "EGG REF BULK MEDIUM",
+      "quantity": "1.000",
+      "unitPrice": "51.7000",
+      "amount": "51.70",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "5.830",
+      "unitPrice": "45.8500",
+      "amount": "267.31",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "1.000",
+      "unitPrice": "42.3000",
+      "amount": "42.30",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "4.990",
+      "unitPrice": "45.8500",
+      "amount": "228.84",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "6.000",
+      "unitPrice": "42.3000",
+      "amount": "253.80",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "4.720",
+      "unitPrice": "45.8500",
+      "amount": "216.23",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "4.960",
+      "unitPrice": "45.3500",
+      "amount": "224.94",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "EGG REF BULK MEDIUM",
+      "quantity": "1.000",
+      "unitPrice": "51.0500",
+      "amount": "51.05",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "EGG REF BULK MEDIUM",
+      "quantity": "2.000",
+      "unitPrice": "51.0500",
+      "amount": "102.10",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "7.000",
+      "unitPrice": "45.8500",
+      "amount": "320.95",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "EGG REF BULK MEDIUM",
+      "quantity": "2.000",
+      "unitPrice": "51.7000",
+      "amount": "103.40",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "CHEESE CREAM SPREAD M. RIVIER",
+      "quantity": "1.000",
+      "unitPrice": "41.5000",
+      "amount": "41.50",
+      "matchedItemName": "CC Riviera"
+    },
+    {
+      "description": "CHICKEN BREA GRIL COOK HAL FL",
+      "quantity": "3.000",
+      "unitPrice": "90.8500",
+      "amount": "272.55",
+      "matchedItemName": "Chicken"
+    },
+    {
+      "description": "FISH SALMON SMOKED ATL",
+      "quantity": "2.000",
+      "unitPrice": "95.3000",
+      "amount": "190.60",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "EGG REF BULK MEDIUM",
+      "quantity": "3.000",
+      "unitPrice": "51.7000",
+      "amount": "155.10",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "EGG MED FRESH GRADE A",
+      "quantity": "3.000",
+      "unitPrice": "51.4800",
+      "amount": "154.44",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "EGG MED FRESH GRADE A",
+      "quantity": "1.000",
+      "unitPrice": "51.4800",
+      "amount": "51.48",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "OEUF MOY VRAC",
+      "quantity": "1.000",
+      "unitPrice": "51.4800",
+      "amount": "51.48",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "OEUF MOY VRAC",
+      "quantity": "1.000",
+      "unitPrice": "51.4800",
+      "amount": "51.48",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "OEUF LARGE VRAC",
+      "quantity": "1.000",
+      "unitPrice": "56.3700",
+      "amount": "56.37",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "SAUMON COHO FUME EN TRANCHE SU",
+      "quantity": "2.000",
+      "unitPrice": "42.9700",
+      "amount": "383.38",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "EGG LARGE GRADE A FRSH",
+      "quantity": "2.000",
+      "unitPrice": "56.3700",
+      "amount": "112.74",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "SALMON COHO SMKD SLCD FZN",
+      "quantity": "2.000",
+      "unitPrice": "42.9700",
+      "amount": "423.25",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "EGG LARGE GRADE A FRSH",
+      "quantity": "1.000",
+      "unitPrice": "56.3700",
+      "amount": "56.37",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "SALMON SMKD COHO SLCD FZN BAP",
+      "quantity": "2.000",
+      "unitPrice": "247.0000",
+      "amount": "494.00",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "EGG LARGE GRADE A FRSH",
+      "quantity": "1.000",
+      "unitPrice": "56.3700",
+      "amount": "56.37",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "SALMON SMKD COHO SLCD FZN BAP",
+      "quantity": "1.000",
+      "unitPrice": "247.0000",
+      "amount": "247.00",
+      "matchedItemName": "Salmon"
+    },
+    {
+      "description": "EGG LARGE GRADE A FRSH",
+      "quantity": "1.000",
+      "unitPrice": "56.3700",
+      "amount": "56.37",
+      "matchedItemName": "Egg"
+    },
+    {
+      "description": "SALMON SMKD COHO SLCD FZN BAP",
+      "quantity": "1.000",
+      "unitPrice": "247.0000",
+      "amount": "247.00",
+      "matchedItemName": "Salmon"
+    }
+  ],
+  "messages": [],
+  "stdout": "description\tquantity\tunitPrice\tamount\tmatchedItemName\nCHEESE CREAM SPREAD M. RIVIER\t1.000\t41.5000\t41.50\tCC Riviera\nCHICKEN BREA GRIL COOK HAL FL\t1.000\t90.8500\t90.85\tChicken\nCHEESE CREAM SPREAD M. RIVIER\t2.000\t30.0000\t60.00\tCC Riviera\nCHICKEN BREA GRIL COOK HAL FL\t2.000\t90.8500\t181.70\tChicken\nEGG REF BULK MEDIUM\t2.000\t51.7000\t103.40\tEgg\nCHICKEN BREA GRIL COOK HAL FL\t1.000\t90.8500\t90.85\tChicken\nEGG REF BULK MEDIUM\t1.000\t51.7000\t51.70\tEgg\nFISH SALMON SMOKE COHO SLICE\t5.340\t45.8500\t244.61\tSalmon\nCHEESE CREAM SPREAD M. RIVIER\t4.000\t42.3000\t169.20\tCC Riviera\nCHEESE CREAM PHILADELPHIA\t3.000\t51.0000\t153.00\tCC Philadelphia\nCHEESE CREAM SPREAD M. RIVIER\t3.000\t42.3000\t126.90\tCC Riviera\nCHICKEN BREA GRIL COOK HAL FL\t2.000\t90.8500\t181.70\tChicken\nCHEESE CREAM SPREAD M. RIVIER\t4.000\t42.3000\t169.20\tCC Riviera\nCHEESE CREAM SPREAD M. RIVIER\t1.000\t42.3000\t42.30\tCC Riviera\nCHEESE CREAM SPREAD M. RIVIER\t2.000\t42.3000\t84.60\tCC Riviera\nCHEESE CREAM SPREAD M. RIVIER\t4.000\t42.3000\t169.20\tCC Riviera\nCHEESE CREAM SPREAD M. RIVIER\t3.000\t42.3000\t126.90\tCC Riviera\nFISH SALMON SMOKE COHO SLICE\t4.240\t45.8500\t194.45\tSalmon\nCHEESE CREAM SPREAD M. RIVIER\t4.000\t42.3000\t169.20\tCC Riviera\nFISH SALMON SMOKE COHO SLICE\t5.410\t45.8500\t248.05\tSalmon\nEGG REF BULK MEDIUM\t1.000\t51.7000\t51.70\tEgg\nFISH SALMON SMOKE COHO SLICE\t5.830\t45.8500\t267.31\tSalmon\nCHEESE CREAM SPREAD M. RIVIER\t1.000\t42.3000\t42.30\tCC Riviera\nFISH SALMON SMOKE COHO SLICE\t4.990\t45.8500\t228.84\tSalmon\nCHEESE CREAM SPREAD M. RIVIER\t6.000\t42.3000\t253.80\tCC Riviera\nFISH SALMON SMOKE COHO SLICE\t4.720\t45.8500\t216.23\tSalmon\nFISH SALMON SMOKE COHO SLICE\t4.960\t45.3500\t224.94\tSalmon\nEGG REF BULK MEDIUM\t1.000\t51.0500\t51.05\tEgg\nEGG REF BULK MEDIUM\t2.000\t51.0500\t102.10\tEgg\nFISH SALMON SMOKE COHO SLICE\t7.000\t45.8500\t320.95\tSalmon\nEGG REF BULK MEDIUM\t2.000\t51.7000\t103.40\tEgg\nCHEESE CREAM SPREAD M. RIVIER\t1.000\t41.5000\t41.50\tCC Riviera\nCHICKEN BREA GRIL COOK HAL FL\t3.000\t90.8500\t272.55\tChicken\nFISH SALMON SMOKED ATL\t2.000\t95.3000\t190.60\tSalmon\nEGG REF BULK MEDIUM\t3.000\t51.7000\t155.10\tEgg\nEGG MED FRESH GRADE A\t3.000\t51.4800\t154.44\tEgg\nEGG MED FRESH GRADE A\t1.000\t51.4800\t51.48\tEgg\nOEUF MOY VRAC\t1.000\t51.4800\t51.48\tEgg\nOEUF MOY VRAC\t1.000\t51.4800\t51.48\tEgg\nOEUF LARGE VRAC\t1.000\t56.3700\t56.37\tEgg\nSAUMON COHO FUME EN TRANCHE SU\t2.000\t42.9700\t383.38\tSalmon\nEGG LARGE GRADE A FRSH\t2.000\t56.3700\t112.74\tEgg\nSALMON COHO SMKD SLCD FZN\t2.000\t42.9700\t423.25\tSalmon\nEGG LARGE GRADE A FRSH\t1.000\t56.3700\t56.37\tEgg\nSALMON SMKD COHO SLCD FZN BAP\t2.000\t247.0000\t494.00\tSalmon\nEGG LARGE GRADE A FRSH\t1.000\t56.3700\t56.37\tEgg\nSALMON SMKD COHO SLCD FZN BAP\t1.000\t247.0000\t247.00\tSalmon\nEGG LARGE GRADE A FRSH\t1.000\t56.3700\t56.37\tEgg\nSALMON SMKD COHO SLCD FZN BAP\t1.000\t247.0000\t247.00\tSalmon\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

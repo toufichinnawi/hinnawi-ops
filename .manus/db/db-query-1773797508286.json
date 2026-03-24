@@ -1,0 +1,95 @@
+{
+  "query": "SELECT m.matchedItemName, COUNT(*) as match_count, ROUND(AVG(m.unitPrice), 4) as avg_price FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NOT NULL GROUP BY m.matchedItemName ORDER BY match_count DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT m.matchedItemName, COUNT(*) as match_count, ROUND(AVG(m.unitPrice), 4) as avg_price FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NOT NULL GROUP BY m.matchedItemName ORDER BY match_count DESC;",
+  "rows": [
+    {
+      "matchedItemName": "Butter",
+      "match_count": "19",
+      "avg_price": "170.4105"
+    },
+    {
+      "matchedItemName": "Egg",
+      "match_count": "16",
+      "avg_price": "53.0231"
+    },
+    {
+      "matchedItemName": "Turkey",
+      "match_count": "16",
+      "avg_price": "20.2550"
+    },
+    {
+      "matchedItemName": "Salmon",
+      "match_count": "14",
+      "avg_price": "92.0386"
+    },
+    {
+      "matchedItemName": "CC Riviera",
+      "match_count": "13",
+      "avg_price": "41.2308"
+    },
+    {
+      "matchedItemName": "Bacon",
+      "match_count": "13",
+      "avg_price": "54.9385"
+    },
+    {
+      "matchedItemName": "Ham",
+      "match_count": "9",
+      "avg_price": "13.2778"
+    },
+    {
+      "matchedItemName": "Cheddar",
+      "match_count": "8",
+      "avg_price": "67.3375"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "match_count": "7",
+      "avg_price": "176.4000"
+    },
+    {
+      "matchedItemName": "Onions",
+      "match_count": "6",
+      "avg_price": "115.8167"
+    },
+    {
+      "matchedItemName": "Chicken",
+      "match_count": "5",
+      "avg_price": "90.8500"
+    },
+    {
+      "matchedItemName": "Tofu",
+      "match_count": "3",
+      "avg_price": "28.3933"
+    },
+    {
+      "matchedItemName": "Cajun seasoning",
+      "match_count": "3",
+      "avg_price": "38.2000"
+    },
+    {
+      "matchedItemName": "Mayo",
+      "match_count": "3",
+      "avg_price": "92.7133"
+    },
+    {
+      "matchedItemName": "Olive oil",
+      "match_count": "3",
+      "avg_price": "152.9767"
+    },
+    {
+      "matchedItemName": "Dijon",
+      "match_count": "1",
+      "avg_price": "69.4700"
+    },
+    {
+      "matchedItemName": "CC Philadelphia",
+      "match_count": "1",
+      "avg_price": "51.0000"
+    }
+  ],
+  "messages": [],
+  "stdout": "matchedItemName\tmatch_count\tavg_price\nButter\t19\t170.4105\nEgg\t16\t53.0231\nTurkey\t16\t20.2550\nSalmon\t14\t92.0386\nCC Riviera\t13\t41.2308\nBacon\t13\t54.9385\nHam\t9\t13.2778\nCheddar\t8\t67.3375\nMozzarella\t7\t176.4000\nOnions\t6\t115.8167\nChicken\t5\t90.8500\nTofu\t3\t28.3933\nCajun seasoning\t3\t38.2000\nMayo\t3\t92.7133\nOlive oil\t3\t152.9767\nDijon\t1\t69.4700\nCC Philadelphia\t1\t51.0000\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE invoiceLineItemMatches SET unitPrice = 49.4000 WHERE matchedItemName = 'Salmon' AND lineDescription LIKE '%SALMON SMKD COHO SLCD FZN BAP%' AND invoiceId BETWEEN 60012 AND 60131;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute UPDATE invoiceLineItemMatches SET unitPrice = 49.4000 WHERE matchedItemName = 'Salmon' AND lineDescription LIKE '%SALMON SMKD COHO SLCD FZN BAP%' AND invoiceId BETWEEN 60012 AND 60131;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 65
+}

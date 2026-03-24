@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, name, accountType, qboId FROM qboAccounts WHERE accountType = 'Bank' OR name LIKE '%Bank%' OR name LIKE '%Checking%' ORDER BY name LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name, accountType, qboId FROM qboAccounts WHERE accountType = 'Bank' OR name LIKE '%Bank%' OR name LIKE '%Checking%' ORDER BY name LIMIT 20",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'h46y7gagiybszkhnccdshx.qboAccounts' doesn't exist"
+  ]
+}

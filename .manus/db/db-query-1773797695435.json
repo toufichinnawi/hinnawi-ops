@@ -1,0 +1,150 @@
+{
+  "query": "SELECT li.description, li.quantity, li.unitPrice, li.amount, m.matchedItemName FROM invoiceLineItems li JOIN invoiceLineItemMatches m ON m.invoiceLineItemId = li.id WHERE m.inventoryItemId IS NOT NULL AND m.invoiceId BETWEEN 60012 AND 60131 ORDER BY m.matchedItemName LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT li.description, li.quantity, li.unitPrice, li.amount, m.matchedItemName FROM invoiceLineItems li JOIN invoiceLineItemMatches m ON m.invoiceLineItemId = li.id WHERE m.inventoryItemId IS NOT NULL AND m.invoiceId BETWEEN 60012 AND 60131 ORDER BY m.matchedItemName LIMIT 20;",
+  "rows": [
+    {
+      "description": "BACON PRECOOKED 2X150SL M.LEAF",
+      "quantity": "4.000",
+      "unitPrice": "58.9000",
+      "amount": "235.60",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BAC PL 15X20X7PO BL",
+      "quantity": "2.000",
+      "unitPrice": "11.3400",
+      "amount": "22.68",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON PRECOOKED 2X150SL M.LEAF",
+      "quantity": "4.000",
+      "unitPrice": "62.8000",
+      "amount": "251.20",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON PRECOOKED 2X150SL M.LEAF",
+      "quantity": "1.000",
+      "unitPrice": "58.9000",
+      "amount": "58.90",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON 15-17SL/IN RDY CRISP FRSH",
+      "quantity": "2.000",
+      "unitPrice": "54.9500",
+      "amount": "109.90",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON CUIT 15-17 TR/PO READY CRISP FR",
+      "quantity": "4.000",
+      "unitPrice": "59.0600",
+      "amount": "236.24",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON PRECOOKED 2X150SL M.LEAF",
+      "quantity": "3.000",
+      "unitPrice": "62.8000",
+      "amount": "188.40",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON PRECOOKED 2X150SL M.LEAF",
+      "quantity": "3.000",
+      "unitPrice": "56.9000",
+      "amount": "170.70",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON PRECOOKED 2X150SL M.LEAF",
+      "quantity": "3.000",
+      "unitPrice": "58.9000",
+      "amount": "176.70",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON 15-17SL/IN RDY CRISP FRSH",
+      "quantity": "4.000",
+      "unitPrice": "54.9500",
+      "amount": "219.80",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON PRECOOKED 2X150SL M.LEAF",
+      "quantity": "3.000",
+      "unitPrice": "56.9000",
+      "amount": "170.70",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON PRECOOKED 2X150SL M.LEAF",
+      "quantity": "4.000",
+      "unitPrice": "58.9000",
+      "amount": "235.60",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BACON PRECOOKED 2X150SL M.LEAF",
+      "quantity": "5.000",
+      "unitPrice": "58.9000",
+      "amount": "294.50",
+      "matchedItemName": "Bacon"
+    },
+    {
+      "description": "BEURRE N/SEL 82PCT EUROPEEN",
+      "quantity": "4.000",
+      "unitPrice": "96.7400",
+      "amount": "386.96",
+      "matchedItemName": "Butter"
+    },
+    {
+      "description": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "quantity": "1.000",
+      "unitPrice": "340.6200",
+      "amount": "340.62",
+      "matchedItemName": "Butter"
+    },
+    {
+      "description": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "quantity": "1.000",
+      "unitPrice": "354.9200",
+      "amount": "354.92",
+      "matchedItemName": "Butter"
+    },
+    {
+      "description": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "quantity": "1.000",
+      "unitPrice": "340.6200",
+      "amount": "340.62",
+      "matchedItemName": "Butter"
+    },
+    {
+      "description": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "quantity": "1.000",
+      "unitPrice": "354.9200",
+      "amount": "354.92",
+      "matchedItemName": "Butter"
+    },
+    {
+      "description": "BUTTER SALTED (20)",
+      "quantity": "4.000",
+      "unitPrice": "7.8500",
+      "amount": "31.40",
+      "matchedItemName": "Butter"
+    },
+    {
+      "description": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "quantity": "1.000",
+      "unitPrice": "340.6200",
+      "amount": "340.62",
+      "matchedItemName": "Butter"
+    }
+  ],
+  "messages": [],
+  "stdout": "description\tquantity\tunitPrice\tamount\tmatchedItemName\nBACON PRECOOKED 2X150SL M.LEAF\t4.000\t58.9000\t235.60\tBacon\nBAC PL 15X20X7PO BL\t2.000\t11.3400\t22.68\tBacon\nBACON PRECOOKED 2X150SL M.LEAF\t4.000\t62.8000\t251.20\tBacon\nBACON PRECOOKED 2X150SL M.LEAF\t1.000\t58.9000\t58.90\tBacon\nBACON 15-17SL/IN RDY CRISP FRSH\t2.000\t54.9500\t109.90\tBacon\nBACON CUIT 15-17 TR/PO READY CRISP FR\t4.000\t59.0600\t236.24\tBacon\nBACON PRECOOKED 2X150SL M.LEAF\t3.000\t62.8000\t188.40\tBacon\nBACON PRECOOKED 2X150SL M.LEAF\t3.000\t56.9000\t170.70\tBacon\nBACON PRECOOKED 2X150SL M.LEAF\t3.000\t58.9000\t176.70\tBacon\nBACON 15-17SL/IN RDY CRISP FRSH\t4.000\t54.9500\t219.80\tBacon\nBACON PRECOOKED 2X150SL M.LEAF\t3.000\t56.9000\t170.70\tBacon\nBACON PRECOOKED 2X150SL M.LEAF\t4.000\t58.9000\t235.60\tBacon\nBACON PRECOOKED 2X150SL M.LEAF\t5.000\t58.9000\t294.50\tBacon\nBEURRE N/SEL 82PCT EUROPEEN\t4.000\t96.7400\t386.96\tButter\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t1.000\t340.6200\t340.62\tButter\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t1.000\t354.9200\t354.92\tButter\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t1.000\t340.6200\t340.62\tButter\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t1.000\t354.9200\t354.92\tButter\nBUTTER SALTED (20)\t4.000\t7.8500\t31.40\tButter\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t1.000\t340.6200\t340.62\tButter\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

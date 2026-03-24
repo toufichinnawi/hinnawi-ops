@@ -1,0 +1,62 @@
+{
+  "query": "SELECT id, name FROM inventoryItems WHERE isActive = 1 AND id > 30021 ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name FROM inventoryItems WHERE isActive = 1 AND id > 30021 ORDER BY id;",
+  "rows": [
+    {
+      "id": "30022",
+      "name": "Capers"
+    },
+    {
+      "id": "30023",
+      "name": "Spring mix"
+    },
+    {
+      "id": "30024",
+      "name": "Peppers"
+    },
+    {
+      "id": "30025",
+      "name": "Lemon"
+    },
+    {
+      "id": "30026",
+      "name": "Spicy Mayo"
+    },
+    {
+      "id": "30027",
+      "name": "Mayo"
+    },
+    {
+      "id": "30028",
+      "name": "Dijon"
+    },
+    {
+      "id": "30029",
+      "name": "Honey mustard"
+    },
+    {
+      "id": "30030",
+      "name": "Butter"
+    },
+    {
+      "id": "30031",
+      "name": "Bacon jam"
+    },
+    {
+      "id": "30032",
+      "name": "Olive oil"
+    },
+    {
+      "id": "30033",
+      "name": "Cajun seasoning"
+    },
+    {
+      "id": "30034",
+      "name": "Bagel"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n30022\tCapers\n30023\tSpring mix\n30024\tPeppers\n30025\tLemon\n30026\tSpicy Mayo\n30027\tMayo\n30028\tDijon\n30029\tHoney mustard\n30030\tButter\n30031\tBacon jam\n30032\tOlive oil\n30033\tCajun seasoning\n30034\tBagel\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

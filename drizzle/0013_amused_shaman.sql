@@ -1,0 +1,1 @@
+ALTER TABLE `quotations` MODIFY COLUMN `quotation_status` enum('draft','pending_advance','advance_paid','accepted','converted','expired','rejected') DEFAULT 'draft';

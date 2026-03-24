@@ -1,0 +1,46 @@
+{
+  "query": "SELECT l.name, SUM(ds.totalSales) as monthTotal, SUM(ds.taxExemptSales) as monthTaxExempt, SUM(ds.taxableSales) as monthTaxable, SUM(ds.gstCollected) as monthGst, SUM(ds.qstCollected) as monthQst, COUNT(*) as days FROM dailySales ds LEFT JOIN locations l ON ds.locationId = l.id WHERE ds.saleDate BETWEEN '2026-03-01' AND '2026-03-17' GROUP BY ds.locationId ORDER BY ds.locationId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT l.name, SUM(ds.totalSales) as monthTotal, SUM(ds.taxExemptSales) as monthTaxExempt, SUM(ds.taxableSales) as monthTaxable, SUM(ds.gstCollected) as monthGst, SUM(ds.qstCollected) as monthQst, COUNT(*) as days FROM dailySales ds LEFT JOIN locations l ON ds.locationId = l.id WHERE ds.saleDate BETWEEN '2026-03-01' AND '2026-03-17' GROUP BY ds.locationId ORDER BY ds.locationId;",
+  "rows": [
+    {
+      "name": "President Kennedy",
+      "monthTotal": "36363.87",
+      "monthTaxExempt": "22910.09",
+      "monthTaxable": "12283.29",
+      "monthGst": "586.73",
+      "monthQst": "1170.43",
+      "days": "17"
+    },
+    {
+      "name": "Mackay",
+      "monthTotal": "24748.50",
+      "monthTaxExempt": "14022.18",
+      "monthTaxable": "9730.79",
+      "monthGst": "459.33",
+      "monthQst": "916.35",
+      "days": "17"
+    },
+    {
+      "name": "Ontario",
+      "monthTotal": "8371.18",
+      "monthTaxExempt": "0.00",
+      "monthTaxable": "0.00",
+      "monthGst": "0.00",
+      "monthQst": "0.00",
+      "days": "16"
+    },
+    {
+      "name": "Cathcart Tunnel",
+      "monthTotal": "11383.89",
+      "monthTaxExempt": "8345.63",
+      "monthTaxable": "2645.00",
+      "monthGst": "123.86",
+      "monthQst": "247.08",
+      "days": "14"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\tmonthTotal\tmonthTaxExempt\tmonthTaxable\tmonthGst\tmonthQst\tdays\nPresident Kennedy\t36363.87\t22910.09\t12283.29\t586.73\t1170.43\t17\nMackay\t24748.50\t14022.18\t9730.79\t459.33\t916.35\t17\nOntario\t8371.18\t0.00\t0.00\t0.00\t0.00\t16\nCathcart Tunnel\t11383.89\t8345.63\t2645.00\t123.86\t247.08\t14\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

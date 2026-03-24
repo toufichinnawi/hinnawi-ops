@@ -1,0 +1,70 @@
+{
+  "query": "SELECT DISTINCT li.description, li.unitPrice FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND UPPER(li.description) IN ('FARINE DE BLÉ ENTIER - MAXIMA 20 KG', 'FARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER''S HAND 20 KG', 'MÉLANGE DE 12 GRAINS - FARINART 20 KG', 'AIL ÉMINCÉ DÉSHYDRATÉ - 2.27 KG', 'CASSONADE FONCÉE - REDPATH 20 KG', 'HUILE DE CANOLA LA PERLA 16 LITRES', 'MÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 KG', 'MIEL NATUREL DORÉ DU QUEBEC - 15 KG', 'POUDRE À PÂTE - FLEISCHMANN''S 5 KG') LIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT DISTINCT li.description, li.unitPrice FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND UPPER(li.description) IN ('FARINE DE BLÉ ENTIER - MAXIMA 20 KG', 'FARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER''S HAND 20 KG', 'MÉLANGE DE 12 GRAINS - FARINART 20 KG', 'AIL ÉMINCÉ DÉSHYDRATÉ - 2.27 KG', 'CASSONADE FONCÉE - REDPATH 20 KG', 'HUILE DE CANOLA LA PERLA 16 LITRES', 'MÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 KG', 'MIEL NATUREL DORÉ DU QUEBEC - 15 KG', 'POUDRE À PÂTE - FLEISCHMANN''S 5 KG') LIMIT 15;",
+  "rows": [
+    {
+      "description": "CASSONADE FONCÉE - REDPATH 20 kg",
+      "unitPrice": "37.5000"
+    },
+    {
+      "description": "HUILE DE CANOLA LA PERLA 16 litres",
+      "unitPrice": "35.1100"
+    },
+    {
+      "description": "MIEL NATUREL DORÉ DU QUEBEC - 15 kg",
+      "unitPrice": "154.2300"
+    },
+    {
+      "description": "HUILE DE CANOLA LA PERLA 16 litres",
+      "unitPrice": "35.0200"
+    },
+    {
+      "description": "FARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER'S HAND 20 kg",
+      "unitPrice": "19.2500"
+    },
+    {
+      "description": "FARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER'S HAND 20 kg",
+      "unitPrice": "23.3700"
+    },
+    {
+      "description": "HUILE DE CANOLA LA PERLA 16 litres",
+      "unitPrice": "39.7800"
+    },
+    {
+      "description": "AIL ÉMINCÉ DÉSHYDRATÉ - 2.27 kg",
+      "unitPrice": "28.8700"
+    },
+    {
+      "description": "FARINE DE BLÉ ENTIER - MAXIMA 20 kg",
+      "unitPrice": "21.2500"
+    },
+    {
+      "description": "FARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER'S HAND 20 kg",
+      "unitPrice": "20.5000"
+    },
+    {
+      "description": "MÉLANGE DE 12 GRAINS - FARINART 20 kg",
+      "unitPrice": "60.5100"
+    },
+    {
+      "description": "MÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 kg",
+      "unitPrice": "29.9100"
+    },
+    {
+      "description": "MÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 kg",
+      "unitPrice": "29.9000"
+    },
+    {
+      "description": "CASSONADE FONCÉE - REDPATH 20 kg",
+      "unitPrice": "36.9100"
+    },
+    {
+      "description": "CASSONADE FONCÉE - REDPATH 20 kg",
+      "unitPrice": "37.2900"
+    }
+  ],
+  "messages": [],
+  "stdout": "description\tunitPrice\nCASSONADE FONCÉE - REDPATH 20 kg\t37.5000\nHUILE DE CANOLA LA PERLA 16 litres\t35.1100\nMIEL NATUREL DORÉ DU QUEBEC - 15 kg\t154.2300\nHUILE DE CANOLA LA PERLA 16 litres\t35.0200\nFARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER'S HAND 20 kg\t19.2500\nFARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER'S HAND 20 kg\t23.3700\nHUILE DE CANOLA LA PERLA 16 litres\t39.7800\nAIL ÉMINCÉ DÉSHYDRATÉ - 2.27 kg\t28.8700\nFARINE DE BLÉ ENTIER - MAXIMA 20 kg\t21.2500\nFARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER'S HAND 20 kg\t20.5000\nMÉLANGE DE 12 GRAINS - FARINART 20 kg\t60.5100\nMÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 kg\t29.9100\nMÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 kg\t29.9000\nCASSONADE FONCÉE - REDPATH 20 kg\t36.9100\nCASSONADE FONCÉE - REDPATH 20 kg\t37.2900\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

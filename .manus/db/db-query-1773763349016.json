@@ -1,0 +1,28 @@
+{
+  "query": "SELECT status, qboSyncStatus, COUNT(*) as cnt, ROUND(SUM(CAST(total AS DECIMAL(12,2))),2) as totalAmt FROM invoices GROUP BY status, qboSyncStatus ORDER BY status, qboSyncStatus;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT status, qboSyncStatus, COUNT(*) as cnt, ROUND(SUM(CAST(total AS DECIMAL(12,2))),2) as totalAmt FROM invoices GROUP BY status, qboSyncStatus ORDER BY status, qboSyncStatus;",
+  "rows": [
+    {
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "cnt": "12",
+      "totalAmt": "17773.20"
+    },
+    {
+      "status": "approved",
+      "qboSyncStatus": "synced",
+      "cnt": "3",
+      "totalAmt": "2633.52"
+    },
+    {
+      "status": "paid",
+      "qboSyncStatus": "synced",
+      "cnt": "9",
+      "totalAmt": "8107.77"
+    }
+  ],
+  "messages": [],
+  "stdout": "status\tqboSyncStatus\tcnt\ttotalAmt\npending\tsynced\t12\t17773.20\napproved\tsynced\t3\t2633.52\npaid\tsynced\t9\t8107.77\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

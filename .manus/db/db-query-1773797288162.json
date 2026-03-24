@@ -1,0 +1,210 @@
+{
+  "query": "SELECT DISTINCT UPPER(description) as d, COUNT(*) as c FROM invoiceLineItems WHERE invoiceId BETWEEN 60012 AND 60131 GROUP BY d ORDER BY c DESC LIMIT 50 OFFSET 70;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT DISTINCT UPPER(description) as d, COUNT(*) as c FROM invoiceLineItems WHERE invoiceId BETWEEN 60012 AND 60131 GROUP BY d ORDER BY c DESC LIMIT 50 OFFSET 70;",
+  "rows": [
+    {
+      "d": "BUTTER SALTED (20)",
+      "c": "2"
+    },
+    {
+      "d": "FRUIT DRIED RAISIN SULT MAISON",
+      "c": "2"
+    },
+    {
+      "d": "CHEESE CHED MILD WHT",
+      "c": "2"
+    },
+    {
+      "d": "EGG MED FRESH GRADE A",
+      "c": "2"
+    },
+    {
+      "d": "DINDE ROTI POIT FUMEE MTL FR",
+      "c": "2"
+    },
+    {
+      "d": "TOFU REGULAR",
+      "c": "2"
+    },
+    {
+      "d": "HAT (HAIR NET ONLY) INV 21I",
+      "c": "2"
+    },
+    {
+      "d": "OEUF MOY VRAC",
+      "c": "2"
+    },
+    {
+      "d": "GANT EN NITRILE NOIR SANS POUDRE - MEDIUM - 100 UNITÉS",
+      "c": "2"
+    },
+    {
+      "d": "LID PLAST DOME WH 10-12-16OZ",
+      "c": "2"
+    },
+    {
+      "d": "PISTACHE ÉCALLÉE ENTIÈRE DE LA CALIFORNIE 25 LBS - 11.33 KG",
+      "c": "2"
+    },
+    {
+      "d": "NUTELLA 2 X 3 KG",
+      "c": "2"
+    },
+    {
+      "d": "CHILI BROYÉ - 2.27KG",
+      "c": "2"
+    },
+    {
+      "d": "SAUCE SOYA KIKKOMAN (4)",
+      "c": "2"
+    },
+    {
+      "d": "BACON 15-17SL/IN RDY CRISP FRSH",
+      "c": "2"
+    },
+    {
+      "d": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "c": "2"
+    },
+    {
+      "d": "PÂTE FEUILLETÉE 10 X 15 CRU CONGELÉS DUMAS - 20 X 350 G",
+      "c": "2"
+    },
+    {
+      "d": "BAG WAX PAPER SANDWICH MENU",
+      "c": "2"
+    },
+    {
+      "d": "WATER SPRING NAT PET",
+      "c": "2"
+    },
+    {
+      "d": "ROMARIN ENTIER 2.27 KG",
+      "c": "2"
+    },
+    {
+      "d": "SUGAR BROWN PORT",
+      "c": "1"
+    },
+    {
+      "d": "HUILE DE NOIX DE COCO 18 KG",
+      "c": "1"
+    },
+    {
+      "d": "BLEACH 4.25% MAISON",
+      "c": "1"
+    },
+    {
+      "d": "FC00215243",
+      "c": "1"
+    },
+    {
+      "d": "NOIX DE GRENOBLE DE CALIFORNIE DEMIES ET MORCEAUX - 25 LB",
+      "c": "1"
+    },
+    {
+      "d": "CANNELLE MOULUE - 2.27 KG",
+      "c": "1"
+    },
+    {
+      "d": "LAIT HOMO 3.25PCT (CAISSON)",
+      "c": "1"
+    },
+    {
+      "d": "CHILI BROYÉ 2.27KG",
+      "c": "1"
+    },
+    {
+      "d": "BACON CUIT 15-17 TR/PO READY CRISP FR",
+      "c": "1"
+    },
+    {
+      "d": "CUP PPR HOT WHT 12Z",
+      "c": "1"
+    },
+    {
+      "d": "DETERGENT DISH MAN POT & PAN",
+      "c": "1"
+    },
+    {
+      "d": "HUILE D'OLIVE PURE 4 X 3 LITRES",
+      "c": "1"
+    },
+    {
+      "d": "BAG CLR POLY 5LB 5X3X14IN 0.8MIL",
+      "c": "1"
+    },
+    {
+      "d": "BUTTER CULTURED UNSALTED",
+      "c": "1"
+    },
+    {
+      "d": "NAPKIN MEALMATES 1 PLY KRAFT",
+      "c": "1"
+    },
+    {
+      "d": "HAM WHL BLK FOREST V/PK FRSH",
+      "c": "1"
+    },
+    {
+      "d": "PAPER HAND TOWEL 8I BROWN DEC",
+      "c": "1"
+    },
+    {
+      "d": "SOFT DRINK SEVEN UP CAN",
+      "c": "1"
+    },
+    {
+      "d": "TOWEL HAND CONTINUOUS WHT PEAKSERVE",
+      "c": "1"
+    },
+    {
+      "d": "SAUCE À SAVEUR DE CARAMEL - MEC3 1 KG",
+      "c": "1"
+    },
+    {
+      "d": "FC00213793",
+      "c": "1"
+    },
+    {
+      "d": "TURKEY RST BRST SMKD MTL FRSH",
+      "c": "1"
+    },
+    {
+      "d": "CORNES DE PLASTIQUE BEIGE - FARINEX 20 UNITÉS",
+      "c": "1"
+    },
+    {
+      "d": "CHEESE FETA BLOCK MAISON",
+      "c": "1"
+    },
+    {
+      "d": "BUTTER UNSALTED (20)",
+      "c": "1"
+    },
+    {
+      "d": "SANITIZER QUAT SURFACE SMARTDOSE",
+      "c": "1"
+    },
+    {
+      "d": "DRINK OAT ORIG BARISTA TETRA",
+      "c": "1"
+    },
+    {
+      "d": "BABEURRE 0.25PCT (CAISSON)",
+      "c": "1"
+    },
+    {
+      "d": "OIGNON HACHÉ - 2.27 KG",
+      "c": "1"
+    },
+    {
+      "d": "BAG GARBAGE 35X50I STRONG MENU",
+      "c": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "d\tc\nBUTTER SALTED (20)\t2\nFRUIT DRIED RAISIN SULT MAISON\t2\nCHEESE CHED MILD WHT\t2\nEGG MED FRESH GRADE A\t2\nDINDE ROTI POIT FUMEE MTL FR\t2\nTOFU REGULAR\t2\nHAT (HAIR NET ONLY) INV 21I\t2\nOEUF MOY VRAC\t2\nGANT EN NITRILE NOIR SANS POUDRE - MEDIUM - 100 UNITÉS\t2\nLID PLAST DOME WH 10-12-16OZ\t2\nPISTACHE ÉCALLÉE ENTIÈRE DE LA CALIFORNIE 25 LBS - 11.33 KG\t2\nNUTELLA 2 X 3 KG\t2\nCHILI BROYÉ - 2.27KG\t2\nSAUCE SOYA KIKKOMAN (4)\t2\nBACON 15-17SL/IN RDY CRISP FRSH\t2\nCHEESE MOZZ BLOCK 19PCT MF HALAL\t2\nPÂTE FEUILLETÉE 10 X 15 CRU CONGELÉS DUMAS - 20 X 350 G\t2\nBAG WAX PAPER SANDWICH MENU\t2\nWATER SPRING NAT PET\t2\nROMARIN ENTIER 2.27 KG\t2\nSUGAR BROWN PORT\t1\nHUILE DE NOIX DE COCO 18 KG\t1\nBLEACH 4.25% MAISON\t1\nFC00215243\t1\nNOIX DE GRENOBLE DE CALIFORNIE DEMIES ET MORCEAUX - 25 LB\t1\nCANNELLE MOULUE - 2.27 KG\t1\nLAIT HOMO 3.25PCT (CAISSON)\t1\nCHILI BROYÉ 2.27KG\t1\nBACON CUIT 15-17 TR/PO READY CRISP FR\t1\nCUP PPR HOT WHT 12Z\t1\nDETERGENT DISH MAN POT & PAN\t1\nHUILE D'OLIVE PURE 4 X 3 LITRES\t1\nBAG CLR POLY 5LB 5X3X14IN 0.8MIL\t1\nBUTTER CULTURED UNSALTED\t1\nNAPKIN MEALMATES 1 PLY KRAFT\t1\nHAM WHL BLK FOREST V/PK FRSH\t1\nPAPER HAND TOWEL 8I BROWN DEC\t1\nSOFT DRINK SEVEN UP CAN\t1\nTOWEL HAND CONTINUOUS WHT PEAKSERVE\t1\nSAUCE À SAVEUR DE CARAMEL - MEC3 1 KG\t1\nFC00213793\t1\nTURKEY RST BRST SMKD MTL FRSH\t1\nCORNES DE PLASTIQUE BEIGE - FARINEX 20 UNITÉS\t1\nCHEESE FETA BLOCK MAISON\t1\nBUTTER UNSALTED (20)\t1\nSANITIZER QUAT SURFACE SMARTDOSE\t1\nDRINK OAT ORIG BARISTA TETRA\t1\nBABEURRE 0.25PCT (CAISSON)\t1\nOIGNON HACHÉ - 2.27 KG\t1\nBAG GARBAGE 35X50I STRONG MENU\t1\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

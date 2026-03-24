@@ -1,0 +1,70 @@
+{
+  "query": "SELECT li.description, li.quantity, li.unitPrice, li.amount FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND UPPER(li.description) IN ('FARINE THREE STARS NON BLANCHIE AA40 - 20 KG', 'MILK 3.25% LACTANTIA', 'SUCRE FIN - REDPATH - 20 KG', 'CREAM 10% LACTANTIA (16)', 'GRAINE DE SÉSAME INDIEN 99.98% PUR - 50 LBS - 22.68 KG') LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT li.description, li.quantity, li.unitPrice, li.amount FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND UPPER(li.description) IN ('FARINE THREE STARS NON BLANCHIE AA40 - 20 KG', 'MILK 3.25% LACTANTIA', 'SUCRE FIN - REDPATH - 20 KG', 'CREAM 10% LACTANTIA (16)', 'GRAINE DE SÉSAME INDIEN 99.98% PUR - 50 LBS - 22.68 KG') LIMIT 10;",
+  "rows": [
+    {
+      "description": "CREAM 10% LACTANTIA (16)",
+      "quantity": "9.000",
+      "unitPrice": "4.2000",
+      "amount": "37.80"
+    },
+    {
+      "description": "MILK 3.25% LACTANTIA",
+      "quantity": "5.000",
+      "unitPrice": "41.1500",
+      "amount": "205.75"
+    },
+    {
+      "description": "CREAM 10% LACTANTIA (16)",
+      "quantity": "6.000",
+      "unitPrice": "4.2000",
+      "amount": "25.20"
+    },
+    {
+      "description": "MILK 3.25% LACTANTIA",
+      "quantity": "4.000",
+      "unitPrice": "41.1500",
+      "amount": "164.60"
+    },
+    {
+      "description": "CREAM 10% LACTANTIA (16)",
+      "quantity": "6.000",
+      "unitPrice": "4.2000",
+      "amount": "25.20"
+    },
+    {
+      "description": "MILK 3.25% LACTANTIA",
+      "quantity": "4.000",
+      "unitPrice": "41.1500",
+      "amount": "164.60"
+    },
+    {
+      "description": "CREAM 10% LACTANTIA (16)",
+      "quantity": "6.000",
+      "unitPrice": "4.2000",
+      "amount": "25.20"
+    },
+    {
+      "description": "MILK 3.25% LACTANTIA",
+      "quantity": "4.000",
+      "unitPrice": "41.1500",
+      "amount": "164.60"
+    },
+    {
+      "description": "CREAM 10% LACTANTIA (16)",
+      "quantity": "6.000",
+      "unitPrice": "4.2000",
+      "amount": "25.20"
+    },
+    {
+      "description": "MILK 3.25% LACTANTIA",
+      "quantity": "3.000",
+      "unitPrice": "41.1500",
+      "amount": "123.45"
+    }
+  ],
+  "messages": [],
+  "stdout": "description\tquantity\tunitPrice\tamount\nCREAM 10% LACTANTIA (16)\t9.000\t4.2000\t37.80\nMILK 3.25% LACTANTIA\t5.000\t41.1500\t205.75\nCREAM 10% LACTANTIA (16)\t6.000\t4.2000\t25.20\nMILK 3.25% LACTANTIA\t4.000\t41.1500\t164.60\nCREAM 10% LACTANTIA (16)\t6.000\t4.2000\t25.20\nMILK 3.25% LACTANTIA\t4.000\t41.1500\t164.60\nCREAM 10% LACTANTIA (16)\t6.000\t4.2000\t25.20\nMILK 3.25% LACTANTIA\t4.000\t41.1500\t164.60\nCREAM 10% LACTANTIA (16)\t6.000\t4.2000\t25.20\nMILK 3.25% LACTANTIA\t3.000\t41.1500\t123.45\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

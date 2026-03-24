@@ -1,0 +1,210 @@
+{
+  "query": "SELECT DISTINCT UPPER(description) as desc_upper, COUNT(*) as cnt FROM invoiceLineItems WHERE invoiceId BETWEEN 60012 AND 60131 GROUP BY desc_upper ORDER BY cnt DESC LIMIT 50;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT DISTINCT UPPER(description) as desc_upper, COUNT(*) as cnt FROM invoiceLineItems WHERE invoiceId BETWEEN 60012 AND 60131 GROUP BY desc_upper ORDER BY cnt DESC LIMIT 50;",
+  "rows": [
+    {
+      "desc_upper": "FRAIS DE CARBURANT",
+      "cnt": "35"
+    },
+    {
+      "desc_upper": "FARINE THREE STARS NON BLANCHIE AA40 - 20 KG",
+      "cnt": "32"
+    },
+    {
+      "desc_upper": "MILK 3.25% LACTANTIA",
+      "cnt": "29"
+    },
+    {
+      "desc_upper": "SUCRE FIN - REDPATH - 20 KG",
+      "cnt": "26"
+    },
+    {
+      "desc_upper": "FARINE DE BLÉ ENTIER - MAXIMA 20 KG",
+      "cnt": "25"
+    },
+    {
+      "desc_upper": "CREAM 10% LACTANTIA (16)",
+      "cnt": "25"
+    },
+    {
+      "desc_upper": "GRAINE DE SÉSAME INDIEN 99.98% PUR - 50 LBS - 22.68 KG",
+      "cnt": "24"
+    },
+    {
+      "desc_upper": "FARINE MALT NO 05505 - 20 KG",
+      "cnt": "18"
+    },
+    {
+      "desc_upper": "FARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER'S HAND 20 KG",
+      "cnt": "15"
+    },
+    {
+      "desc_upper": "MÉLANGE DE 12 GRAINS - FARINART 20 KG",
+      "cnt": "14"
+    },
+    {
+      "desc_upper": "LEVURE FRAÎCHE - LALLEMAND 20 X 2 LBS - 18.14 KG",
+      "cnt": "14"
+    },
+    {
+      "desc_upper": "CHEESE CREAM SPREAD M. RIVIER",
+      "cnt": "13"
+    },
+    {
+      "desc_upper": "DELI TURKEY SMOKED MEAT 2X1.2",
+      "cnt": "12"
+    },
+    {
+      "desc_upper": "SUCRE FIN - REDPATH 20 KG",
+      "cnt": "12"
+    },
+    {
+      "desc_upper": "LEVURE FRAÎCHE - LALLEMAND 2 LBS - 0.908 KG",
+      "cnt": "10"
+    },
+    {
+      "desc_upper": "AIL ÉMINCÉ DÉSHYDRATÉ - 2.27 KG",
+      "cnt": "10"
+    },
+    {
+      "desc_upper": "CASSONADE FONCÉE - REDPATH 20 KG",
+      "cnt": "10"
+    },
+    {
+      "desc_upper": "BACON PRECOOKED 2X150SL M.LEAF",
+      "cnt": "9"
+    },
+    {
+      "desc_upper": "HAM BLC FOREST OLYMEL 2.3KG (4",
+      "cnt": "8"
+    },
+    {
+      "desc_upper": "FISH SALMON SMOKE COHO SLICE",
+      "cnt": "8"
+    },
+    {
+      "desc_upper": "LEVURE FRAÎCHE - LALLEMAND 10 X 2 LBS - 9.07 KG",
+      "cnt": "8"
+    },
+    {
+      "desc_upper": "LALTISAN FRESH - CONDITIONNEUR POUR PAINS FRAIS 10 KG",
+      "cnt": "8"
+    },
+    {
+      "desc_upper": "CHOCOLAT DE COUVERTURE NOIR 64% PURETÉ EXTRA-BITTER GUAYAQUIL - CACAO BARRY 20 KG",
+      "cnt": "8"
+    },
+    {
+      "desc_upper": "EGG REF BULK MEDIUM",
+      "cnt": "7"
+    },
+    {
+      "desc_upper": "HUILE DE CANOLA LA PERLA 16 LITRES",
+      "cnt": "7"
+    },
+    {
+      "desc_upper": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 KG",
+      "cnt": "7"
+    },
+    {
+      "desc_upper": "NUTS PISTACHIO SHELLED UNS(12",
+      "cnt": "6"
+    },
+    {
+      "desc_upper": "GRAINE DE SÉSAME DÉCORTIQUÉE 99.98% PUR INDE - 50 LBS - 22.68 KG",
+      "cnt": "6"
+    },
+    {
+      "desc_upper": "MÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 KG",
+      "cnt": "6"
+    },
+    {
+      "desc_upper": "MILK HOMOGENIZED 3.25PCT",
+      "cnt": "5"
+    },
+    {
+      "desc_upper": "OIGNON HACHÉ - 14 KG",
+      "cnt": "5"
+    },
+    {
+      "desc_upper": "CHICKEN BREA GRIL COOK HAL FL",
+      "cnt": "5"
+    },
+    {
+      "desc_upper": "JUICE APPLE PLAST BTL OASIS",
+      "cnt": "5"
+    },
+    {
+      "desc_upper": "FROM CHED DOUX BL",
+      "cnt": "5"
+    },
+    {
+      "desc_upper": "PÉPITES DE CHOCOLAT PUR FONCÉ 4000CT - FOLEY'S 12 KG",
+      "cnt": "5"
+    },
+    {
+      "desc_upper": "EGG LARGE GRADE A FRSH",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "WATER NATURAL SPRING ESKA",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "BEURRE N/SEL 82PCT EUROPEEN",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "HAT (HAIR NET ONLY) INV BROWN",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "CHOCOLAT DE COUVERTURE NOIR 64% PURETÉ EXTRA-BITTER GUAYAQUIL - CACAO BARRY 5 KG",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "MIEL NATUREL DORÉ DU QUEBEC - 15 KG",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "CHIPS REGULAR RIPPLE MENU",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "BAG PAPER SANDWICH GIANT 6X9X2",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "PÉPITES DE CHOCOLATS PUR BLANC 4000CT - BARRY CALLEBAUT 30 LBS - 13.608 KG",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "CONTAINER DEPOSIT",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "PÉPITES DE CHOCOLAT COMP FONCÉ 4000CT - FOLEY'S - 12 KG",
+      "cnt": "4"
+    },
+    {
+      "desc_upper": "JUICE ORANGE BLEND PLAST OASIS",
+      "cnt": "3"
+    },
+    {
+      "desc_upper": "EXTRAIT DE VANILLE NATUREL (BOURBON 200 G)- EUROVANILLE 1 KG",
+      "cnt": "3"
+    },
+    {
+      "desc_upper": "FARINE FORTE À BOULANGERIE THREE STARS AA40 - ADM - 20 KG",
+      "cnt": "3"
+    },
+    {
+      "desc_upper": "SAUCE CHILI SRIRACHA F. GO (12",
+      "cnt": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "desc_upper\tcnt\nFRAIS DE CARBURANT\t35\nFARINE THREE STARS NON BLANCHIE AA40 - 20 KG\t32\nMILK 3.25% LACTANTIA\t29\nSUCRE FIN - REDPATH - 20 KG\t26\nFARINE DE BLÉ ENTIER - MAXIMA 20 KG\t25\nCREAM 10% LACTANTIA (16)\t25\nGRAINE DE SÉSAME INDIEN 99.98% PUR - 50 LBS - 22.68 KG\t24\nFARINE MALT NO 05505 - 20 KG\t18\nFARINE TOUT-USAGE SELECT NON-BLANCHI - BAKER'S HAND 20 KG\t15\nMÉLANGE DE 12 GRAINS - FARINART 20 KG\t14\nLEVURE FRAÎCHE - LALLEMAND 20 X 2 LBS - 18.14 KG\t14\nCHEESE CREAM SPREAD M. RIVIER\t13\nDELI TURKEY SMOKED MEAT 2X1.2\t12\nSUCRE FIN - REDPATH 20 KG\t12\nLEVURE FRAÎCHE - LALLEMAND 2 LBS - 0.908 KG\t10\nAIL ÉMINCÉ DÉSHYDRATÉ - 2.27 KG\t10\nCASSONADE FONCÉE - REDPATH 20 KG\t10\nBACON PRECOOKED 2X150SL M.LEAF\t9\nHAM BLC FOREST OLYMEL 2.3KG (4\t8\nFISH SALMON SMOKE COHO SLICE\t8\nLEVURE FRAÎCHE - LALLEMAND 10 X 2 LBS - 9.07 KG\t8\nLALTISAN FRESH - CONDITIONNEUR POUR PAINS FRAIS 10 KG\t8\nCHOCOLAT DE COUVERTURE NOIR 64% PURETÉ EXTRA-BITTER GUAYAQUIL - CACAO BARRY 20 KG\t8\nEGG REF BULK MEDIUM\t7\nHUILE DE CANOLA LA PERLA 16 LITRES\t7\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 KG\t7\nNUTS PISTACHIO SHELLED UNS(12\t6\nGRAINE DE SÉSAME DÉCORTIQUÉE 99.98% PUR INDE - 50 LBS - 22.68 KG\t6\nMÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 KG\t6\nMILK HOMOGENIZED 3.25PCT\t5\nOIGNON HACHÉ - 14 KG\t5\nCHICKEN BREA GRIL COOK HAL FL\t5\nJUICE APPLE PLAST BTL OASIS\t5\nFROM CHED DOUX BL\t5\nPÉPITES DE CHOCOLAT PUR FONCÉ 4000CT - FOLEY'S 12 KG\t5\nEGG LARGE GRADE A FRSH\t4\nWATER NATURAL SPRING ESKA\t4\nBEURRE N/SEL 82PCT EUROPEEN\t4\nHAT (HAIR NET ONLY) INV BROWN\t4\nCHOCOLAT DE COUVERTURE NOIR 64% PURETÉ EXTRA-BITTER GUAYAQUIL - CACAO BARRY 5 KG\t4\nMIEL NATUREL DORÉ DU QUEBEC - 15 KG\t4\nCHIPS REGULAR RIPPLE MENU\t4\nBAG PAPER SANDWICH GIANT 6X9X2\t4\nPÉPITES DE CHOCOLATS PUR BLANC 4000CT - BARRY CALLEBAUT 30 LBS - 13.608 KG\t4\nCONTAINER DEPOSIT\t4\nPÉPITES DE CHOCOLAT COMP FONCÉ 4000CT - FOLEY'S - 12 KG\t4\nJUICE ORANGE BLEND PLAST OASIS\t3\nEXTRAIT DE VANILLE NATUREL (BOURBON 200 G)- EUROVANILLE 1 KG\t3\nFARINE FORTE À BOULANGERIE THREE STARS AA40 - ADM - 20 KG\t3\nSAUCE CHILI SRIRACHA F. GO (12\t3\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

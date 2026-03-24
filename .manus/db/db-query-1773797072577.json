@@ -1,0 +1,25 @@
+{
+  "query": "SELECT COUNT(*) as total_line_items FROM invoiceLineItems WHERE invoiceId BETWEEN 60012 AND 60131;\nSELECT COUNT(*) as total_inventory_items FROM inventoryItems WHERE isActive = true;\nSELECT COUNT(*) as already_matched FROM invoiceLineItemMatches WHERE invoiceId BETWEEN 60012 AND 60131;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COUNT(*) as total_line_items FROM invoiceLineItems WHERE invoiceId BETWEEN 60012 AND 60131;\nSELECT COUNT(*) as total_inventory_items FROM inventoryItems WHERE isActive = true;\nSELECT COUNT(*) as already_matched FROM invoiceLineItemMatches WHERE invoiceId BETWEEN 60012 AND 60131;",
+  "rows": [
+    {
+      "total_line_items": "702"
+    },
+    {
+      "total_line_items": "total_inventory_items"
+    },
+    {
+      "total_line_items": "33"
+    },
+    {
+      "total_line_items": "already_matched"
+    },
+    {
+      "total_line_items": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_line_items\n702\ntotal_inventory_items\n33\nalready_matched\n0\n",
+  "stderr": "",
+  "execution_time_ms": 73
+}

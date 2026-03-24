@@ -1,0 +1,50 @@
+{
+  "query": "SELECT invoiceId, COUNT(*) as match_count FROM invoiceLineItemMatches WHERE invoiceId BETWEEN 60012 AND 60131 GROUP BY invoiceId ORDER BY invoiceId DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT invoiceId, COUNT(*) as match_count FROM invoiceLineItemMatches WHERE invoiceId BETWEEN 60012 AND 60131 GROUP BY invoiceId ORDER BY invoiceId DESC LIMIT 10;",
+  "rows": [
+    {
+      "invoiceId": "60127",
+      "match_count": "1"
+    },
+    {
+      "invoiceId": "60126",
+      "match_count": "4"
+    },
+    {
+      "invoiceId": "60125",
+      "match_count": "2"
+    },
+    {
+      "invoiceId": "60124",
+      "match_count": "4"
+    },
+    {
+      "invoiceId": "60123",
+      "match_count": "3"
+    },
+    {
+      "invoiceId": "60122",
+      "match_count": "12"
+    },
+    {
+      "invoiceId": "60121",
+      "match_count": "4"
+    },
+    {
+      "invoiceId": "60120",
+      "match_count": "4"
+    },
+    {
+      "invoiceId": "60119",
+      "match_count": "9"
+    },
+    {
+      "invoiceId": "60118",
+      "match_count": "8"
+    }
+  ],
+  "messages": [],
+  "stdout": "invoiceId\tmatch_count\n60127\t1\n60126\t4\n60125\t2\n60124\t4\n60123\t3\n60122\t12\n60121\t4\n60120\t4\n60119\t9\n60118\t8\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

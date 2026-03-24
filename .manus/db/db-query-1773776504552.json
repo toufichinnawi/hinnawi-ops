@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, realmId, companyName, isActive, accessTokenExpiresAt, refreshTokenExpiresAt, connectedBy, updatedAt FROM qboTokens ORDER BY updatedAt DESC LIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, realmId, companyName, isActive, accessTokenExpiresAt, refreshTokenExpiresAt, connectedBy, updatedAt FROM qboTokens ORDER BY updatedAt DESC LIMIT 3;",
+  "rows": [
+    {
+      "id": "2",
+      "realmId": "9341456522572832",
+      "companyName": "Sandbox Company US 4575",
+      "isActive": "1",
+      "accessTokenExpiresAt": "2026-03-15 05:25:41",
+      "refreshTokenExpiresAt": "2026-06-24 04:25:41",
+      "connectedBy": "oauth-callback",
+      "updatedAt": "2026-03-15 04:25:41"
+    },
+    {
+      "id": "1",
+      "realmId": "9341456522572832",
+      "companyName": "NULL",
+      "isActive": "0",
+      "accessTokenExpiresAt": "2026-03-15 05:25:40",
+      "refreshTokenExpiresAt": "2026-06-24 04:25:40",
+      "connectedBy": "oauth-callback",
+      "updatedAt": "2026-03-15 04:25:41"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\trealmId\tcompanyName\tisActive\taccessTokenExpiresAt\trefreshTokenExpiresAt\tconnectedBy\tupdatedAt\n2\t9341456522572832\tSandbox Company US 4575\t1\t2026-03-15 05:25:41\t2026-06-24 04:25:41\toauth-callback\t2026-03-15 04:25:41\n1\t9341456522572832\tNULL\t0\t2026-03-15 05:25:40\t2026-06-24 04:25:40\toauth-callback\t2026-03-15 04:25:41\n",
+  "stderr": "",
+  "execution_time_ms": 77
+}

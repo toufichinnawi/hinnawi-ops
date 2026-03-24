@@ -1,0 +1,66 @@
+{
+  "query": "SELECT id, name FROM suppliers ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name FROM suppliers ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Gordon Food Service"
+    },
+    {
+      "id": "2",
+      "name": "Farinex Distribution"
+    },
+    {
+      "id": "3",
+      "name": "Dubé Loiselle"
+    },
+    {
+      "id": "4",
+      "name": "JG Rive-Sud"
+    },
+    {
+      "id": "5",
+      "name": "Nantel Distribution"
+    },
+    {
+      "id": "6",
+      "name": "Costco Wholesale"
+    },
+    {
+      "id": "7",
+      "name": "Les Touriers"
+    },
+    {
+      "id": "8",
+      "name": "Lightspeed Commerce"
+    },
+    {
+      "id": "9",
+      "name": "Hydro-Québec"
+    },
+    {
+      "id": "10",
+      "name": "Koomi POS"
+    },
+    {
+      "id": "11",
+      "name": "Pure Tea"
+    },
+    {
+      "id": "30002",
+      "name": "Portebleue"
+    },
+    {
+      "id": "30003",
+      "name": "UniFirst Canada"
+    },
+    {
+      "id": "30004",
+      "name": "Rosalyn Sales-Operations"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n1\tGordon Food Service\n2\tFarinex Distribution\n3\tDubé Loiselle\n4\tJG Rive-Sud\n5\tNantel Distribution\n6\tCostco Wholesale\n7\tLes Touriers\n8\tLightspeed Commerce\n9\tHydro-Québec\n10\tKoomi POS\n11\tPure Tea\n30002\tPortebleue\n30003\tUniFirst Canada\n30004\tRosalyn Sales-Operations\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

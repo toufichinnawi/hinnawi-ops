@@ -1,0 +1,15 @@
+{
+  "query": "SELECT COUNT(*) as total_matches, SUM(CASE WHEN inventoryItemId IS NOT NULL THEN 1 ELSE 0 END) as matched, SUM(CASE WHEN inventoryItemId IS NULL THEN 1 ELSE 0 END) as unmatched FROM invoiceLineItemMatches WHERE invoiceId BETWEEN 60012 AND 60131;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COUNT(*) as total_matches, SUM(CASE WHEN inventoryItemId IS NOT NULL THEN 1 ELSE 0 END) as matched, SUM(CASE WHEN inventoryItemId IS NULL THEN 1 ELSE 0 END) as unmatched FROM invoiceLineItemMatches WHERE invoiceId BETWEEN 60012 AND 60131;",
+  "rows": [
+    {
+      "total_matches": "660",
+      "matched": "3",
+      "unmatched": "657"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_matches\tmatched\tunmatched\n660\t3\t657\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

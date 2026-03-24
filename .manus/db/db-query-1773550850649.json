@@ -1,0 +1,16 @@
+{
+  "query": "SELECT COUNT(*) as total, SUM(isActive = 1) as active, SUM(isActive = 0) as inactive, SUM(isSubRecipe = 1) as sub_recipes FROM recipes;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COUNT(*) as total, SUM(isActive = 1) as active, SUM(isActive = 0) as inactive, SUM(isSubRecipe = 1) as sub_recipes FROM recipes;",
+  "rows": [
+    {
+      "total": "25",
+      "active": "25",
+      "inactive": "0",
+      "sub_recipes": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tactive\tinactive\tsub_recipes\n25\t25\t0\t3\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

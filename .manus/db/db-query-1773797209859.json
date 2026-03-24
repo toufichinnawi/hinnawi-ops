@@ -1,0 +1,122 @@
+{
+  "query": "DESCRIBE ingredientPriceHistory;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute DESCRIBE ingredientPriceHistory;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "inventoryItemId",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "invoiceId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "invoiceLineItemId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "supplierId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "previousCostPerUnit",
+      "Type": "decimal(10,4)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "newCostPerUnit",
+      "Type": "decimal(10,4)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "previousCostPerUsableUnit",
+      "Type": "decimal(10,4)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "newCostPerUsableUnit",
+      "Type": "decimal(10,4)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "changePercent",
+      "Type": "decimal(8,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "quantity",
+      "Type": "decimal(10,3)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "unit",
+      "Type": "varchar(32)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "priceSource",
+      "Type": "enum('invoice','manual','email_extraction','import')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "invoice",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\ninventoryItemId\tint\tNO\t\tNULL\t\ninvoiceId\tint\tYES\t\tNULL\t\ninvoiceLineItemId\tint\tYES\t\tNULL\t\nsupplierId\tint\tYES\t\tNULL\t\npreviousCostPerUnit\tdecimal(10,4)\tYES\t\tNULL\t\nnewCostPerUnit\tdecimal(10,4)\tNO\t\tNULL\t\npreviousCostPerUsableUnit\tdecimal(10,4)\tYES\t\tNULL\t\nnewCostPerUsableUnit\tdecimal(10,4)\tNO\t\tNULL\t\nchangePercent\tdecimal(8,2)\tYES\t\tNULL\t\nquantity\tdecimal(10,3)\tYES\t\tNULL\t\nunit\tvarchar(32)\tYES\t\tNULL\t\npriceSource\tenum('invoice','manual','email_extraction','import')\tNO\t\tinvoice\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

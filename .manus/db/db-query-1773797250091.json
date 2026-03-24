@@ -1,0 +1,52 @@
+{
+  "query": "SELECT id, name, unit, category FROM inventoryItems WHERE isActive = 1 AND id > 30027 ORDER BY name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name, unit, category FROM inventoryItems WHERE isActive = 1 AND id > 30027 ORDER BY name;",
+  "rows": [
+    {
+      "id": "30031",
+      "name": "Bacon jam",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30034",
+      "name": "Bagel",
+      "unit": "Unit",
+      "category": "Bagel"
+    },
+    {
+      "id": "30030",
+      "name": "Butter",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30033",
+      "name": "Cajun seasoning",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30028",
+      "name": "Dijon",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30029",
+      "name": "Honey mustard",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30032",
+      "name": "Olive oil",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tunit\tcategory\n30031\tBacon jam\tKg\tCondiments & Seasonings\n30034\tBagel\tUnit\tBagel\n30030\tButter\tKg\tCondiments & Seasonings\n30033\tCajun seasoning\tKg\tCondiments & Seasonings\n30028\tDijon\tKg\tCondiments & Seasonings\n30029\tHoney mustard\tKg\tCondiments & Seasonings\n30032\tOlive oil\tKg\tCondiments & Seasonings\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

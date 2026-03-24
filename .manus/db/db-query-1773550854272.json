@@ -1,0 +1,235 @@
+{
+  "query": "SELECT id, name, isActive, isSubRecipe, sellingPrice, totalCost, foodCostPct FROM recipes ORDER BY id LIMIT 30;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name, isActive, isSubRecipe, sellingPrice, totalCost, foodCostPct FROM recipes ORDER BY id LIMIT 30;",
+  "rows": [
+    {
+      "id": "30002",
+      "name": "Spicy Mayo",
+      "isActive": "1",
+      "isSubRecipe": "1",
+      "sellingPrice": "NULL",
+      "totalCost": "7.5000",
+      "foodCostPct": "0.00"
+    },
+    {
+      "id": "30003",
+      "name": "Honey Mustard",
+      "isActive": "1",
+      "isSubRecipe": "1",
+      "sellingPrice": "NULL",
+      "totalCost": "8.4300",
+      "foodCostPct": "0.00"
+    },
+    {
+      "id": "30004",
+      "name": "Bacon jam",
+      "isActive": "1",
+      "isSubRecipe": "1",
+      "sellingPrice": "NULL",
+      "totalCost": "0.0000",
+      "foodCostPct": "0.00"
+    },
+    {
+      "id": "30005",
+      "name": "New York",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "13.99",
+      "totalCost": "4.0310",
+      "foodCostPct": "28.81"
+    },
+    {
+      "id": "30006",
+      "name": "Toronto",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "13.99",
+      "totalCost": "2.9829",
+      "foodCostPct": "21.32"
+    },
+    {
+      "id": "30007",
+      "name": "Mila",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "14.75",
+      "totalCost": "4.3755",
+      "foodCostPct": "29.66"
+    },
+    {
+      "id": "30008",
+      "name": "Amelia with turkey",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "10.99",
+      "totalCost": "2.3898",
+      "foodCostPct": "21.74"
+    },
+    {
+      "id": "30009",
+      "name": "Amelia with ham",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "10.99",
+      "totalCost": "1.2519",
+      "foodCostPct": "11.39"
+    },
+    {
+      "id": "30010",
+      "name": "Montréal",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "13.99",
+      "totalCost": "3.4827",
+      "foodCostPct": "24.89"
+    },
+    {
+      "id": "30011",
+      "name": "Petit-déjeuner",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "8.99",
+      "totalCost": "1.4820",
+      "foodCostPct": "16.49"
+    },
+    {
+      "id": "30012",
+      "name": "Petit-Quebec",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "8.99",
+      "totalCost": "1.3760",
+      "foodCostPct": "15.31"
+    },
+    {
+      "id": "30013",
+      "name": "Petit-Quebec with bacon",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "12.98",
+      "totalCost": "1.6529",
+      "foodCostPct": "12.73"
+    },
+    {
+      "id": "30014",
+      "name": "Petit-Quebec with ham",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "12.98",
+      "totalCost": "1.6529",
+      "foodCostPct": "12.73"
+    },
+    {
+      "id": "30015",
+      "name": "Quebec",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "6.99",
+      "totalCost": "1.2013",
+      "foodCostPct": "17.19"
+    },
+    {
+      "id": "30016",
+      "name": "Wake up",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "5.49",
+      "totalCost": "1.4048",
+      "foodCostPct": "25.59"
+    },
+    {
+      "id": "30017",
+      "name": "Cream cheese bagel",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "2.99",
+      "totalCost": "1.1886",
+      "foodCostPct": "39.75"
+    },
+    {
+      "id": "30018",
+      "name": "Cream cheese with Lox",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "10.99",
+      "totalCost": "4.4026",
+      "foodCostPct": "40.06"
+    },
+    {
+      "id": "30019",
+      "name": "George",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "12.99",
+      "totalCost": "2.5598",
+      "foodCostPct": "19.71"
+    },
+    {
+      "id": "30020",
+      "name": "Shanghai",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "11.99",
+      "totalCost": "2.3590",
+      "foodCostPct": "19.68"
+    },
+    {
+      "id": "30021",
+      "name": "Vegetarian",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "10.99",
+      "totalCost": "1.3678",
+      "foodCostPct": "12.45"
+    },
+    {
+      "id": "30022",
+      "name": "BLT",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "10.99",
+      "totalCost": "1.2755",
+      "foodCostPct": "11.61"
+    },
+    {
+      "id": "30023",
+      "name": "Bacon jam",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "9.99",
+      "totalCost": "0.0000",
+      "foodCostPct": "0.00"
+    },
+    {
+      "id": "30024",
+      "name": "Chicken Salad",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "13.98",
+      "totalCost": "5.1019",
+      "foodCostPct": "36.49"
+    },
+    {
+      "id": "30025",
+      "name": "Avocado Salad",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "12.98",
+      "totalCost": "2.8357",
+      "foodCostPct": "21.85"
+    },
+    {
+      "id": "30026",
+      "name": "Tofu Salad",
+      "isActive": "1",
+      "isSubRecipe": "0",
+      "sellingPrice": "12.98",
+      "totalCost": "3.3855",
+      "foodCostPct": "26.08"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tisActive\tisSubRecipe\tsellingPrice\ttotalCost\tfoodCostPct\n30002\tSpicy Mayo\t1\t1\tNULL\t7.5000\t0.00\n30003\tHoney Mustard\t1\t1\tNULL\t8.4300\t0.00\n30004\tBacon jam\t1\t1\tNULL\t0.0000\t0.00\n30005\tNew York\t1\t0\t13.99\t4.0310\t28.81\n30006\tToronto\t1\t0\t13.99\t2.9829\t21.32\n30007\tMila\t1\t0\t14.75\t4.3755\t29.66\n30008\tAmelia with turkey\t1\t0\t10.99\t2.3898\t21.74\n30009\tAmelia with ham\t1\t0\t10.99\t1.2519\t11.39\n30010\tMontréal\t1\t0\t13.99\t3.4827\t24.89\n30011\tPetit-déjeuner\t1\t0\t8.99\t1.4820\t16.49\n30012\tPetit-Quebec\t1\t0\t8.99\t1.3760\t15.31\n30013\tPetit-Quebec with bacon\t1\t0\t12.98\t1.6529\t12.73\n30014\tPetit-Quebec with ham\t1\t0\t12.98\t1.6529\t12.73\n30015\tQuebec\t1\t0\t6.99\t1.2013\t17.19\n30016\tWake up\t1\t0\t5.49\t1.4048\t25.59\n30017\tCream cheese bagel\t1\t0\t2.99\t1.1886\t39.75\n30018\tCream cheese with Lox\t1\t0\t10.99\t4.4026\t40.06\n30019\tGeorge\t1\t0\t12.99\t2.5598\t19.71\n30020\tShanghai\t1\t0\t11.99\t2.3590\t19.68\n30021\tVegetarian\t1\t0\t10.99\t1.3678\t12.45\n30022\tBLT\t1\t0\t10.99\t1.2755\t11.61\n30023\tBacon jam\t1\t0\t9.99\t0.0000\t0.00\n30024\tChicken Salad\t1\t0\t13.98\t5.1019\t36.49\n30025\tAvocado Salad\t1\t0\t12.98\t2.8357\t21.85\n30026\tTofu Salad\t1\t0\t12.98\t3.3855\t26.08\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

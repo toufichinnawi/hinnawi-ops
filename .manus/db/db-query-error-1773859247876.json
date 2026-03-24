@@ -1,0 +1,8 @@
+{
+  "query": "SELECT ds.saleDate, l.name as location, ds.totalSales, ds.netSales, ds.totalTax, ds.orderCount \nFROM dailySales ds \nJOIN locations l ON ds.locationId = l.id \nWHERE ds.saleDate BETWEEN '2026-03-10' AND '2026-03-16' \nORDER BY ds.saleDate, l.name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT ds.saleDate, l.name as location, ds.totalSales, ds.netSales, ds.totalTax, ds.orderCount \nFROM dailySales ds \nJOIN locations l ON ds.locationId = l.id \nWHERE ds.saleDate BETWEEN '2026-03-10' AND '2026-03-16' \nORDER BY ds.saleDate, l.name;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'ds.netsales' in 'field list'"
+  ]
+}

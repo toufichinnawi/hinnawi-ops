@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as broken_count FROM dailySales WHERE totalSales = taxExemptSales AND taxableSales > 0;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COUNT(*) as broken_count FROM dailySales WHERE totalSales = taxExemptSales AND taxableSales > 0;",
+  "rows": [
+    {
+      "broken_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "broken_count\n0\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

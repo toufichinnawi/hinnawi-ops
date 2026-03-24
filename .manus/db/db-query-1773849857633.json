@@ -1,0 +1,35 @@
+{
+  "query": "SELECT lineDescription, unitPrice, invoiceId FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Olive oil' AND matchStatus = 'auto_matched'\nORDER BY invoiceId",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT lineDescription, unitPrice, invoiceId FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Olive oil' AND matchStatus = 'auto_matched'\nORDER BY invoiceId",
+  "rows": [
+    {
+      "lineDescription": "HUILE D'OLIVE PURE 4 x 3 litres",
+      "unitPrice": "50.1026",
+      "invoiceId": "60067"
+    },
+    {
+      "lineDescription": "HUILE D'OLIVE PURE - 4 x 3 litres",
+      "unitPrice": "45.1099",
+      "invoiceId": "60096"
+    },
+    {
+      "lineDescription": "HUILE D'OLIVE EXTRA VIERGE 16 litres / 14 kg",
+      "unitPrice": "72.8938",
+      "invoiceId": "60114"
+    },
+    {
+      "lineDescription": "OIL OLIVE EXTRA VIRGIN",
+      "unitPrice": "17.7802",
+      "invoiceId": "90080"
+    },
+    {
+      "lineDescription": "Summum Extra-virgin Olive Oil, 3 L",
+      "unitPrice": "12.7436",
+      "invoiceId": "90261"
+    }
+  ],
+  "messages": [],
+  "stdout": "lineDescription\tunitPrice\tinvoiceId\nHUILE D'OLIVE PURE 4 x 3 litres\t50.1026\t60067\nHUILE D'OLIVE PURE - 4 x 3 litres\t45.1099\t60096\nHUILE D'OLIVE EXTRA VIERGE 16 litres / 14 kg\t72.8938\t60114\nOIL OLIVE EXTRA VIRGIN\t17.7802\t90080\nSummum Extra-virgin Olive Oil, 3 L\t12.7436\t90261\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

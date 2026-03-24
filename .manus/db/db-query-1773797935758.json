@@ -1,0 +1,130 @@
+{
+  "query": "SELECT UPPER(m.lineDescription) as d, COUNT(*) as c FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NULL GROUP BY d ORDER BY c DESC LIMIT 30 OFFSET 40;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT UPPER(m.lineDescription) as d, COUNT(*) as c FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NULL GROUP BY d ORDER BY c DESC LIMIT 30 OFFSET 40;",
+  "rows": [
+    {
+      "d": "CHOCOLAT DE COUVERTURE NOIR 70% ORIGINE SAINT-DOMINGUE - CACAO BARRY 20 KG",
+      "c": "3"
+    },
+    {
+      "d": "NOIX DE GRENOBLE EN PETIT MORCEAUX 30 LB",
+      "c": "3"
+    },
+    {
+      "d": "FLOCONS DE CHILI BROYÉ 2.27KG",
+      "c": "3"
+    },
+    {
+      "d": "JUICE ORANGE BLEND PLAST OASIS",
+      "c": "3"
+    },
+    {
+      "d": "POUDRE À PÂTE - FLEISCHMANN'S 5 KG",
+      "c": "3"
+    },
+    {
+      "d": "EXTRAIT DE VANILLE NATUREL (BOURBON 200 G)- EUROVANILLE 1 KG",
+      "c": "3"
+    },
+    {
+      "d": "NAPKIN DISP KRAFT 1PLY XPRESSNAP",
+      "c": "3"
+    },
+    {
+      "d": "EMPTY MILK CRATE",
+      "c": "2"
+    },
+    {
+      "d": "NUTELLA 2 X 3 KG",
+      "c": "2"
+    },
+    {
+      "d": "SUCRE DE CANNE BIOLOGIQUE DE COLOMBIE 25 KG",
+      "c": "2"
+    },
+    {
+      "d": "BAG WAX PAPER SANDWICH MENU",
+      "c": "2"
+    },
+    {
+      "d": "LID PLAST DOME WH 10-12-16OZ",
+      "c": "2"
+    },
+    {
+      "d": "BEV ICED TEA CAN FUZE",
+      "c": "2"
+    },
+    {
+      "d": "GANT EN NITRILE NOIR SANS POUDRE - MEDIUM - 100 UNITÉS",
+      "c": "2"
+    },
+    {
+      "d": "FRUIT DRIED RAISIN SULT MAISON",
+      "c": "2"
+    },
+    {
+      "d": "PISTACHE ÉCALLÉE ENTIÈRE DE LA CALIFORNIE 25 LBS - 11.33 KG",
+      "c": "2"
+    },
+    {
+      "d": "CHILI BROYÉ - 2.27KG",
+      "c": "2"
+    },
+    {
+      "d": "HAT (HAIR NET ONLY) INV 21I",
+      "c": "2"
+    },
+    {
+      "d": "PÂTE FEUILLETÉE 10 X 15 CRU CONGELÉS DUMAS - 20 X 350 G",
+      "c": "2"
+    },
+    {
+      "d": "FARINE DE BLÉ ENTIER À PAIN BIOLOGIQUE - MILANAISE 20 KG",
+      "c": "2"
+    },
+    {
+      "d": "GRAINES DE CHIA NOIRES - CEBON 2.5 KG",
+      "c": "2"
+    },
+    {
+      "d": "PAD À FOUR POUR PLAQUE DE CUISSON - 1 UNITÉ",
+      "c": "2"
+    },
+    {
+      "d": "SAUCE SOYA KIKKOMAN (4)",
+      "c": "2"
+    },
+    {
+      "d": "WATER SPRING NAT PET",
+      "c": "2"
+    },
+    {
+      "d": "ROMARIN ENTIER 2.27 KG",
+      "c": "2"
+    },
+    {
+      "d": "OIL CANOLA JIB ZTF ANTI FOAM",
+      "c": "2"
+    },
+    {
+      "d": "LAIT HOMO 3.25PCT (CAISSON)",
+      "c": "1"
+    },
+    {
+      "d": "YOGURT VANILLA 1.5% ORIG IOGO",
+      "c": "1"
+    },
+    {
+      "d": "PÉPITES DE CHOCOLAT PUR MI-SUCRÉ 10000CT - BARRY CALLEBAUT 20 KG",
+      "c": "1"
+    },
+    {
+      "d": "SLEEVE PPR HOT CUP KRFT",
+      "c": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "d\tc\nCHOCOLAT DE COUVERTURE NOIR 70% ORIGINE SAINT-DOMINGUE - CACAO BARRY 20 KG\t3\nNOIX DE GRENOBLE EN PETIT MORCEAUX 30 LB\t3\nFLOCONS DE CHILI BROYÉ 2.27KG\t3\nJUICE ORANGE BLEND PLAST OASIS\t3\nPOUDRE À PÂTE - FLEISCHMANN'S 5 KG\t3\nEXTRAIT DE VANILLE NATUREL (BOURBON 200 G)- EUROVANILLE 1 KG\t3\nNAPKIN DISP KRAFT 1PLY XPRESSNAP\t3\nEMPTY MILK CRATE\t2\nNUTELLA 2 X 3 KG\t2\nSUCRE DE CANNE BIOLOGIQUE DE COLOMBIE 25 KG\t2\nBAG WAX PAPER SANDWICH MENU\t2\nLID PLAST DOME WH 10-12-16OZ\t2\nBEV ICED TEA CAN FUZE\t2\nGANT EN NITRILE NOIR SANS POUDRE - MEDIUM - 100 UNITÉS\t2\nFRUIT DRIED RAISIN SULT MAISON\t2\nPISTACHE ÉCALLÉE ENTIÈRE DE LA CALIFORNIE 25 LBS - 11.33 KG\t2\nCHILI BROYÉ - 2.27KG\t2\nHAT (HAIR NET ONLY) INV 21I\t2\nPÂTE FEUILLETÉE 10 X 15 CRU CONGELÉS DUMAS - 20 X 350 G\t2\nFARINE DE BLÉ ENTIER À PAIN BIOLOGIQUE - MILANAISE 20 KG\t2\nGRAINES DE CHIA NOIRES - CEBON 2.5 KG\t2\nPAD À FOUR POUR PLAQUE DE CUISSON - 1 UNITÉ\t2\nSAUCE SOYA KIKKOMAN (4)\t2\nWATER SPRING NAT PET\t2\nROMARIN ENTIER 2.27 KG\t2\nOIL CANOLA JIB ZTF ANTI FOAM\t2\nLAIT HOMO 3.25PCT (CAISSON)\t1\nYOGURT VANILLA 1.5% ORIG IOGO\t1\nPÉPITES DE CHOCOLAT PUR MI-SUCRÉ 10000CT - BARRY CALLEBAUT 20 KG\t1\nSLEEVE PPR HOT CUP KRFT\t1\n",
+  "stderr": "",
+  "execution_time_ms": 75
+}

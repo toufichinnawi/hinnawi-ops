@@ -1,0 +1,115 @@
+{
+  "query": "SELECT name, ROUND(totalCost, 2) as cost, ROUND(sellingPrice, 2) as price, ROUND(foodCostPct, 1) as food_cost_pct, ROUND(profit, 2) as profit FROM recipes ORDER BY foodCostPct DESC LIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT name, ROUND(totalCost, 2) as cost, ROUND(sellingPrice, 2) as price, ROUND(foodCostPct, 1) as food_cost_pct, ROUND(profit, 2) as profit FROM recipes ORDER BY foodCostPct DESC LIMIT 15;",
+  "rows": [
+    {
+      "name": "Wake up",
+      "cost": "58.88",
+      "price": "5.49",
+      "food_cost_pct": "1000.0",
+      "profit": "-53.39"
+    },
+    {
+      "name": "Quebec",
+      "cost": "58.17",
+      "price": "6.99",
+      "food_cost_pct": "832.2",
+      "profit": "-51.18"
+    },
+    {
+      "name": "Petit-déjeuner",
+      "cost": "60.33",
+      "price": "8.99",
+      "food_cost_pct": "671.0",
+      "profit": "-51.34"
+    },
+    {
+      "name": "Petit-Quebec",
+      "cost": "58.29",
+      "price": "8.99",
+      "food_cost_pct": "648.3",
+      "profit": "-49.30"
+    },
+    {
+      "name": "Bacon jam",
+      "cost": "59.95",
+      "price": "9.99",
+      "food_cost_pct": "600.1",
+      "profit": "-49.96"
+    },
+    {
+      "name": "Petit-Quebec with bacon",
+      "cost": "58.95",
+      "price": "12.98",
+      "food_cost_pct": "454.1",
+      "profit": "-45.97"
+    },
+    {
+      "name": "Petit-Quebec with ham",
+      "cost": "58.95",
+      "price": "12.98",
+      "food_cost_pct": "454.1",
+      "profit": "-45.97"
+    },
+    {
+      "name": "New York",
+      "cost": "25.59",
+      "price": "13.99",
+      "food_cost_pct": "182.9",
+      "profit": "-11.60"
+    },
+    {
+      "name": "Cream cheese with Lox",
+      "cost": "18.10",
+      "price": "10.99",
+      "food_cost_pct": "164.7",
+      "profit": "-7.11"
+    },
+    {
+      "name": "Chicken Salad",
+      "cost": "22.29",
+      "price": "13.98",
+      "food_cost_pct": "159.5",
+      "profit": "-8.31"
+    },
+    {
+      "name": "Mila",
+      "cost": "21.08",
+      "price": "14.75",
+      "food_cost_pct": "142.9",
+      "profit": "-6.33"
+    },
+    {
+      "name": "Shanghai",
+      "cost": "14.73",
+      "price": "11.99",
+      "food_cost_pct": "122.9",
+      "profit": "-2.74"
+    },
+    {
+      "name": "Tofu Salad",
+      "cost": "11.39",
+      "price": "12.98",
+      "food_cost_pct": "87.8",
+      "profit": "1.59"
+    },
+    {
+      "name": "Vegetarian",
+      "cost": "8.56",
+      "price": "10.99",
+      "food_cost_pct": "77.9",
+      "profit": "2.43"
+    },
+    {
+      "name": "George",
+      "cost": "9.75",
+      "price": "12.99",
+      "food_cost_pct": "75.1",
+      "profit": "3.24"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\tcost\tprice\tfood_cost_pct\tprofit\nWake up\t58.88\t5.49\t1000.0\t-53.39\nQuebec\t58.17\t6.99\t832.2\t-51.18\nPetit-déjeuner\t60.33\t8.99\t671.0\t-51.34\nPetit-Quebec\t58.29\t8.99\t648.3\t-49.30\nBacon jam\t59.95\t9.99\t600.1\t-49.96\nPetit-Quebec with bacon\t58.95\t12.98\t454.1\t-45.97\nPetit-Quebec with ham\t58.95\t12.98\t454.1\t-45.97\nNew York\t25.59\t13.99\t182.9\t-11.60\nCream cheese with Lox\t18.10\t10.99\t164.7\t-7.11\nChicken Salad\t22.29\t13.98\t159.5\t-8.31\nMila\t21.08\t14.75\t142.9\t-6.33\nShanghai\t14.73\t11.99\t122.9\t-2.74\nTofu Salad\t11.39\t12.98\t87.8\t1.59\nVegetarian\t8.56\t10.99\t77.9\t2.43\nGeorge\t9.75\t12.99\t75.1\t3.24\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

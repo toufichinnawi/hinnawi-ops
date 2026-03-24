@@ -1,0 +1,58 @@
+{
+  "query": "SELECT locationId, saleDate, totalSales, totalDeposit, gstCollected, qstCollected, tipsCollected, merchantFees, taxExemptSales, taxableSales FROM dailySales WHERE saleDate = '2026-03-10' ORDER BY locationId",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT locationId, saleDate, totalSales, totalDeposit, gstCollected, qstCollected, tipsCollected, merchantFees, taxExemptSales, taxableSales FROM dailySales WHERE saleDate = '2026-03-10' ORDER BY locationId",
+  "rows": [
+    {
+      "locationId": "1",
+      "saleDate": "2026-03-10",
+      "totalSales": "3099.08",
+      "totalDeposit": "2232.92",
+      "gstCollected": "50.94",
+      "qstCollected": "101.62",
+      "tipsCollected": "204.97",
+      "merchantFees": "0.00",
+      "taxExemptSales": "2080.37",
+      "taxableSales": "1018.71"
+    },
+    {
+      "locationId": "2",
+      "saleDate": "2026-03-10",
+      "totalSales": "2302.95",
+      "totalDeposit": "1616.66",
+      "gstCollected": "40.36",
+      "qstCollected": "80.51",
+      "tipsCollected": "141.94",
+      "merchantFees": "0.00",
+      "taxExemptSales": "1495.79",
+      "taxableSales": "807.16"
+    },
+    {
+      "locationId": "3",
+      "saleDate": "2026-03-10",
+      "totalSales": "404.12",
+      "totalDeposit": "0.00",
+      "gstCollected": "0.00",
+      "qstCollected": "0.00",
+      "tipsCollected": "34.92",
+      "merchantFees": "0.00",
+      "taxExemptSales": "0.00",
+      "taxableSales": "0.00"
+    },
+    {
+      "locationId": "4",
+      "saleDate": "2026-03-10",
+      "totalSales": "964.77",
+      "totalDeposit": "798.36",
+      "gstCollected": "9.79",
+      "qstCollected": "19.52",
+      "tipsCollected": "104.07",
+      "merchantFees": "0.00",
+      "taxExemptSales": "769.05",
+      "taxableSales": "195.72"
+    }
+  ],
+  "messages": [],
+  "stdout": "locationId\tsaleDate\ttotalSales\ttotalDeposit\tgstCollected\tqstCollected\ttipsCollected\tmerchantFees\ttaxExemptSales\ttaxableSales\n1\t2026-03-10\t3099.08\t2232.92\t50.94\t101.62\t204.97\t0.00\t2080.37\t1018.71\n2\t2026-03-10\t2302.95\t1616.66\t40.36\t80.51\t141.94\t0.00\t1495.79\t807.16\n3\t2026-03-10\t404.12\t0.00\t0.00\t0.00\t34.92\t0.00\t0.00\t0.00\n4\t2026-03-10\t964.77\t798.36\t9.79\t19.52\t104.07\t0.00\t769.05\t195.72\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

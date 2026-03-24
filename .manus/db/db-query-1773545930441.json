@@ -1,0 +1,76 @@
+{
+  "query": "SELECT id, name, code, category FROM suppliers;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name, code, category FROM suppliers;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Gordon Food Service",
+      "code": "GFS",
+      "category": "Broadline Distributor"
+    },
+    {
+      "id": "2",
+      "name": "Farinex Distribution",
+      "code": "FAR",
+      "category": "Bakery & Flour"
+    },
+    {
+      "id": "3",
+      "name": "Dubé Loiselle",
+      "code": "DUB",
+      "category": "Dairy & Cheese"
+    },
+    {
+      "id": "4",
+      "name": "JG Rive-Sud",
+      "code": "JGR",
+      "category": "Produce"
+    },
+    {
+      "id": "5",
+      "name": "Nantel Distribution",
+      "code": "NAN",
+      "category": "Specialty Foods"
+    },
+    {
+      "id": "6",
+      "name": "Costco Wholesale",
+      "code": "COS",
+      "category": "Wholesale Grocery"
+    },
+    {
+      "id": "7",
+      "name": "Les Touriers",
+      "code": "LES",
+      "category": "Bakery Supplies"
+    },
+    {
+      "id": "8",
+      "name": "Lightspeed Commerce",
+      "code": "LIG",
+      "category": "POS System"
+    },
+    {
+      "id": "9",
+      "name": "Hydro-Québec",
+      "code": "HYD",
+      "category": "Utilities"
+    },
+    {
+      "id": "10",
+      "name": "Koomi POS",
+      "code": "KOO",
+      "category": "POS System"
+    },
+    {
+      "id": "11",
+      "name": "Pure Tea",
+      "code": "PUR",
+      "category": "Tea & Beverages"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcode\tcategory\n1\tGordon Food Service\tGFS\tBroadline Distributor\n2\tFarinex Distribution\tFAR\tBakery & Flour\n3\tDubé Loiselle\tDUB\tDairy & Cheese\n4\tJG Rive-Sud\tJGR\tProduce\n5\tNantel Distribution\tNAN\tSpecialty Foods\n6\tCostco Wholesale\tCOS\tWholesale Grocery\n7\tLes Touriers\tLES\tBakery Supplies\n8\tLightspeed Commerce\tLIG\tPOS System\n9\tHydro-Québec\tHYD\tUtilities\n10\tKoomi POS\tKOO\tPOS System\n11\tPure Tea\tPUR\tTea & Beverages\n",
+  "stderr": "",
+  "execution_time_ms": 88
+}

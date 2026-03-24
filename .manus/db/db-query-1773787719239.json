@@ -1,0 +1,138 @@
+{
+  "query": "SELECT invoiceNumber, supplierId FROM invoices ORDER BY invoiceNumber;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT invoiceNumber, supplierId FROM invoices ORDER BY invoiceNumber;",
+  "rows": [
+    {
+      "invoiceNumber": "NULL",
+      "supplierId": "NULL"
+    },
+    {
+      "invoiceNumber": "NULL",
+      "supplierId": "NULL"
+    },
+    {
+      "invoiceNumber": "NULL",
+      "supplierId": "NULL"
+    },
+    {
+      "invoiceNumber": "NULL",
+      "supplierId": "NULL"
+    },
+    {
+      "invoiceNumber": "NULL",
+      "supplierId": "NULL"
+    },
+    {
+      "invoiceNumber": "NULL",
+      "supplierId": "NULL"
+    },
+    {
+      "invoiceNumber": "NULL",
+      "supplierId": "NULL"
+    },
+    {
+      "invoiceNumber": "NULL",
+      "supplierId": "NULL"
+    },
+    {
+      "invoiceNumber": "026032",
+      "supplierId": "30002"
+    },
+    {
+      "invoiceNumber": "COS-2025-0012",
+      "supplierId": "6"
+    },
+    {
+      "invoiceNumber": "DUB-2025-0456",
+      "supplierId": "3"
+    },
+    {
+      "invoiceNumber": "DUB-2025-0457",
+      "supplierId": "3"
+    },
+    {
+      "invoiceNumber": "DUB-2025-0458",
+      "supplierId": "3"
+    },
+    {
+      "invoiceNumber": "FAR-2025-1190",
+      "supplierId": "2"
+    },
+    {
+      "invoiceNumber": "FAR-2025-1204",
+      "supplierId": "2"
+    },
+    {
+      "invoiceNumber": "FAR-2025-1205",
+      "supplierId": "2"
+    },
+    {
+      "invoiceNumber": "FAR-2025-1206",
+      "supplierId": "2"
+    },
+    {
+      "invoiceNumber": "FC00221028",
+      "supplierId": "2"
+    },
+    {
+      "invoiceNumber": "GFS-2025-0880",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "GFS-2025-0881",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "GFS-2025-0892",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "GFS-2025-0893",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "GFS-2025-0894",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "GFS-2026-0311",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "HYD-2025-0003",
+      "supplierId": "9"
+    },
+    {
+      "invoiceNumber": "JGR-2025-0085",
+      "supplierId": "4"
+    },
+    {
+      "invoiceNumber": "JGR-2025-0089",
+      "supplierId": "4"
+    },
+    {
+      "invoiceNumber": "NAN-2025-0034",
+      "supplierId": "5"
+    },
+    {
+      "invoiceNumber": "PPA-CC1-2026-0313",
+      "supplierId": "4"
+    },
+    {
+      "invoiceNumber": "UNI-MK-2026-0314",
+      "supplierId": "30003"
+    },
+    {
+      "invoiceNumber": "UNI-ONT-2026-0314",
+      "supplierId": "30003"
+    },
+    {
+      "invoiceNumber": "UNI-PK-2026-0314",
+      "supplierId": "30003"
+    }
+  ],
+  "messages": [],
+  "stdout": "invoiceNumber\tsupplierId\nNULL\tNULL\nNULL\tNULL\nNULL\tNULL\nNULL\tNULL\nNULL\tNULL\nNULL\tNULL\nNULL\tNULL\nNULL\tNULL\n026032\t30002\nCOS-2025-0012\t6\nDUB-2025-0456\t3\nDUB-2025-0457\t3\nDUB-2025-0458\t3\nFAR-2025-1190\t2\nFAR-2025-1204\t2\nFAR-2025-1205\t2\nFAR-2025-1206\t2\nFC00221028\t2\nGFS-2025-0880\t1\nGFS-2025-0881\t1\nGFS-2025-0892\t1\nGFS-2025-0893\t1\nGFS-2025-0894\t1\nGFS-2026-0311\t1\nHYD-2025-0003\t9\nJGR-2025-0085\t4\nJGR-2025-0089\t4\nNAN-2025-0034\t5\nPPA-CC1-2026-0313\t4\nUNI-MK-2026-0314\t30003\nUNI-ONT-2026-0314\t30003\nUNI-PK-2026-0314\t30003\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

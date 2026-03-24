@@ -1,0 +1,370 @@
+{
+  "query": "SELECT m.matchedItemName, m.lineDescription, m.unitPrice, m.quantity, i.purchaseAmount, i.unit, m.invoiceId\nFROM invoiceLineItemMatches m\nJOIN inventoryItems i ON i.id = m.inventoryItemId\nWHERE m.matchedItemName IN ('Ham', 'Mozzarella', 'Peppers', 'Olive oil', 'Garlic - Dehydrated', 'Chicken')\nAND m.invoiceId BETWEEN 90001 AND 90272\nAND m.matchStatus = 'auto_matched'\nORDER BY m.matchedItemName, m.invoiceId DESC\nLIMIT 40",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT m.matchedItemName, m.lineDescription, m.unitPrice, m.quantity, i.purchaseAmount, i.unit, m.invoiceId\nFROM invoiceLineItemMatches m\nJOIN inventoryItems i ON i.id = m.inventoryItemId\nWHERE m.matchedItemName IN ('Ham', 'Mozzarella', 'Peppers', 'Olive oil', 'Garlic - Dehydrated', 'Chicken')\nAND m.invoiceId BETWEEN 90001 AND 90272\nAND m.matchStatus = 'auto_matched'\nORDER BY m.matchedItemName, m.invoiceId DESC\nLIMIT 40",
+  "rows": [
+    {
+      "matchedItemName": "Chicken",
+      "lineDescription": "CHICKEN BRST CKD GRILL 3Z IQF G/FREE",
+      "unitPrice": "5.1770",
+      "quantity": "1.000",
+      "purchaseAmount": "19.600",
+      "unit": "Kg",
+      "invoiceId": "90078"
+    },
+    {
+      "matchedItemName": "Garlic - Dehydrated",
+      "lineDescription": "Kirkland Signature Minced California Garlic, 1.36 kg",
+      "unitPrice": "4.9736",
+      "quantity": "1.000",
+      "purchaseAmount": "2.270",
+      "unit": "Kg",
+      "invoiceId": "90259"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "Chamomile flower / Tea bag / compostable Chamomile / Teabag/compostable",
+      "unitPrice": "0.1913",
+      "quantity": "50.000",
+      "purchaseAmount": "2.300",
+      "unit": "Kg",
+      "invoiceId": "90270"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "HAM BLC FOREST OLYMEL 2.3KG (4",
+      "unitPrice": "5.7609",
+      "quantity": "4.010",
+      "purchaseAmount": "2.300",
+      "unit": "Kg",
+      "invoiceId": "90216"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "HAM BLC FOREST OLYMEL 2.3KG (4",
+      "unitPrice": "5.7609",
+      "quantity": "8.900",
+      "purchaseAmount": "2.300",
+      "unit": "Kg",
+      "invoiceId": "90215"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "HAM BLC FOREST OLYMEL 2.3KG (4",
+      "unitPrice": "5.7609",
+      "quantity": "10.110",
+      "purchaseAmount": "2.300",
+      "unit": "Kg",
+      "invoiceId": "90214"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "HAM BLC FOREST OLYMEL 2.3KG (4",
+      "unitPrice": "5.7609",
+      "quantity": "15.360",
+      "purchaseAmount": "2.300",
+      "unit": "Kg",
+      "invoiceId": "90213"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "HAM BLC FOREST OLYMEL 2.3KG (4",
+      "unitPrice": "5.7609",
+      "quantity": "7.640",
+      "purchaseAmount": "2.300",
+      "unit": "Kg",
+      "invoiceId": "90212"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "Champignon portobello 2,27kg (Ontario-Usa)",
+      "unitPrice": "9.8043",
+      "quantity": "1.000",
+      "purchaseAmount": "2.300",
+      "unit": "Kg",
+      "invoiceId": "90128"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "Champignon portobello 2,27kg (US)",
+      "unitPrice": "9.8043",
+      "quantity": "1.000",
+      "purchaseAmount": "2.300",
+      "unit": "Kg",
+      "invoiceId": "90117"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "HAM WHL BLK FOREST V/PK FRSH",
+      "unitPrice": "6.2174",
+      "quantity": "1.000",
+      "purchaseAmount": "2.300",
+      "unit": "Kg",
+      "invoiceId": "90022"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "HAM WHL BLK FOREST V/PK FRSH",
+      "unitPrice": "6.2174",
+      "quantity": "1.000",
+      "purchaseAmount": "2.300",
+      "unit": "Kg",
+      "invoiceId": "90021"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "Racolli 19% Pizza Mozzarella Shredded Cheese, 2.27 kg",
+      "unitPrice": "1.8799",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90260"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.3576",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90058"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.3576",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90056"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.3576",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90054"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.3370",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90050"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.3370",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90048"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.3370",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90046"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.3364",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90043"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.3364",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90041"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "1.6326",
+      "quantity": "4.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90040"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.3364",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90039"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.3364",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90036"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "0.0000",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90035"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "13.5440",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90031"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "13.5440",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90029"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "13.5440",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90026"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "12.2832",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90022"
+    },
+    {
+      "matchedItemName": "Mozzarella",
+      "lineDescription": "CHEESE MOZZ BLOCK 19PCT MF HALAL",
+      "unitPrice": "-12.3364",
+      "quantity": "1.000",
+      "purchaseAmount": "18.400",
+      "unit": "Kg",
+      "invoiceId": "90011"
+    },
+    {
+      "matchedItemName": "Olive oil",
+      "lineDescription": "Summum Extra-virgin Olive Oil, 3 L",
+      "unitPrice": "12.7436",
+      "quantity": "1.000",
+      "purchaseAmount": "2.730",
+      "unit": "Kg",
+      "invoiceId": "90261"
+    },
+    {
+      "matchedItemName": "Olive oil",
+      "lineDescription": "OIL OLIVE EXTRA VIRGIN",
+      "unitPrice": "17.7802",
+      "quantity": "1.000",
+      "purchaseAmount": "2.730",
+      "unit": "Kg",
+      "invoiceId": "90080"
+    },
+    {
+      "matchedItemName": "Peppers",
+      "lineDescription": "Peppermint TB Peppermint / Tea bag / compostable",
+      "unitPrice": "0.0860",
+      "quantity": "100.000",
+      "purchaseAmount": "5.000",
+      "unit": "Kg",
+      "invoiceId": "90272"
+    },
+    {
+      "matchedItemName": "Peppers",
+      "lineDescription": "Peppermint TB Peppermint / Teabag / compostable",
+      "unitPrice": "0.0860",
+      "quantity": "50.000",
+      "purchaseAmount": "5.000",
+      "unit": "Kg",
+      "invoiceId": "90270"
+    },
+    {
+      "matchedItemName": "Peppers",
+      "lineDescription": "Poivron rouge 5kg (Mexique-Ontario-Hollande)",
+      "unitPrice": "5.8800",
+      "quantity": "3.000",
+      "purchaseAmount": "5.000",
+      "unit": "Kg",
+      "invoiceId": "90230"
+    },
+    {
+      "matchedItemName": "Peppers",
+      "lineDescription": "Poivron rouge 5kg (Mexique-Ontario)",
+      "unitPrice": "5.8800",
+      "quantity": "2.000",
+      "purchaseAmount": "5.000",
+      "unit": "Kg",
+      "invoiceId": "90229"
+    },
+    {
+      "matchedItemName": "Peppers",
+      "lineDescription": "Poivron rouge 5kg (Mexique-Ontario)",
+      "unitPrice": "3.5200",
+      "quantity": "3.000",
+      "purchaseAmount": "5.000",
+      "unit": "Kg",
+      "invoiceId": "90227"
+    },
+    {
+      "matchedItemName": "Peppers",
+      "lineDescription": "Poivron rouge 5kg (Mexique-Ontario)",
+      "unitPrice": "3.5200",
+      "quantity": "3.000",
+      "purchaseAmount": "5.000",
+      "unit": "Kg",
+      "invoiceId": "90226"
+    },
+    {
+      "matchedItemName": "Peppers",
+      "lineDescription": "Poivron rouge 5kg (Mexique-Ontario)",
+      "unitPrice": "2.5800",
+      "quantity": "3.000",
+      "purchaseAmount": "5.000",
+      "unit": "Kg",
+      "invoiceId": "90224"
+    },
+    {
+      "matchedItemName": "Peppers",
+      "lineDescription": "Poivron rouge 5kg (Mexique-Ontario)",
+      "unitPrice": "2.8200",
+      "quantity": "2.000",
+      "purchaseAmount": "5.000",
+      "unit": "Kg",
+      "invoiceId": "90223"
+    }
+  ],
+  "messages": [],
+  "stdout": "matchedItemName\tlineDescription\tunitPrice\tquantity\tpurchaseAmount\tunit\tinvoiceId\nChicken\tCHICKEN BRST CKD GRILL 3Z IQF G/FREE\t5.1770\t1.000\t19.600\tKg\t90078\nGarlic - Dehydrated\tKirkland Signature Minced California Garlic, 1.36 kg\t4.9736\t1.000\t2.270\tKg\t90259\nHam\tChamomile flower / Tea bag / compostable Chamomile / Teabag/compostable\t0.1913\t50.000\t2.300\tKg\t90270\nHam\tHAM BLC FOREST OLYMEL 2.3KG (4\t5.7609\t4.010\t2.300\tKg\t90216\nHam\tHAM BLC FOREST OLYMEL 2.3KG (4\t5.7609\t8.900\t2.300\tKg\t90215\nHam\tHAM BLC FOREST OLYMEL 2.3KG (4\t5.7609\t10.110\t2.300\tKg\t90214\nHam\tHAM BLC FOREST OLYMEL 2.3KG (4\t5.7609\t15.360\t2.300\tKg\t90213\nHam\tHAM BLC FOREST OLYMEL 2.3KG (4\t5.7609\t7.640\t2.300\tKg\t90212\nHam\tChampignon portobello 2,27kg (Ontario-Usa)\t9.8043\t1.000\t2.300\tKg\t90128\nHam\tChampignon portobello 2,27kg (US)\t9.8043\t1.000\t2.300\tKg\t90117\nHam\tHAM WHL BLK FOREST V/PK FRSH\t6.2174\t1.000\t2.300\tKg\t90022\nHam\tHAM WHL BLK FOREST V/PK FRSH\t6.2174\t1.000\t2.300\tKg\t90021\nMozzarella\tRacolli 19% Pizza Mozzarella Shredded Cheese, 2.27 kg\t1.8799\t1.000\t18.400\tKg\t90260\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.3576\t1.000\t18.400\tKg\t90058\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.3576\t1.000\t18.400\tKg\t90056\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.3576\t1.000\t18.400\tKg\t90054\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.3370\t1.000\t18.400\tKg\t90050\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.3370\t1.000\t18.400\tKg\t90048\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.3370\t1.000\t18.400\tKg\t90046\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.3364\t1.000\t18.400\tKg\t90043\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.3364\t1.000\t18.400\tKg\t90041\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t1.6326\t4.000\t18.400\tKg\t90040\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.3364\t1.000\t18.400\tKg\t90039\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.3364\t1.000\t18.400\tKg\t90036\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t0.0000\t1.000\t18.400\tKg\t90035\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t13.5440\t1.000\t18.400\tKg\t90031\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t13.5440\t1.000\t18.400\tKg\t90029\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t13.5440\t1.000\t18.400\tKg\t90026\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t12.2832\t1.000\t18.400\tKg\t90022\nMozzarella\tCHEESE MOZZ BLOCK 19PCT MF HALAL\t-12.3364\t1.000\t18.400\tKg\t90011\nOlive oil\tSummum Extra-virgin Olive Oil, 3 L\t12.7436\t1.000\t2.730\tKg\t90261\nOlive oil\tOIL OLIVE EXTRA VIRGIN\t17.7802\t1.000\t2.730\tKg\t90080\nPeppers\tPeppermint TB Peppermint / Tea bag / compostable\t0.0860\t100.000\t5.000\tKg\t90272\nPeppers\tPeppermint TB Peppermint / Teabag / compostable\t0.0860\t50.000\t5.000\tKg\t90270\nPeppers\tPoivron rouge 5kg (Mexique-Ontario-Hollande)\t5.8800\t3.000\t5.000\tKg\t90230\nPeppers\tPoivron rouge 5kg (Mexique-Ontario)\t5.8800\t2.000\t5.000\tKg\t90229\nPeppers\tPoivron rouge 5kg (Mexique-Ontario)\t3.5200\t3.000\t5.000\tKg\t90227\nPeppers\tPoivron rouge 5kg (Mexique-Ontario)\t3.5200\t3.000\t5.000\tKg\t90226\nPeppers\tPoivron rouge 5kg (Mexique-Ontario)\t2.5800\t3.000\t5.000\tKg\t90224\nPeppers\tPoivron rouge 5kg (Mexique-Ontario)\t2.8200\t2.000\t5.000\tKg\t90223\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

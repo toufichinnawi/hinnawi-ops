@@ -1,0 +1,82 @@
+{
+  "query": "SELECT ds.saleDate, ds.taxExemptSales, ds.taxableSales, ds.totalSales, (ds.taxExemptSales + ds.taxableSales) as expectedTotal, CASE WHEN ds.totalSales = (ds.taxExemptSales + ds.taxableSales) THEN 'OK' ELSE 'MISMATCH' END as status FROM dailySales ds WHERE ds.locationId = 1 AND ds.saleDate BETWEEN '2026-03-08' AND '2026-03-16' ORDER BY ds.saleDate;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT ds.saleDate, ds.taxExemptSales, ds.taxableSales, ds.totalSales, (ds.taxExemptSales + ds.taxableSales) as expectedTotal, CASE WHEN ds.totalSales = (ds.taxExemptSales + ds.taxableSales) THEN 'OK' ELSE 'MISMATCH' END as status FROM dailySales ds WHERE ds.locationId = 1 AND ds.saleDate BETWEEN '2026-03-08' AND '2026-03-16' ORDER BY ds.saleDate;",
+  "rows": [
+    {
+      "saleDate": "2026-03-08",
+      "taxExemptSales": "813.27",
+      "taxableSales": "391.51",
+      "totalSales": "1204.78",
+      "expectedTotal": "1204.78",
+      "status": "OK"
+    },
+    {
+      "saleDate": "2026-03-09",
+      "taxExemptSales": "1585.28",
+      "taxableSales": "757.19",
+      "totalSales": "2342.47",
+      "expectedTotal": "2342.47",
+      "status": "OK"
+    },
+    {
+      "saleDate": "2026-03-10",
+      "taxExemptSales": "2080.37",
+      "taxableSales": "1018.71",
+      "totalSales": "3099.08",
+      "expectedTotal": "3099.08",
+      "status": "OK"
+    },
+    {
+      "saleDate": "2026-03-11",
+      "taxExemptSales": "481.20",
+      "taxableSales": "200.50",
+      "totalSales": "681.70",
+      "expectedTotal": "681.70",
+      "status": "OK"
+    },
+    {
+      "saleDate": "2026-03-12",
+      "taxExemptSales": "1809.18",
+      "taxableSales": "951.10",
+      "totalSales": "2760.28",
+      "expectedTotal": "2760.28",
+      "status": "OK"
+    },
+    {
+      "saleDate": "2026-03-13",
+      "taxExemptSales": "2138.67",
+      "taxableSales": "940.98",
+      "totalSales": "3079.65",
+      "expectedTotal": "3079.65",
+      "status": "OK"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "taxExemptSales": "1219.33",
+      "taxableSales": "796.52",
+      "totalSales": "2015.85",
+      "expectedTotal": "2015.85",
+      "status": "OK"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "taxExemptSales": "1821.63",
+      "taxableSales": "927.40",
+      "totalSales": "2749.03",
+      "expectedTotal": "2749.03",
+      "status": "OK"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "taxExemptSales": "2098.48",
+      "taxableSales": "1134.05",
+      "totalSales": "3232.53",
+      "expectedTotal": "3232.53",
+      "status": "OK"
+    }
+  ],
+  "messages": [],
+  "stdout": "saleDate\ttaxExemptSales\ttaxableSales\ttotalSales\texpectedTotal\tstatus\n2026-03-08\t813.27\t391.51\t1204.78\t1204.78\tOK\n2026-03-09\t1585.28\t757.19\t2342.47\t2342.47\tOK\n2026-03-10\t2080.37\t1018.71\t3099.08\t3099.08\tOK\n2026-03-11\t481.20\t200.50\t681.70\t681.70\tOK\n2026-03-12\t1809.18\t951.10\t2760.28\t2760.28\tOK\n2026-03-13\t2138.67\t940.98\t3079.65\t3079.65\tOK\n2026-03-14\t1219.33\t796.52\t2015.85\t2015.85\tOK\n2026-03-15\t1821.63\t927.40\t2749.03\t2749.03\tOK\n2026-03-16\t2098.48\t1134.05\t3232.53\t3232.53\tOK\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

@@ -1,0 +1,25 @@
+{
+  "query": "SELECT matchedItemName, lineDescription, unitPrice\nFROM invoiceLineItemMatches \nWHERE matchedItemName = 'Ham'\nAND invoiceId BETWEEN 90001 AND 90272\nAND matchStatus = 'auto_matched'\nAND (lineDescription LIKE '%Cham%' OR lineDescription LIKE '%cham%' OR lineDescription LIKE '%tea%')\nLIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT matchedItemName, lineDescription, unitPrice\nFROM invoiceLineItemMatches \nWHERE matchedItemName = 'Ham'\nAND invoiceId BETWEEN 90001 AND 90272\nAND matchStatus = 'auto_matched'\nAND (lineDescription LIKE '%Cham%' OR lineDescription LIKE '%cham%' OR lineDescription LIKE '%tea%')\nLIMIT 10",
+  "rows": [
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "Champignon portobello 2,27kg (US)",
+      "unitPrice": "9.8043"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "Champignon portobello 2,27kg (Ontario-Usa)",
+      "unitPrice": "9.8043"
+    },
+    {
+      "matchedItemName": "Ham",
+      "lineDescription": "Chamomile flower / Tea bag / compostable Chamomile / Teabag/compostable",
+      "unitPrice": "0.1913"
+    }
+  ],
+  "messages": [],
+  "stdout": "matchedItemName\tlineDescription\tunitPrice\nHam\tChampignon portobello 2,27kg (US)\t9.8043\nHam\tChampignon portobello 2,27kg (Ontario-Usa)\t9.8043\nHam\tChamomile flower / Tea bag / compostable Chamomile / Teabag/compostable\t0.1913\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

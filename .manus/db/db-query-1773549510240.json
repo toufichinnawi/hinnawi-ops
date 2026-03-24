@@ -1,0 +1,16 @@
+{
+  "query": "SELECT MIN(saleDate) as earliest, MAX(saleDate) as latest, COUNT(*) as total_rows, COUNT(DISTINCT saleDate) as unique_dates FROM dailySales;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT MIN(saleDate) as earliest, MAX(saleDate) as latest, COUNT(*) as total_rows, COUNT(DISTINCT saleDate) as unique_dates FROM dailySales;",
+  "rows": [
+    {
+      "earliest": "2025-01-01",
+      "latest": "2025-03-13",
+      "total_rows": "219",
+      "unique_dates": "72"
+    }
+  ],
+  "messages": [],
+  "stdout": "earliest\tlatest\ttotal_rows\tunique_dates\n2025-01-01\t2025-03-13\t219\t72\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

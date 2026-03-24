@@ -1,0 +1,79 @@
+{
+  "query": "SHOW TABLES",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SHOW TABLES",
+  "rows": [
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "alerts"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "appSettings"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "bankAccounts"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "bankTransactions"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "dailySales"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "importLogs"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "integrations"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "inventoryItems"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "invoiceLineItems"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "invoices"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "locations"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "menuItems"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "payrollRecords"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "poLineItems"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "productSales"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "purchaseOrders"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "qboTokens"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "recipeIngredients"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "recipes"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "suppliers"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "syncLogs"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_h46y7gAGiyBszkHNcCdSHx\n__drizzle_migrations\nalerts\nappSettings\nbankAccounts\nbankTransactions\ndailySales\nimportLogs\nintegrations\ninventoryItems\ninvoiceLineItems\ninvoices\nlocations\nmenuItems\npayrollRecords\npoLineItems\nproductSales\npurchaseOrders\nqboTokens\nrecipeIngredients\nrecipes\nsuppliers\nsyncLogs\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

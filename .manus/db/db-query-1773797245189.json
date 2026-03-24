@@ -1,0 +1,241 @@
+{
+  "query": "SELECT id, name, itemCode, unit, category FROM inventoryItems WHERE isActive = 1 ORDER BY name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name, itemCode, unit, category FROM inventoryItems WHERE isActive = 1 ORDER BY name;",
+  "rows": [
+    {
+      "id": "30016",
+      "name": "Avocados",
+      "itemCode": "NULL",
+      "unit": "Unit",
+      "category": "Vegetables & Greens"
+    },
+    {
+      "id": "30005",
+      "name": "Bacon",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Proteins"
+    },
+    {
+      "id": "30031",
+      "name": "Bacon jam",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30034",
+      "name": "Bagel",
+      "itemCode": "NULL",
+      "unit": "Unit",
+      "category": "Bagel"
+    },
+    {
+      "id": "30030",
+      "name": "Butter",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30033",
+      "name": "Cajun seasoning",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30022",
+      "name": "Capers",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Vegetables & Greens"
+    },
+    {
+      "id": "30014",
+      "name": "CC Hinnawi",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Dairy"
+    },
+    {
+      "id": "30013",
+      "name": "CC Philadelphia",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Dairy"
+    },
+    {
+      "id": "30015",
+      "name": "CC Riviera",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Dairy"
+    },
+    {
+      "id": "30012",
+      "name": "Cheddar",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Dairy"
+    },
+    {
+      "id": "30002",
+      "name": "Chicken",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Proteins"
+    },
+    {
+      "id": "30020",
+      "name": "Cucumbers",
+      "itemCode": "NULL",
+      "unit": "Unit",
+      "category": "Vegetables & Greens"
+    },
+    {
+      "id": "30028",
+      "name": "Dijon",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30006",
+      "name": "Egg",
+      "itemCode": "NULL",
+      "unit": "Unit",
+      "category": "Proteins"
+    },
+    {
+      "id": "30004",
+      "name": "Ham",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Proteins"
+    },
+    {
+      "id": "30029",
+      "name": "Honey mustard",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30025",
+      "name": "Lemon",
+      "itemCode": "NULL",
+      "unit": "Unit",
+      "category": "Vegetables & Greens"
+    },
+    {
+      "id": "30017",
+      "name": "Lettuce",
+      "itemCode": "NULL",
+      "unit": "Unit",
+      "category": "Vegetables & Greens"
+    },
+    {
+      "id": "30027",
+      "name": "Mayo",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30011",
+      "name": "Mozzarella",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Dairy"
+    },
+    {
+      "id": "30032",
+      "name": "Olive oil",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30019",
+      "name": "Onions",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Vegetables & Greens"
+    },
+    {
+      "id": "30024",
+      "name": "Peppers",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Vegetables & Greens"
+    },
+    {
+      "id": "30021",
+      "name": "Pickles",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Vegetables & Greens"
+    },
+    {
+      "id": "30007",
+      "name": "Salmon",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Proteins"
+    },
+    {
+      "id": "30009",
+      "name": "Smoked meat",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Proteins"
+    },
+    {
+      "id": "30026",
+      "name": "Spicy Mayo",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Condiments & Seasonings"
+    },
+    {
+      "id": "30023",
+      "name": "Spring mix",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Vegetables & Greens"
+    },
+    {
+      "id": "30010",
+      "name": "Tofu",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Proteins"
+    },
+    {
+      "id": "30018",
+      "name": "Tomatoes",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Vegetables & Greens"
+    },
+    {
+      "id": "30003",
+      "name": "Turkey",
+      "itemCode": "NULL",
+      "unit": "Kg",
+      "category": "Proteins"
+    },
+    {
+      "id": "30008",
+      "name": "Veggie patty",
+      "itemCode": "NULL",
+      "unit": "Unit",
+      "category": "Proteins"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\titemCode\tunit\tcategory\n30016\tAvocados\tNULL\tUnit\tVegetables & Greens\n30005\tBacon\tNULL\tKg\tProteins\n30031\tBacon jam\tNULL\tKg\tCondiments & Seasonings\n30034\tBagel\tNULL\tUnit\tBagel\n30030\tButter\tNULL\tKg\tCondiments & Seasonings\n30033\tCajun seasoning\tNULL\tKg\tCondiments & Seasonings\n30022\tCapers\tNULL\tKg\tVegetables & Greens\n30014\tCC Hinnawi\tNULL\tKg\tDairy\n30013\tCC Philadelphia\tNULL\tKg\tDairy\n30015\tCC Riviera\tNULL\tKg\tDairy\n30012\tCheddar\tNULL\tKg\tDairy\n30002\tChicken\tNULL\tKg\tProteins\n30020\tCucumbers\tNULL\tUnit\tVegetables & Greens\n30028\tDijon\tNULL\tKg\tCondiments & Seasonings\n30006\tEgg\tNULL\tUnit\tProteins\n30004\tHam\tNULL\tKg\tProteins\n30029\tHoney mustard\tNULL\tKg\tCondiments & Seasonings\n30025\tLemon\tNULL\tUnit\tVegetables & Greens\n30017\tLettuce\tNULL\tUnit\tVegetables & Greens\n30027\tMayo\tNULL\tKg\tCondiments & Seasonings\n30011\tMozzarella\tNULL\tKg\tDairy\n30032\tOlive oil\tNULL\tKg\tCondiments & Seasonings\n30019\tOnions\tNULL\tKg\tVegetables & Greens\n30024\tPeppers\tNULL\tKg\tVegetables & Greens\n30021\tPickles\tNULL\tKg\tVegetables & Greens\n30007\tSalmon\tNULL\tKg\tProteins\n30009\tSmoked meat\tNULL\tKg\tProteins\n30026\tSpicy Mayo\tNULL\tKg\tCondiments & Seasonings\n30023\tSpring mix\tNULL\tKg\tVegetables & Greens\n30010\tTofu\tNULL\tKg\tProteins\n30018\tTomatoes\tNULL\tKg\tVegetables & Greens\n30003\tTurkey\tNULL\tKg\tProteins\n30008\tVeggie patty\tNULL\tUnit\tProteins\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

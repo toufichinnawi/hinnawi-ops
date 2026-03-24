@@ -1,0 +1,46 @@
+{
+  "query": "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = 'productSales' LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = 'productSales' LIMIT 20",
+  "rows": [
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "locationId"
+    },
+    {
+      "COLUMN_NAME": "periodStart"
+    },
+    {
+      "COLUMN_NAME": "periodEnd"
+    },
+    {
+      "COLUMN_NAME": "section"
+    },
+    {
+      "COLUMN_NAME": "itemName"
+    },
+    {
+      "COLUMN_NAME": "category"
+    },
+    {
+      "COLUMN_NAME": "groupName"
+    },
+    {
+      "COLUMN_NAME": "totalRevenue"
+    },
+    {
+      "COLUMN_NAME": "quantitySold"
+    },
+    {
+      "COLUMN_NAME": "quantityRefunded"
+    },
+    {
+      "COLUMN_NAME": "createdAt"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nid\nlocationId\nperiodStart\nperiodEnd\nsection\nitemName\ncategory\ngroupName\ntotalRevenue\nquantitySold\nquantityRefunded\ncreatedAt\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

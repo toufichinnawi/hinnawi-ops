@@ -1,0 +1,70 @@
+{
+  "query": "SELECT * FROM bankAccounts ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT * FROM bankAccounts ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "7553-CIBC PK",
+      "bankName": "CIBC",
+      "accountNumber": "7553",
+      "locationId": "1",
+      "accountType": "checking",
+      "currency": "CAD",
+      "qboAccountId": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-03-17 02:48:35"
+    },
+    {
+      "id": "2",
+      "name": "720-BMO MK",
+      "bankName": "BMO",
+      "accountNumber": "720",
+      "locationId": "2",
+      "accountType": "checking",
+      "currency": "CAD",
+      "qboAccountId": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-03-17 02:48:35"
+    },
+    {
+      "id": "3",
+      "name": "Desjardins-Tunnel",
+      "bankName": "Desjardins",
+      "accountNumber": "NULL",
+      "locationId": "4",
+      "accountType": "checking",
+      "currency": "CAD",
+      "qboAccountId": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-03-17 02:48:35"
+    },
+    {
+      "id": "4",
+      "name": "615-CIBC Ontario",
+      "bankName": "CIBC",
+      "accountNumber": "615",
+      "locationId": "3",
+      "accountType": "checking",
+      "currency": "CAD",
+      "qboAccountId": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-03-17 02:48:35"
+    },
+    {
+      "id": "5",
+      "name": "811-CIBC CK",
+      "bankName": "CIBC",
+      "accountNumber": "811",
+      "locationId": "5",
+      "accountType": "checking",
+      "currency": "CAD",
+      "qboAccountId": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-03-17 02:48:35"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tbankName\taccountNumber\tlocationId\taccountType\tcurrency\tqboAccountId\tisActive\tcreatedAt\n1\t7553-CIBC PK\tCIBC\t7553\t1\tchecking\tCAD\tNULL\t1\t2026-03-17 02:48:35\n2\t720-BMO MK\tBMO\t720\t2\tchecking\tCAD\tNULL\t1\t2026-03-17 02:48:35\n3\tDesjardins-Tunnel\tDesjardins\tNULL\t4\tchecking\tCAD\tNULL\t1\t2026-03-17 02:48:35\n4\t615-CIBC Ontario\tCIBC\t615\t3\tchecking\tCAD\tNULL\t1\t2026-03-17 02:48:35\n5\t811-CIBC CK\tCIBC\t811\t5\tchecking\tCAD\tNULL\t1\t2026-03-17 02:48:35\n",
+  "stderr": "",
+  "execution_time_ms": 71
+}

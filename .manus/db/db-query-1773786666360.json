@@ -1,0 +1,19 @@
+{
+  "query": "SHOW TABLES LIKE '%qbo%'; SHOW TABLES LIKE '%sync%'; SHOW TABLES LIKE '%je%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SHOW TABLES LIKE '%qbo%'; SHOW TABLES LIKE '%sync%'; SHOW TABLES LIKE '%je%';",
+  "rows": [
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx (%qbo%)": "qboTokens"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx (%qbo%)": "Tables_in_h46y7gAGiyBszkHNcCdSHx (%sync%)"
+    },
+    {
+      "Tables_in_h46y7gAGiyBszkHNcCdSHx (%qbo%)": "syncLogs"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_h46y7gAGiyBszkHNcCdSHx (%qbo%)\nqboTokens\nTables_in_h46y7gAGiyBszkHNcCdSHx (%sync%)\nsyncLogs\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

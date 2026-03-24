@@ -1,0 +1,43 @@
+[2026-03-19T01:52:38.939Z] {"timestamp":1773885155322,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-19T01:52:39.959Z] {"timestamp":1773885158878,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-20T14:39:08.921Z] {"timestamp":1774017545786,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-20T14:39:08.921Z] {"timestamp":1774017545800,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-20T14:39:09.960Z] {"timestamp":1774017549165,"level":"INFO","args":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"],"stack":null}
+[2026-03-20T14:39:16.468Z] {"timestamp":1774017554424,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-20T14:39:16.469Z] {"timestamp":1774017554528,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-20T14:39:17.766Z] {"timestamp":1774017554945,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-20T14:39:17.766Z] {"timestamp":1774017555053,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-20T14:39:30.770Z] {"timestamp":1774017568725,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-20T14:39:30.770Z] {"timestamp":1774017569077,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-20T14:39:30.770Z] {"timestamp":1774017569745,"level":"WARN","args":["The width(0) and height(0) of chart should be greater than 0,\n       please check the style of container, or the props width(100%) and height(100%),\n       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the\n       height and width."],"stack":null}
+[2026-03-20T14:39:30.770Z] {"timestamp":1774017569745,"level":"WARN","args":["The width(0) and height(0) of chart should be greater than 0,\n       please check the style of container, or the props width(100%) and height(100%),\n       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the\n       height and width."],"stack":null}
+[2026-03-20T14:39:30.770Z] {"timestamp":1774017570028,"level":"WARN","args":["The width(0) and height(0) of chart should be greater than 0,\n       please check the style of container, or the props width(100%) and height(100%),\n       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the\n       height and width."],"stack":null}
+[2026-03-20T14:39:30.770Z] {"timestamp":1774017570029,"level":"WARN","args":["The width(0) and height(0) of chart should be greater than 0,\n       please check the style of container, or the props width(100%) and height(100%),\n       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the\n       height and width."],"stack":null}
+[2026-03-20T14:39:34.698Z] {"timestamp":1774017571656,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-20T14:39:34.698Z] {"timestamp":1774017571762,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-20T14:39:34.698Z] {"timestamp":1774017571971,"level":"WARN","args":["The width(0) and height(0) of chart should be greater than 0,\n       please check the style of container, or the props width(100%) and height(100%),\n       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the\n       height and width."],"stack":null}
+[2026-03-20T14:39:34.698Z] {"timestamp":1774017571971,"level":"WARN","args":["The width(0) and height(0) of chart should be greater than 0,\n       please check the style of container, or the props width(100%) and height(100%),\n       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the\n       height and width."],"stack":null}
+[2026-03-20T14:39:34.698Z] {"timestamp":1774017572114,"level":"WARN","args":["The width(0) and height(0) of chart should be greater than 0,\n       please check the style of container, or the props width(100%) and height(100%),\n       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the\n       height and width."],"stack":null}
+[2026-03-20T14:39:34.698Z] {"timestamp":1774017572115,"level":"WARN","args":["The width(0) and height(0) of chart should be greater than 0,\n       please check the style of container, or the props width(100%) and height(100%),\n       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the\n       height and width."],"stack":null}
+[2026-03-20T14:39:35.859Z] {"timestamp":1774017573590,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-20T14:39:35.859Z] {"timestamp":1774017573701,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-20T14:44:09.853Z] {"timestamp":1774017847789,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-20T14:44:09.853Z] {"timestamp":1774017847898,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-20T15:00:10.898Z] {"timestamp":1774018808810,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-20T15:00:10.898Z] {"timestamp":1774018808922,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-20T17:07:44.122Z] {"timestamp":1774026462053,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-20T17:07:44.122Z] {"timestamp":1774026462162,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-20T17:11:59.644Z] {"timestamp":1774026716866,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-20T17:11:59.644Z] {"timestamp":1774026716973,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-22T00:05:58.128Z] {"timestamp":1774137956057,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-22T00:05:58.128Z] {"timestamp":1774137956305,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-22T00:06:01.673Z] {"timestamp":1774137959524,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-22T00:06:01.673Z] {"timestamp":1774137959750,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-24T16:12:36.546Z] {"timestamp":1774368754323,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-24T16:12:36.546Z] {"timestamp":1774368754516,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-24T16:27:38.241Z] {"timestamp":1774369656136,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-24T16:27:38.241Z] {"timestamp":1774369656303,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-24T16:28:06.385Z] {"timestamp":1774369684173,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-24T16:28:06.385Z] {"timestamp":1774369684868,"level":"DEBUG","args":["[vite] connected."],"stack":null}
+[2026-03-24T16:28:10.962Z] {"timestamp":1774369688852,"level":"DEBUG","args":["[Manus] Debug collector initialized (no rrweb, UI events only)"],"stack":null}
+[2026-03-24T16:28:10.962Z] {"timestamp":1774369688972,"level":"DEBUG","args":["[vite] connected."],"stack":null}

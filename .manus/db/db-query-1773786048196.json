@@ -1,0 +1,42 @@
+{
+  "query": "SELECT ds.saleDate, l.name, ds.taxExemptSales, ds.taxableSales, ds.totalSales, (ds.taxExemptSales + ds.taxableSales) as expectedTotal FROM dailySales ds LEFT JOIN locations l ON ds.locationId = l.id WHERE ds.saleDate = '2026-03-12' ORDER BY ds.locationId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT ds.saleDate, l.name, ds.taxExemptSales, ds.taxableSales, ds.totalSales, (ds.taxExemptSales + ds.taxableSales) as expectedTotal FROM dailySales ds LEFT JOIN locations l ON ds.locationId = l.id WHERE ds.saleDate = '2026-03-12' ORDER BY ds.locationId;",
+  "rows": [
+    {
+      "saleDate": "2026-03-12",
+      "name": "President Kennedy",
+      "taxExemptSales": "1809.18",
+      "taxableSales": "951.10",
+      "totalSales": "2760.28",
+      "expectedTotal": "2760.28"
+    },
+    {
+      "saleDate": "2026-03-12",
+      "name": "Mackay",
+      "taxExemptSales": "1071.03",
+      "taxableSales": "541.71",
+      "totalSales": "1612.74",
+      "expectedTotal": "1612.74"
+    },
+    {
+      "saleDate": "2026-03-12",
+      "name": "Ontario",
+      "taxExemptSales": "0.00",
+      "taxableSales": "0.00",
+      "totalSales": "402.12",
+      "expectedTotal": "0.00"
+    },
+    {
+      "saleDate": "2026-03-12",
+      "name": "Cathcart Tunnel",
+      "taxExemptSales": "628.40",
+      "taxableSales": "172.05",
+      "totalSales": "800.45",
+      "expectedTotal": "800.45"
+    }
+  ],
+  "messages": [],
+  "stdout": "saleDate\tname\ttaxExemptSales\ttaxableSales\ttotalSales\texpectedTotal\n2026-03-12\tPresident Kennedy\t1809.18\t951.10\t2760.28\t2760.28\n2026-03-12\tMackay\t1071.03\t541.71\t1612.74\t1612.74\n2026-03-12\tOntario\t0.00\t0.00\t402.12\t0.00\n2026-03-12\tCathcart Tunnel\t628.40\t172.05\t800.45\t800.45\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

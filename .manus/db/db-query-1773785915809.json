@@ -1,0 +1,82 @@
+{
+  "query": "SELECT ds.saleDate, l.name, ds.taxExemptSales, ds.taxableSales, ds.totalSales, (ds.taxExemptSales + ds.taxableSales) as expectedTotal FROM dailySales ds LEFT JOIN locations l ON ds.locationId = l.id WHERE ds.locationId = 1 AND ds.saleDate IN ('2026-03-08','2026-03-09','2026-03-10','2026-03-11','2026-03-12','2026-03-13','2026-03-14','2026-03-15','2026-03-16') ORDER BY ds.saleDate;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT ds.saleDate, l.name, ds.taxExemptSales, ds.taxableSales, ds.totalSales, (ds.taxExemptSales + ds.taxableSales) as expectedTotal FROM dailySales ds LEFT JOIN locations l ON ds.locationId = l.id WHERE ds.locationId = 1 AND ds.saleDate IN ('2026-03-08','2026-03-09','2026-03-10','2026-03-11','2026-03-12','2026-03-13','2026-03-14','2026-03-15','2026-03-16') ORDER BY ds.saleDate;",
+  "rows": [
+    {
+      "saleDate": "2026-03-08",
+      "name": "President Kennedy",
+      "taxExemptSales": "813.27",
+      "taxableSales": "391.51",
+      "totalSales": "1204.78",
+      "expectedTotal": "1204.78"
+    },
+    {
+      "saleDate": "2026-03-09",
+      "name": "President Kennedy",
+      "taxExemptSales": "1585.28",
+      "taxableSales": "757.19",
+      "totalSales": "2342.47",
+      "expectedTotal": "2342.47"
+    },
+    {
+      "saleDate": "2026-03-10",
+      "name": "President Kennedy",
+      "taxExemptSales": "2080.37",
+      "taxableSales": "1018.71",
+      "totalSales": "2080.37",
+      "expectedTotal": "3099.08"
+    },
+    {
+      "saleDate": "2026-03-11",
+      "name": "President Kennedy",
+      "taxExemptSales": "481.20",
+      "taxableSales": "200.50",
+      "totalSales": "481.20",
+      "expectedTotal": "681.70"
+    },
+    {
+      "saleDate": "2026-03-12",
+      "name": "President Kennedy",
+      "taxExemptSales": "1809.18",
+      "taxableSales": "951.10",
+      "totalSales": "1809.18",
+      "expectedTotal": "2760.28"
+    },
+    {
+      "saleDate": "2026-03-13",
+      "name": "President Kennedy",
+      "taxExemptSales": "2138.67",
+      "taxableSales": "940.98",
+      "totalSales": "2138.67",
+      "expectedTotal": "3079.65"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "name": "President Kennedy",
+      "taxExemptSales": "1219.33",
+      "taxableSales": "796.52",
+      "totalSales": "1219.33",
+      "expectedTotal": "2015.85"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "name": "President Kennedy",
+      "taxExemptSales": "1821.63",
+      "taxableSales": "927.40",
+      "totalSales": "1821.63",
+      "expectedTotal": "2749.03"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "name": "President Kennedy",
+      "taxExemptSales": "2098.48",
+      "taxableSales": "1134.05",
+      "totalSales": "2098.48",
+      "expectedTotal": "3232.53"
+    }
+  ],
+  "messages": [],
+  "stdout": "saleDate\tname\ttaxExemptSales\ttaxableSales\ttotalSales\texpectedTotal\n2026-03-08\tPresident Kennedy\t813.27\t391.51\t1204.78\t1204.78\n2026-03-09\tPresident Kennedy\t1585.28\t757.19\t2342.47\t2342.47\n2026-03-10\tPresident Kennedy\t2080.37\t1018.71\t2080.37\t3099.08\n2026-03-11\tPresident Kennedy\t481.20\t200.50\t481.20\t681.70\n2026-03-12\tPresident Kennedy\t1809.18\t951.10\t1809.18\t2760.28\n2026-03-13\tPresident Kennedy\t2138.67\t940.98\t2138.67\t3079.65\n2026-03-14\tPresident Kennedy\t1219.33\t796.52\t1219.33\t2015.85\n2026-03-15\tPresident Kennedy\t1821.63\t927.40\t1821.63\t2749.03\n2026-03-16\tPresident Kennedy\t2098.48\t1134.05\t2098.48\t3232.53\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

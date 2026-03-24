@@ -1,0 +1,8 @@
+{
+  "query": "SELECT ds.sale_date, l.code, l.name, ds.total_sales, ds.order_count, ds.labour_cost FROM dailySales ds JOIN locations l ON ds.location_id = l.id ORDER BY ds.sale_date DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT ds.sale_date, l.code, l.name, ds.total_sales, ds.order_count, ds.labour_cost FROM dailySales ds JOIN locations l ON ds.location_id = l.id ORDER BY ds.sale_date DESC LIMIT 20;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'ds.location_id' in 'on clause'"
+  ]
+}

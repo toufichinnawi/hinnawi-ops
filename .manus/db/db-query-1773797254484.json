@@ -1,0 +1,142 @@
+{
+  "query": "SELECT id, name FROM inventoryItems WHERE isActive = 1 ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name FROM inventoryItems WHERE isActive = 1 ORDER BY id;",
+  "rows": [
+    {
+      "id": "30002",
+      "name": "Chicken"
+    },
+    {
+      "id": "30003",
+      "name": "Turkey"
+    },
+    {
+      "id": "30004",
+      "name": "Ham"
+    },
+    {
+      "id": "30005",
+      "name": "Bacon"
+    },
+    {
+      "id": "30006",
+      "name": "Egg"
+    },
+    {
+      "id": "30007",
+      "name": "Salmon"
+    },
+    {
+      "id": "30008",
+      "name": "Veggie patty"
+    },
+    {
+      "id": "30009",
+      "name": "Smoked meat"
+    },
+    {
+      "id": "30010",
+      "name": "Tofu"
+    },
+    {
+      "id": "30011",
+      "name": "Mozzarella"
+    },
+    {
+      "id": "30012",
+      "name": "Cheddar"
+    },
+    {
+      "id": "30013",
+      "name": "CC Philadelphia"
+    },
+    {
+      "id": "30014",
+      "name": "CC Hinnawi"
+    },
+    {
+      "id": "30015",
+      "name": "CC Riviera"
+    },
+    {
+      "id": "30016",
+      "name": "Avocados"
+    },
+    {
+      "id": "30017",
+      "name": "Lettuce"
+    },
+    {
+      "id": "30018",
+      "name": "Tomatoes"
+    },
+    {
+      "id": "30019",
+      "name": "Onions"
+    },
+    {
+      "id": "30020",
+      "name": "Cucumbers"
+    },
+    {
+      "id": "30021",
+      "name": "Pickles"
+    },
+    {
+      "id": "30022",
+      "name": "Capers"
+    },
+    {
+      "id": "30023",
+      "name": "Spring mix"
+    },
+    {
+      "id": "30024",
+      "name": "Peppers"
+    },
+    {
+      "id": "30025",
+      "name": "Lemon"
+    },
+    {
+      "id": "30026",
+      "name": "Spicy Mayo"
+    },
+    {
+      "id": "30027",
+      "name": "Mayo"
+    },
+    {
+      "id": "30028",
+      "name": "Dijon"
+    },
+    {
+      "id": "30029",
+      "name": "Honey mustard"
+    },
+    {
+      "id": "30030",
+      "name": "Butter"
+    },
+    {
+      "id": "30031",
+      "name": "Bacon jam"
+    },
+    {
+      "id": "30032",
+      "name": "Olive oil"
+    },
+    {
+      "id": "30033",
+      "name": "Cajun seasoning"
+    },
+    {
+      "id": "30034",
+      "name": "Bagel"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n30002\tChicken\n30003\tTurkey\n30004\tHam\n30005\tBacon\n30006\tEgg\n30007\tSalmon\n30008\tVeggie patty\n30009\tSmoked meat\n30010\tTofu\n30011\tMozzarella\n30012\tCheddar\n30013\tCC Philadelphia\n30014\tCC Hinnawi\n30015\tCC Riviera\n30016\tAvocados\n30017\tLettuce\n30018\tTomatoes\n30019\tOnions\n30020\tCucumbers\n30021\tPickles\n30022\tCapers\n30023\tSpring mix\n30024\tPeppers\n30025\tLemon\n30026\tSpicy Mayo\n30027\tMayo\n30028\tDijon\n30029\tHoney mustard\n30030\tButter\n30031\tBacon jam\n30032\tOlive oil\n30033\tCajun seasoning\n30034\tBagel\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

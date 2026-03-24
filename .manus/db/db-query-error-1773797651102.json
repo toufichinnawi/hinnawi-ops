@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, name, unit, ROUND(purchaseAmount, 2) as purchaseAmt, ROUND(lastCost, 4) as lastCost, ROUND(avgCost, 4) as avgCost, ROUND(costPerUsableUnit, 4) as costPerUsable, ROUND(yieldPercent, 2) as yieldPct FROM inventoryItems WHERE isActive = 1 AND lastCost > 0 ORDER BY name LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name, unit, ROUND(purchaseAmount, 2) as purchaseAmt, ROUND(lastCost, 4) as lastCost, ROUND(avgCost, 4) as avgCost, ROUND(costPerUsableUnit, 4) as costPerUsable, ROUND(yieldPercent, 2) as yieldPct FROM inventoryItems WHERE isActive = 1 AND lastCost > 0 ORDER BY name LIMIT 20;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'yieldpercent' in 'field list'"
+  ]
+}

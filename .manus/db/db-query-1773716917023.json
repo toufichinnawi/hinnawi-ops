@@ -1,0 +1,42 @@
+{
+  "query": "SELECT locationId, COUNT(*) as days, MIN(saleDate) as minDate, MAX(saleDate) as maxDate, ROUND(SUM(totalSales), 2) as totalSales, ROUND(SUM(labourCost), 2) as totalLabour FROM dailySales GROUP BY locationId ORDER BY locationId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT locationId, COUNT(*) as days, MIN(saleDate) as minDate, MAX(saleDate) as maxDate, ROUND(SUM(totalSales), 2) as totalSales, ROUND(SUM(labourCost), 2) as totalLabour FROM dailySales GROUP BY locationId ORDER BY locationId;",
+  "rows": [
+    {
+      "locationId": "1",
+      "days": "432",
+      "minDate": "2025-01-02",
+      "maxDate": "2026-03-13",
+      "totalSales": "1286060.27",
+      "totalLabour": "300280.71"
+    },
+    {
+      "locationId": "2",
+      "days": "431",
+      "minDate": "2025-01-02",
+      "maxDate": "2026-03-13",
+      "totalSales": "746823.58",
+      "totalLabour": "185972.87"
+    },
+    {
+      "locationId": "3",
+      "days": "86",
+      "minDate": "2025-12-17",
+      "maxDate": "2026-03-16",
+      "totalSales": "38037.62",
+      "totalLabour": "4437.81"
+    },
+    {
+      "locationId": "4",
+      "days": "309",
+      "minDate": "2025-01-03",
+      "maxDate": "2026-03-13",
+      "totalSales": "287563.22",
+      "totalLabour": "103204.99"
+    }
+  ],
+  "messages": [],
+  "stdout": "locationId\tdays\tminDate\tmaxDate\ttotalSales\ttotalLabour\n1\t432\t2025-01-02\t2026-03-13\t1286060.27\t300280.71\n2\t431\t2025-01-02\t2026-03-13\t746823.58\t185972.87\n3\t86\t2025-12-17\t2026-03-16\t38037.62\t4437.81\n4\t309\t2025-01-03\t2026-03-13\t287563.22\t103204.99\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

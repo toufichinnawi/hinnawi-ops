@@ -1,0 +1,136 @@
+{
+  "query": "\nSELECT 'POS Sales' as dataType, locationId, MIN(saleDate) as earliest, MAX(saleDate) as latest, COUNT(*) as records\nFROM dailySales GROUP BY locationId\nUNION ALL\nSELECT 'Payroll', locationId, MIN(payDate), MAX(payDate), COUNT(*)\nFROM payrollRecords GROUP BY locationId\nUNION ALL\nSELECT 'Invoices', locationId, MIN(invoiceDate), MAX(invoiceDate), COUNT(*)\nFROM invoices GROUP BY locationId\nUNION ALL\nSELECT 'Product Sales', locationId, MIN(periodStart), MAX(periodEnd), COUNT(*)\nFROM productSales GROUP BY locationId\nUNION ALL\nSELECT 'Bank Statements', locationId, MIN(transactionDate), MAX(transactionDate), COUNT(*)\nFROM bankTransactions GROUP BY locationId\nORDER BY dataType, locationId",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute \nSELECT 'POS Sales' as dataType, locationId, MIN(saleDate) as earliest, MAX(saleDate) as latest, COUNT(*) as records\nFROM dailySales GROUP BY locationId\nUNION ALL\nSELECT 'Payroll', locationId, MIN(payDate), MAX(payDate), COUNT(*)\nFROM payrollRecords GROUP BY locationId\nUNION ALL\nSELECT 'Invoices', locationId, MIN(invoiceDate), MAX(invoiceDate), COUNT(*)\nFROM invoices GROUP BY locationId\nUNION ALL\nSELECT 'Product Sales', locationId, MIN(periodStart), MAX(periodEnd), COUNT(*)\nFROM productSales GROUP BY locationId\nUNION ALL\nSELECT 'Bank Statements', locationId, MIN(transactionDate), MAX(transactionDate), COUNT(*)\nFROM bankTransactions GROUP BY locationId\nORDER BY dataType, locationId",
+  "rows": [
+    {
+      "dataType": "Invoices",
+      "locationId": "NULL",
+      "earliest": "2023-08-31",
+      "latest": "2026-03-05",
+      "records": "42"
+    },
+    {
+      "dataType": "Invoices",
+      "locationId": "1",
+      "earliest": "2022-08-09",
+      "latest": "2026-03-14",
+      "records": "203"
+    },
+    {
+      "dataType": "Invoices",
+      "locationId": "2",
+      "earliest": "2024-07-22",
+      "latest": "2026-03-14",
+      "records": "34"
+    },
+    {
+      "dataType": "Invoices",
+      "locationId": "3",
+      "earliest": "2023-11-15",
+      "latest": "2026-03-14",
+      "records": "27"
+    },
+    {
+      "dataType": "Invoices",
+      "locationId": "4",
+      "earliest": "2023-08-11",
+      "latest": "2026-03-02",
+      "records": "78"
+    },
+    {
+      "dataType": "Invoices",
+      "locationId": "5",
+      "earliest": "2025-01-04",
+      "latest": "2026-03-14",
+      "records": "43"
+    },
+    {
+      "dataType": "Payroll",
+      "locationId": "1",
+      "earliest": "2025-01-10",
+      "latest": "2025-03-07",
+      "records": "5"
+    },
+    {
+      "dataType": "Payroll",
+      "locationId": "2",
+      "earliest": "2025-01-10",
+      "latest": "2025-03-07",
+      "records": "5"
+    },
+    {
+      "dataType": "Payroll",
+      "locationId": "3",
+      "earliest": "2025-01-09",
+      "latest": "2025-03-06",
+      "records": "5"
+    },
+    {
+      "dataType": "Payroll",
+      "locationId": "4",
+      "earliest": "2025-01-10",
+      "latest": "2025-03-07",
+      "records": "5"
+    },
+    {
+      "dataType": "Payroll",
+      "locationId": "5",
+      "earliest": "2025-01-10",
+      "latest": "2025-03-07",
+      "records": "5"
+    },
+    {
+      "dataType": "POS Sales",
+      "locationId": "1",
+      "earliest": "2025-01-02",
+      "latest": "2026-03-18",
+      "records": "437"
+    },
+    {
+      "dataType": "POS Sales",
+      "locationId": "2",
+      "earliest": "2025-01-02",
+      "latest": "2026-03-18",
+      "records": "436"
+    },
+    {
+      "dataType": "POS Sales",
+      "locationId": "3",
+      "earliest": "2025-01-01",
+      "latest": "2026-03-16",
+      "records": "438"
+    },
+    {
+      "dataType": "POS Sales",
+      "locationId": "4",
+      "earliest": "2025-01-03",
+      "latest": "2026-03-18",
+      "records": "314"
+    },
+    {
+      "dataType": "Product Sales",
+      "locationId": "1",
+      "earliest": "2025-01-01",
+      "latest": "2026-03-18",
+      "records": "4132"
+    },
+    {
+      "dataType": "Product Sales",
+      "locationId": "2",
+      "earliest": "2025-01-01",
+      "latest": "2026-03-18",
+      "records": "3374"
+    },
+    {
+      "dataType": "Product Sales",
+      "locationId": "4",
+      "earliest": "2025-01-01",
+      "latest": "2026-03-18",
+      "records": "2837"
+    }
+  ],
+  "messages": [],
+  "stdout": "dataType\tlocationId\tearliest\tlatest\trecords\nInvoices\tNULL\t2023-08-31\t2026-03-05\t42\nInvoices\t1\t2022-08-09\t2026-03-14\t203\nInvoices\t2\t2024-07-22\t2026-03-14\t34\nInvoices\t3\t2023-11-15\t2026-03-14\t27\nInvoices\t4\t2023-08-11\t2026-03-02\t78\nInvoices\t5\t2025-01-04\t2026-03-14\t43\nPayroll\t1\t2025-01-10\t2025-03-07\t5\nPayroll\t2\t2025-01-10\t2025-03-07\t5\nPayroll\t3\t2025-01-09\t2025-03-06\t5\nPayroll\t4\t2025-01-10\t2025-03-07\t5\nPayroll\t5\t2025-01-10\t2025-03-07\t5\nPOS Sales\t1\t2025-01-02\t2026-03-18\t437\nPOS Sales\t2\t2025-01-02\t2026-03-18\t436\nPOS Sales\t3\t2025-01-01\t2026-03-16\t438\nPOS Sales\t4\t2025-01-03\t2026-03-18\t314\nProduct Sales\t1\t2025-01-01\t2026-03-18\t4132\nProduct Sales\t2\t2025-01-01\t2026-03-18\t3374\nProduct Sales\t4\t2025-01-01\t2026-03-18\t2837\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

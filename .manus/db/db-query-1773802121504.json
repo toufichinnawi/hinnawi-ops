@@ -1,0 +1,15 @@
+{
+  "query": "SELECT AVG(m.unitPrice) as avgCost, MAX(m.unitPrice) as maxCost, MIN(m.unitPrice) as minCost FROM invoiceLineItemMatches m WHERE m.matchedItemName = 'Salmon' AND m.invoiceId BETWEEN 60012 AND 60131;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT AVG(m.unitPrice) as avgCost, MAX(m.unitPrice) as maxCost, MIN(m.unitPrice) as minCost FROM invoiceLineItemMatches m WHERE m.matchedItemName = 'Salmon' AND m.invoiceId BETWEEN 60012 AND 60131;",
+  "rows": [
+    {
+      "avgCost": "49.69571429",
+      "maxCost": "95.3000",
+      "minCost": "42.9700"
+    }
+  ],
+  "messages": [],
+  "stdout": "avgCost\tmaxCost\tminCost\n49.69571429\t95.3000\t42.9700\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

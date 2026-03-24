@@ -1,0 +1,101 @@
+{
+  "query": "SELECT saleDate, locationId, totalSales, orderCount, labourCost FROM dailySales WHERE saleDate >= '2026-03-14' ORDER BY saleDate, locationId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT saleDate, locationId, totalSales, orderCount, labourCost FROM dailySales WHERE saleDate >= '2026-03-14' ORDER BY saleDate, locationId;",
+  "rows": [
+    {
+      "saleDate": "2026-03-14",
+      "locationId": "1",
+      "totalSales": "1219.33",
+      "orderCount": "166",
+      "labourCost": "523.27"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "locationId": "2",
+      "totalSales": "1076.41",
+      "orderCount": "132",
+      "labourCost": "340.15"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "locationId": "3",
+      "totalSales": "792.96",
+      "orderCount": "56",
+      "labourCost": "195.09"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "locationId": "1",
+      "totalSales": "1821.63",
+      "orderCount": "207",
+      "labourCost": "322.94"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "locationId": "2",
+      "totalSales": "921.02",
+      "orderCount": "119",
+      "labourCost": "347.74"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "locationId": "3",
+      "totalSales": "896.63",
+      "orderCount": "64",
+      "labourCost": "199.23"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "locationId": "1",
+      "totalSales": "2098.48",
+      "orderCount": "330",
+      "labourCost": "649.79"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "locationId": "2",
+      "totalSales": "1120.18",
+      "orderCount": "185",
+      "labourCost": "463.34"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "locationId": "3",
+      "totalSales": "911.98",
+      "orderCount": "84",
+      "labourCost": "148.75"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "locationId": "4",
+      "totalSales": "871.01",
+      "orderCount": "95",
+      "labourCost": "358.30"
+    },
+    {
+      "saleDate": "2026-03-17",
+      "locationId": "1",
+      "totalSales": "1216.78",
+      "orderCount": "154",
+      "labourCost": "210.43"
+    },
+    {
+      "saleDate": "2026-03-17",
+      "locationId": "2",
+      "totalSales": "347.22",
+      "orderCount": "51",
+      "labourCost": "92.58"
+    },
+    {
+      "saleDate": "2026-03-17",
+      "locationId": "4",
+      "totalSales": "385.36",
+      "orderCount": "63",
+      "labourCost": "166.85"
+    }
+  ],
+  "messages": [],
+  "stdout": "saleDate\tlocationId\ttotalSales\torderCount\tlabourCost\n2026-03-14\t1\t1219.33\t166\t523.27\n2026-03-14\t2\t1076.41\t132\t340.15\n2026-03-14\t3\t792.96\t56\t195.09\n2026-03-15\t1\t1821.63\t207\t322.94\n2026-03-15\t2\t921.02\t119\t347.74\n2026-03-15\t3\t896.63\t64\t199.23\n2026-03-16\t1\t2098.48\t330\t649.79\n2026-03-16\t2\t1120.18\t185\t463.34\n2026-03-16\t3\t911.98\t84\t148.75\n2026-03-16\t4\t871.01\t95\t358.30\n2026-03-17\t1\t1216.78\t154\t210.43\n2026-03-17\t2\t347.22\t51\t92.58\n2026-03-17\t4\t385.36\t63\t166.85\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

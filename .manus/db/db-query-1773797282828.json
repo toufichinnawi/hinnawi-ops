@@ -1,0 +1,210 @@
+{
+  "query": "SELECT DISTINCT UPPER(description) as d, COUNT(*) as c FROM invoiceLineItems WHERE invoiceId BETWEEN 60012 AND 60131 GROUP BY d ORDER BY c DESC LIMIT 50 OFFSET 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT DISTINCT UPPER(description) as d, COUNT(*) as c FROM invoiceLineItems WHERE invoiceId BETWEEN 60012 AND 60131 GROUP BY d ORDER BY c DESC LIMIT 50 OFFSET 20;",
+  "rows": [
+    {
+      "d": "LALTISAN FRESH - CONDITIONNEUR POUR PAINS FRAIS 10 KG",
+      "c": "8"
+    },
+    {
+      "d": "LEVURE FRAÎCHE - LALLEMAND 10 X 2 LBS - 9.07 KG",
+      "c": "8"
+    },
+    {
+      "d": "FISH SALMON SMOKE COHO SLICE",
+      "c": "8"
+    },
+    {
+      "d": "EGG REF BULK MEDIUM",
+      "c": "7"
+    },
+    {
+      "d": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 KG",
+      "c": "7"
+    },
+    {
+      "d": "HUILE DE CANOLA LA PERLA 16 LITRES",
+      "c": "7"
+    },
+    {
+      "d": "NUTS PISTACHIO SHELLED UNS(12",
+      "c": "6"
+    },
+    {
+      "d": "MÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 KG",
+      "c": "6"
+    },
+    {
+      "d": "GRAINE DE SÉSAME DÉCORTIQUÉE 99.98% PUR INDE - 50 LBS - 22.68 KG",
+      "c": "6"
+    },
+    {
+      "d": "PÉPITES DE CHOCOLAT PUR FONCÉ 4000CT - FOLEY'S 12 KG",
+      "c": "5"
+    },
+    {
+      "d": "FROM CHED DOUX BL",
+      "c": "5"
+    },
+    {
+      "d": "MILK HOMOGENIZED 3.25PCT",
+      "c": "5"
+    },
+    {
+      "d": "CHICKEN BREA GRIL COOK HAL FL",
+      "c": "5"
+    },
+    {
+      "d": "OIGNON HACHÉ - 14 KG",
+      "c": "5"
+    },
+    {
+      "d": "JUICE APPLE PLAST BTL OASIS",
+      "c": "5"
+    },
+    {
+      "d": "CHOCOLAT DE COUVERTURE NOIR 64% PURETÉ EXTRA-BITTER GUAYAQUIL - CACAO BARRY 5 KG",
+      "c": "4"
+    },
+    {
+      "d": "BAG PAPER SANDWICH GIANT 6X9X2",
+      "c": "4"
+    },
+    {
+      "d": "WATER NATURAL SPRING ESKA",
+      "c": "4"
+    },
+    {
+      "d": "EGG LARGE GRADE A FRSH",
+      "c": "4"
+    },
+    {
+      "d": "CONTAINER DEPOSIT",
+      "c": "4"
+    },
+    {
+      "d": "CHIPS REGULAR RIPPLE MENU",
+      "c": "4"
+    },
+    {
+      "d": "MIEL NATUREL DORÉ DU QUEBEC - 15 KG",
+      "c": "4"
+    },
+    {
+      "d": "BEURRE N/SEL 82PCT EUROPEEN",
+      "c": "4"
+    },
+    {
+      "d": "PÉPITES DE CHOCOLATS PUR BLANC 4000CT - BARRY CALLEBAUT 30 LBS - 13.608 KG",
+      "c": "4"
+    },
+    {
+      "d": "PÉPITES DE CHOCOLAT COMP FONCÉ 4000CT - FOLEY'S - 12 KG",
+      "c": "4"
+    },
+    {
+      "d": "HAT (HAIR NET ONLY) INV BROWN",
+      "c": "4"
+    },
+    {
+      "d": "GRAINE DE PAVOT - OILSEED SERVIS BLUE SEAL 50 LBS - 22.68 KG",
+      "c": "3"
+    },
+    {
+      "d": "FROM MOZZ BLOC 19PCT HALAL",
+      "c": "3"
+    },
+    {
+      "d": "SALMON SMKD COHO SLCD FZN BAP",
+      "c": "3"
+    },
+    {
+      "d": "JUICE ORANGE BLEND PLAST OASIS",
+      "c": "3"
+    },
+    {
+      "d": "NAPKIN DISP KRAFT 1PLY XPRESSNAP",
+      "c": "3"
+    },
+    {
+      "d": "SAUCE CHILI SRIRACHA F. GO (12",
+      "c": "3"
+    },
+    {
+      "d": "CHOCOLAT DE COUVERTURE NOIR 70% ORIGINE SAINT-DOMINGUE - CACAO BARRY 20 KG",
+      "c": "3"
+    },
+    {
+      "d": "NOIX DE GRENOBLE EN PETIT MORCEAUX 30 LB",
+      "c": "3"
+    },
+    {
+      "d": "EXTRAIT DE VANILLE NATUREL (BOURBON 200 G)- EUROVANILLE 1 KG",
+      "c": "3"
+    },
+    {
+      "d": "FLOCONS DE CHILI BROYÉ 2.27KG",
+      "c": "3"
+    },
+    {
+      "d": "PAPIER SULFURIS AVEC DU SILICONE 16\" X 24\" - 1 000 UNITÉS",
+      "c": "3"
+    },
+    {
+      "d": "ÉPICES CAJUN - 2.27 KG",
+      "c": "3"
+    },
+    {
+      "d": "GANT EN NITRILE NOIR SANS POUDRE - LARGE - 100 UNITÉS",
+      "c": "3"
+    },
+    {
+      "d": "MAYONNAISE",
+      "c": "3"
+    },
+    {
+      "d": "FARINE FORTE À BOULANGERIE THREE STARS AA40 - ADM - 20 KG",
+      "c": "3"
+    },
+    {
+      "d": "ORIGAN RAPÉE 2.27 KG",
+      "c": "3"
+    },
+    {
+      "d": "POUDRE À PÂTE - FLEISCHMANN'S 5 KG",
+      "c": "3"
+    },
+    {
+      "d": "SUCRE DE CANNE BIOLOGIQUE DE COLOMBIE 25 KG",
+      "c": "2"
+    },
+    {
+      "d": "NUTELLA 2 X 3 KG",
+      "c": "2"
+    },
+    {
+      "d": "GANT EN NITRILE NOIR SANS POUDRE - MEDIUM - 100 UNITÉS",
+      "c": "2"
+    },
+    {
+      "d": "EGG MED FRESH GRADE A",
+      "c": "2"
+    },
+    {
+      "d": "TOFU REGULAR",
+      "c": "2"
+    },
+    {
+      "d": "DINDE ROTI POIT FUMEE MTL FR",
+      "c": "2"
+    },
+    {
+      "d": "HAT (HAIR NET ONLY) INV 21I",
+      "c": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "d\tc\nLALTISAN FRESH - CONDITIONNEUR POUR PAINS FRAIS 10 KG\t8\nLEVURE FRAÎCHE - LALLEMAND 10 X 2 LBS - 9.07 KG\t8\nFISH SALMON SMOKE COHO SLICE\t8\nEGG REF BULK MEDIUM\t7\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 KG\t7\nHUILE DE CANOLA LA PERLA 16 LITRES\t7\nNUTS PISTACHIO SHELLED UNS(12\t6\nMÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 KG\t6\nGRAINE DE SÉSAME DÉCORTIQUÉE 99.98% PUR INDE - 50 LBS - 22.68 KG\t6\nPÉPITES DE CHOCOLAT PUR FONCÉ 4000CT - FOLEY'S 12 KG\t5\nFROM CHED DOUX BL\t5\nMILK HOMOGENIZED 3.25PCT\t5\nCHICKEN BREA GRIL COOK HAL FL\t5\nOIGNON HACHÉ - 14 KG\t5\nJUICE APPLE PLAST BTL OASIS\t5\nCHOCOLAT DE COUVERTURE NOIR 64% PURETÉ EXTRA-BITTER GUAYAQUIL - CACAO BARRY 5 KG\t4\nBAG PAPER SANDWICH GIANT 6X9X2\t4\nWATER NATURAL SPRING ESKA\t4\nEGG LARGE GRADE A FRSH\t4\nCONTAINER DEPOSIT\t4\nCHIPS REGULAR RIPPLE MENU\t4\nMIEL NATUREL DORÉ DU QUEBEC - 15 KG\t4\nBEURRE N/SEL 82PCT EUROPEEN\t4\nPÉPITES DE CHOCOLATS PUR BLANC 4000CT - BARRY CALLEBAUT 30 LBS - 13.608 KG\t4\nPÉPITES DE CHOCOLAT COMP FONCÉ 4000CT - FOLEY'S - 12 KG\t4\nHAT (HAIR NET ONLY) INV BROWN\t4\nGRAINE DE PAVOT - OILSEED SERVIS BLUE SEAL 50 LBS - 22.68 KG\t3\nFROM MOZZ BLOC 19PCT HALAL\t3\nSALMON SMKD COHO SLCD FZN BAP\t3\nJUICE ORANGE BLEND PLAST OASIS\t3\nNAPKIN DISP KRAFT 1PLY XPRESSNAP\t3\nSAUCE CHILI SRIRACHA F. GO (12\t3\nCHOCOLAT DE COUVERTURE NOIR 70% ORIGINE SAINT-DOMINGUE - CACAO BARRY 20 KG\t3\nNOIX DE GRENOBLE EN PETIT MORCEAUX 30 LB\t3\nEXTRAIT DE VANILLE NATUREL (BOURBON 200 G)- EUROVANILLE 1 KG\t3\nFLOCONS DE CHILI BROYÉ 2.27KG\t3\nPAPIER SULFURIS AVEC DU SILICONE 16\" X 24\" - 1 000 UNITÉS\t3\nÉPICES CAJUN - 2.27 KG\t3\nGANT EN NITRILE NOIR SANS POUDRE - LARGE - 100 UNITÉS\t3\nMAYONNAISE\t3\nFARINE FORTE À BOULANGERIE THREE STARS AA40 - ADM - 20 KG\t3\nORIGAN RAPÉE 2.27 KG\t3\nPOUDRE À PÂTE - FLEISCHMANN'S 5 KG\t3\nSUCRE DE CANNE BIOLOGIQUE DE COLOMBIE 25 KG\t2\nNUTELLA 2 X 3 KG\t2\nGANT EN NITRILE NOIR SANS POUDRE - MEDIUM - 100 UNITÉS\t2\nEGG MED FRESH GRADE A\t2\nTOFU REGULAR\t2\nDINDE ROTI POIT FUMEE MTL FR\t2\nHAT (HAIR NET ONLY) INV 21I\t2\n",
+  "stderr": "",
+  "execution_time_ms": 67
+}

@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT 'POS Sales' as dataType, locationId, MIN(saleDate) as earliest, MAX(saleDate) as latest, COUNT(*) as records\nFROM dailySales GROUP BY locationId\nUNION ALL\nSELECT 'Payroll', locationId, MIN(payDate), MAX(payDate), COUNT(*)\nFROM payrollRecords GROUP BY locationId\nUNION ALL\nSELECT 'Invoices', locationId, MIN(invoiceDate), MAX(invoiceDate), COUNT(*)\nFROM invoices GROUP BY locationId\nUNION ALL\nSELECT 'Product Sales', locationId, MIN(saleDate), MAX(saleDate), COUNT(*)\nFROM productSales GROUP BY locationId\nORDER BY dataType, locationId",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute \nSELECT 'POS Sales' as dataType, locationId, MIN(saleDate) as earliest, MAX(saleDate) as latest, COUNT(*) as records\nFROM dailySales GROUP BY locationId\nUNION ALL\nSELECT 'Payroll', locationId, MIN(payDate), MAX(payDate), COUNT(*)\nFROM payrollRecords GROUP BY locationId\nUNION ALL\nSELECT 'Invoices', locationId, MIN(invoiceDate), MAX(invoiceDate), COUNT(*)\nFROM invoices GROUP BY locationId\nUNION ALL\nSELECT 'Product Sales', locationId, MIN(saleDate), MAX(saleDate), COUNT(*)\nFROM productSales GROUP BY locationId\nORDER BY dataType, locationId",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'saledate' in 'group statement'"
+  ]
+}

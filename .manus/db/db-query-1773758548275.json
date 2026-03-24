@@ -1,0 +1,19 @@
+{
+  "query": "SELECT * FROM integrations LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT * FROM integrations LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "QuickBooks Online",
+      "type": "accounting",
+      "status": "live",
+      "lastSyncAt": "NULL",
+      "config": "NULL",
+      "createdAt": "2026-03-14 19:22:20"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\ttype\tstatus\tlastSyncAt\tconfig\tcreatedAt\n1\tQuickBooks Online\taccounting\tlive\tNULL\tNULL\t2026-03-14 19:22:20\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

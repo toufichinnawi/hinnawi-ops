@@ -1,0 +1,9 @@
+{
+  "query": "SELECT matchedItemName, lineDescription, unitPrice, COUNT(*) as cnt\nFROM invoiceLineItemMatches \nWHERE matchedItemName IN ('Ham', 'Mozzarella', 'Peppers', 'Olive oil')\nAND invoiceId BETWEEN 90001 AND 90272\nAND matchStatus = 'auto_matched'\nAND lineDescription NOT LIKE '%HAM%' AND lineDescription NOT LIKE '%ham%' AND lineDescription NOT LIKE '%jambon%'\nAND matchedItemName = 'Ham'\nGROUP BY lineDescription, unitPrice\nORDER BY cnt DESC\nLIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT matchedItemName, lineDescription, unitPrice, COUNT(*) as cnt\nFROM invoiceLineItemMatches \nWHERE matchedItemName IN ('Ham', 'Mozzarella', 'Peppers', 'Olive oil')\nAND invoiceId BETWEEN 90001 AND 90272\nAND matchStatus = 'auto_matched'\nAND lineDescription NOT LIKE '%HAM%' AND lineDescription NOT LIKE '%ham%' AND lineDescription NOT LIKE '%jambon%'\nAND matchedItemName = 'Ham'\nGROUP BY lineDescription, unitPrice\nORDER BY cnt DESC\nLIMIT 10",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 57
+}

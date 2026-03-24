@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as lineItemCount FROM invoiceLineItems WHERE invoiceId >= 90001 AND invoiceId <= 90272",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COUNT(*) as lineItemCount FROM invoiceLineItems WHERE invoiceId >= 90001 AND invoiceId <= 90272",
+  "rows": [
+    {
+      "lineItemCount": "2048"
+    }
+  ],
+  "messages": [],
+  "stdout": "lineItemCount\n2048\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

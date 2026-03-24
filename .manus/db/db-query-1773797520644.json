@@ -1,0 +1,266 @@
+{
+  "query": "SELECT i.name, ROUND(i.lastCost, 4) as lastCost, ROUND(i.avgCost, 4) as avgCost, ROUND(i.costPerUsableUnit, 4) as costPerUsable, i.unit, ROUND(i.purchaseAmount, 2) as purchaseAmt FROM inventoryItems i WHERE i.isActive = 1 AND i.lastCost > 0 ORDER BY i.lastCost DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT i.name, ROUND(i.lastCost, 4) as lastCost, ROUND(i.avgCost, 4) as avgCost, ROUND(i.costPerUsableUnit, 4) as costPerUsable, i.unit, ROUND(i.purchaseAmount, 2) as purchaseAmt FROM inventoryItems i WHERE i.isActive = 1 AND i.lastCost > 0 ORDER BY i.lastCost DESC;",
+  "rows": [
+    {
+      "name": "Salmon",
+      "lastCost": "247.0000",
+      "avgCost": "148.3490",
+      "costPerUsable": "247.0000",
+      "unit": "Kg",
+      "purchaseAmt": "5.00"
+    },
+    {
+      "name": "Mozzarella",
+      "lastCost": "234.7400",
+      "avgCost": "132.7450",
+      "costPerUsable": "247.0947",
+      "unit": "Kg",
+      "purchaseAmt": "18.40"
+    },
+    {
+      "name": "Olive oil",
+      "lastCost": "199.0000",
+      "avgCost": "104.9561",
+      "costPerUsable": "199.0000",
+      "unit": "Kg",
+      "purchaseAmt": "2.73"
+    },
+    {
+      "name": "Onions",
+      "lastCost": "133.9700",
+      "avgCost": "67.6574",
+      "costPerUsable": "148.8556",
+      "unit": "Kg",
+      "purchaseAmt": "11.34"
+    },
+    {
+      "name": "Butter",
+      "lastCost": "96.7400",
+      "avgCost": "58.2960",
+      "costPerUsable": "96.7400",
+      "unit": "Kg",
+      "purchaseAmt": "5.00"
+    },
+    {
+      "name": "Chicken",
+      "lastCost": "90.8500",
+      "avgCost": "52.7449",
+      "costPerUsable": "148.9344",
+      "unit": "Kg",
+      "purchaseAmt": "19.60"
+    },
+    {
+      "name": "Mayo",
+      "lastCost": "90.2000",
+      "avgCost": "93.9700",
+      "costPerUsable": "90.2000",
+      "unit": "Kg",
+      "purchaseAmt": "20.00"
+    },
+    {
+      "name": "Cheddar",
+      "lastCost": "71.7800",
+      "avgCost": "54.1150",
+      "costPerUsable": "75.5579",
+      "unit": "Kg",
+      "purchaseAmt": "4.54"
+    },
+    {
+      "name": "Dijon",
+      "lastCost": "69.4700",
+      "avgCost": "38.3350",
+      "costPerUsable": "69.4700",
+      "unit": "Kg",
+      "purchaseAmt": "10.00"
+    },
+    {
+      "name": "Egg",
+      "lastCost": "56.3700",
+      "avgCost": "28.3280",
+      "costPerUsable": "56.3700",
+      "unit": "Unit",
+      "purchaseAmt": "180.00"
+    },
+    {
+      "name": "Bacon",
+      "lastCost": "54.9500",
+      "avgCost": "39.0115",
+      "costPerUsable": "54.9500",
+      "unit": "Kg",
+      "purchaseAmt": "2.60"
+    },
+    {
+      "name": "CC Philadelphia",
+      "lastCost": "51.0000",
+      "avgCost": "30.7966",
+      "costPerUsable": "51.0000",
+      "unit": "Kg",
+      "purchaseAmt": "1.50"
+    },
+    {
+      "name": "CC Riviera",
+      "lastCost": "42.3000",
+      "avgCost": "41.9000",
+      "costPerUsable": "42.3000",
+      "unit": "Kg",
+      "purchaseAmt": "5.00"
+    },
+    {
+      "name": "Cajun seasoning",
+      "lastCost": "38.1900",
+      "avgCost": "27.2411",
+      "costPerUsable": "38.1900",
+      "unit": "Kg",
+      "purchaseAmt": "0.65"
+    },
+    {
+      "name": "Tofu",
+      "lastCost": "28.3100",
+      "avgCost": "16.5266",
+      "costPerUsable": "56.6200",
+      "unit": "Kg",
+      "purchaseAmt": "5.45"
+    },
+    {
+      "name": "Smoked meat",
+      "lastCost": "23.7900",
+      "avgCost": "23.7900",
+      "costPerUsable": "25.0421",
+      "unit": "Kg",
+      "purchaseAmt": "1.00"
+    },
+    {
+      "name": "Turkey",
+      "lastCost": "20.2200",
+      "avgCost": "20.2600",
+      "costPerUsable": "20.2200",
+      "unit": "Kg",
+      "purchaseAmt": "1.00"
+    },
+    {
+      "name": "Ham",
+      "lastCost": "14.3000",
+      "avgCost": "13.7250",
+      "costPerUsable": "15.0526",
+      "unit": "Kg",
+      "purchaseAmt": "2.30"
+    },
+    {
+      "name": "Spring mix",
+      "lastCost": "10.8088",
+      "avgCost": "10.8088",
+      "costPerUsable": "12.0098",
+      "unit": "Kg",
+      "purchaseAmt": "1.36"
+    },
+    {
+      "name": "Honey mustard",
+      "lastCost": "8.4300",
+      "avgCost": "8.4300",
+      "costPerUsable": "8.4300",
+      "unit": "Kg",
+      "purchaseAmt": "1.00"
+    },
+    {
+      "name": "Pickles",
+      "lastCost": "7.7128",
+      "avgCost": "7.7128",
+      "costPerUsable": "12.8547",
+      "unit": "Kg",
+      "purchaseAmt": "12.92"
+    },
+    {
+      "name": "Capers",
+      "lastCost": "7.7037",
+      "avgCost": "7.7037",
+      "costPerUsable": "12.8395",
+      "unit": "Kg",
+      "purchaseAmt": "7.56"
+    },
+    {
+      "name": "CC Hinnawi",
+      "lastCost": "7.6900",
+      "avgCost": "7.6900",
+      "costPerUsable": "7.6900",
+      "unit": "Kg",
+      "purchaseAmt": "10.00"
+    },
+    {
+      "name": "Spicy Mayo",
+      "lastCost": "7.5000",
+      "avgCost": "7.5000",
+      "costPerUsable": "7.5000",
+      "unit": "Kg",
+      "purchaseAmt": "1.00"
+    },
+    {
+      "name": "Peppers",
+      "lastCost": "4.0000",
+      "avgCost": "4.0000",
+      "costPerUsable": "4.4444",
+      "unit": "Kg",
+      "purchaseAmt": "5.00"
+    },
+    {
+      "name": "Tomatoes",
+      "lastCost": "2.3319",
+      "avgCost": "2.3319",
+      "costPerUsable": "2.5910",
+      "unit": "Kg",
+      "purchaseAmt": "9.07"
+    },
+    {
+      "name": "Veggie patty",
+      "lastCost": "1.2058",
+      "avgCost": "1.2058",
+      "costPerUsable": "1.2058",
+      "unit": "Unit",
+      "purchaseAmt": "24.00"
+    },
+    {
+      "name": "Lettuce",
+      "lastCost": "0.9792",
+      "avgCost": "0.9792",
+      "costPerUsable": "1.0880",
+      "unit": "Unit",
+      "purchaseAmt": "24.00"
+    },
+    {
+      "name": "Avocados",
+      "lastCost": "0.8887",
+      "avgCost": "0.8887",
+      "costPerUsable": "0.9875",
+      "unit": "Unit",
+      "purchaseAmt": "70.00"
+    },
+    {
+      "name": "Cucumbers",
+      "lastCost": "0.8792",
+      "avgCost": "0.8792",
+      "costPerUsable": "0.9254",
+      "unit": "Unit",
+      "purchaseAmt": "12.00"
+    },
+    {
+      "name": "Bagel",
+      "lastCost": "0.5000",
+      "avgCost": "0.5000",
+      "costPerUsable": "0.5000",
+      "unit": "Unit",
+      "purchaseAmt": "12.00"
+    },
+    {
+      "name": "Lemon",
+      "lastCost": "0.3571",
+      "avgCost": "0.3571",
+      "costPerUsable": "0.3968",
+      "unit": "Unit",
+      "purchaseAmt": "140.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\tlastCost\tavgCost\tcostPerUsable\tunit\tpurchaseAmt\nSalmon\t247.0000\t148.3490\t247.0000\tKg\t5.00\nMozzarella\t234.7400\t132.7450\t247.0947\tKg\t18.40\nOlive oil\t199.0000\t104.9561\t199.0000\tKg\t2.73\nOnions\t133.9700\t67.6574\t148.8556\tKg\t11.34\nButter\t96.7400\t58.2960\t96.7400\tKg\t5.00\nChicken\t90.8500\t52.7449\t148.9344\tKg\t19.60\nMayo\t90.2000\t93.9700\t90.2000\tKg\t20.00\nCheddar\t71.7800\t54.1150\t75.5579\tKg\t4.54\nDijon\t69.4700\t38.3350\t69.4700\tKg\t10.00\nEgg\t56.3700\t28.3280\t56.3700\tUnit\t180.00\nBacon\t54.9500\t39.0115\t54.9500\tKg\t2.60\nCC Philadelphia\t51.0000\t30.7966\t51.0000\tKg\t1.50\nCC Riviera\t42.3000\t41.9000\t42.3000\tKg\t5.00\nCajun seasoning\t38.1900\t27.2411\t38.1900\tKg\t0.65\nTofu\t28.3100\t16.5266\t56.6200\tKg\t5.45\nSmoked meat\t23.7900\t23.7900\t25.0421\tKg\t1.00\nTurkey\t20.2200\t20.2600\t20.2200\tKg\t1.00\nHam\t14.3000\t13.7250\t15.0526\tKg\t2.30\nSpring mix\t10.8088\t10.8088\t12.0098\tKg\t1.36\nHoney mustard\t8.4300\t8.4300\t8.4300\tKg\t1.00\nPickles\t7.7128\t7.7128\t12.8547\tKg\t12.92\nCapers\t7.7037\t7.7037\t12.8395\tKg\t7.56\nCC Hinnawi\t7.6900\t7.6900\t7.6900\tKg\t10.00\nSpicy Mayo\t7.5000\t7.5000\t7.5000\tKg\t1.00\nPeppers\t4.0000\t4.0000\t4.4444\tKg\t5.00\nTomatoes\t2.3319\t2.3319\t2.5910\tKg\t9.07\nVeggie patty\t1.2058\t1.2058\t1.2058\tUnit\t24.00\nLettuce\t0.9792\t0.9792\t1.0880\tUnit\t24.00\nAvocados\t0.8887\t0.8887\t0.9875\tUnit\t70.00\nCucumbers\t0.8792\t0.8792\t0.9254\tUnit\t12.00\nBagel\t0.5000\t0.5000\t0.5000\tUnit\t12.00\nLemon\t0.3571\t0.3571\t0.3968\tUnit\t140.00\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

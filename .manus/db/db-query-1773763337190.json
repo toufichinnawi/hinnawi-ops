@@ -1,0 +1,145 @@
+{
+  "query": "SELECT id, invoiceNumber, status, qboSyncStatus, total, invoiceDate, supplierId FROM invoices ORDER BY id DESC LIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, invoiceNumber, status, qboSyncStatus, total, invoiceDate, supplierId FROM invoices ORDER BY id DESC LIMIT 15;",
+  "rows": [
+    {
+      "id": "30007",
+      "invoiceNumber": "GFS-2026-0311",
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "total": "4455.28",
+      "invoiceDate": "2026-03-11",
+      "supplierId": "1"
+    },
+    {
+      "id": "30006",
+      "invoiceNumber": "FC00221028",
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "total": "2690.42",
+      "invoiceDate": "2026-03-12",
+      "supplierId": "2"
+    },
+    {
+      "id": "30005",
+      "invoiceNumber": "PPA-CC1-2026-0313",
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "total": "1026.16",
+      "invoiceDate": "2026-03-13",
+      "supplierId": "4"
+    },
+    {
+      "id": "30004",
+      "invoiceNumber": "UNI-ONT-2026-0314",
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "total": "201.21",
+      "invoiceDate": "2026-03-14",
+      "supplierId": "30003"
+    },
+    {
+      "id": "30003",
+      "invoiceNumber": "UNI-MK-2026-0314",
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "total": "189.71",
+      "invoiceDate": "2026-03-14",
+      "supplierId": "30003"
+    },
+    {
+      "id": "30002",
+      "invoiceNumber": "UNI-PK-2026-0314",
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "total": "212.70",
+      "invoiceDate": "2026-03-14",
+      "supplierId": "30003"
+    },
+    {
+      "id": "30001",
+      "invoiceNumber": "026032",
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "total": "1437.19",
+      "invoiceDate": "2026-03-14",
+      "supplierId": "30002"
+    },
+    {
+      "id": "17",
+      "invoiceNumber": "HYD-2025-0003",
+      "status": "paid",
+      "qboSyncStatus": "synced",
+      "total": "597.87",
+      "invoiceDate": "2025-02-15",
+      "supplierId": "9"
+    },
+    {
+      "id": "16",
+      "invoiceNumber": "JGR-2025-0085",
+      "status": "paid",
+      "qboSyncStatus": "synced",
+      "total": "563.38",
+      "invoiceDate": "2025-02-26",
+      "supplierId": "4"
+    },
+    {
+      "id": "15",
+      "invoiceNumber": "FAR-2025-1190",
+      "status": "paid",
+      "qboSyncStatus": "synced",
+      "total": "2069.55",
+      "invoiceDate": "2025-02-25",
+      "supplierId": "2"
+    },
+    {
+      "id": "14",
+      "invoiceNumber": "GFS-2025-0881",
+      "status": "paid",
+      "qboSyncStatus": "synced",
+      "total": "1057.77",
+      "invoiceDate": "2025-02-27",
+      "supplierId": "1"
+    },
+    {
+      "id": "13",
+      "invoiceNumber": "GFS-2025-0880",
+      "status": "paid",
+      "qboSyncStatus": "synced",
+      "total": "1552.16",
+      "invoiceDate": "2025-02-28",
+      "supplierId": "1"
+    },
+    {
+      "id": "12",
+      "invoiceNumber": "DUB-2025-0458",
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "total": "632.36",
+      "invoiceDate": "2025-03-12",
+      "supplierId": "3"
+    },
+    {
+      "id": "11",
+      "invoiceNumber": "FAR-2025-1206",
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "total": "2414.48",
+      "invoiceDate": "2025-03-13",
+      "supplierId": "2"
+    },
+    {
+      "id": "10",
+      "invoiceNumber": "GFS-2025-0894",
+      "status": "pending",
+      "qboSyncStatus": "synced",
+      "total": "1287.72",
+      "invoiceDate": "2025-03-13",
+      "supplierId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tinvoiceNumber\tstatus\tqboSyncStatus\ttotal\tinvoiceDate\tsupplierId\n30007\tGFS-2026-0311\tpending\tsynced\t4455.28\t2026-03-11\t1\n30006\tFC00221028\tpending\tsynced\t2690.42\t2026-03-12\t2\n30005\tPPA-CC1-2026-0313\tpending\tsynced\t1026.16\t2026-03-13\t4\n30004\tUNI-ONT-2026-0314\tpending\tsynced\t201.21\t2026-03-14\t30003\n30003\tUNI-MK-2026-0314\tpending\tsynced\t189.71\t2026-03-14\t30003\n30002\tUNI-PK-2026-0314\tpending\tsynced\t212.70\t2026-03-14\t30003\n30001\t026032\tpending\tsynced\t1437.19\t2026-03-14\t30002\n17\tHYD-2025-0003\tpaid\tsynced\t597.87\t2025-02-15\t9\n16\tJGR-2025-0085\tpaid\tsynced\t563.38\t2025-02-26\t4\n15\tFAR-2025-1190\tpaid\tsynced\t2069.55\t2025-02-25\t2\n14\tGFS-2025-0881\tpaid\tsynced\t1057.77\t2025-02-27\t1\n13\tGFS-2025-0880\tpaid\tsynced\t1552.16\t2025-02-28\t1\n12\tDUB-2025-0458\tpending\tsynced\t632.36\t2025-03-12\t3\n11\tFAR-2025-1206\tpending\tsynced\t2414.48\t2025-03-13\t2\n10\tGFS-2025-0894\tpending\tsynced\t1287.72\t2025-03-13\t1\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

@@ -1,0 +1,13 @@
+{
+  "query": "\n-- 1. Delete false Ham matches (Chamomile tea and Champignon mushroom)\nDELETE FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Ham' \nAND (lineDescription LIKE '%Chamomile%' OR lineDescription LIKE '%Champignon%');\n\n-- 2. Fix Peppers: \"Poivron rouge 5kg\" means 5kg case, purchaseAmount should be 5\nUPDATE inventoryItems SET purchaseAmount = 5.0 WHERE name = 'Peppers';\n\n-- 3. Fix Mozzarella: the Costco \"Racolli 2.27 kg\" is a 2.27kg package, but GFS \"CHEESE MOZZ BLOCK 19PCT\" is 18.4kg case\n-- The last price was the Costco one which is wrong - delete it and recalculate\nDELETE FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Mozzarella' \nAND lineDescription LIKE '%Racolli%';\n\n-- 4. Delete the $0 and negative Mozzarella matches (returns/credits)\nDELETE FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Mozzarella' \nAND CAST(unitPrice AS DECIMAL(10,4)) <= 0;\n\n-- 5. Fix Olive oil: \"Summum 3L\" is a 3L bottle, GFS \"OIL OLIVE EXTRA VIRGIN\" is a different size\n-- Current purchaseAmount is 3 which is correct for the Summum\nSELECT 'Fixes applied' as status;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute \n-- 1. Delete false Ham matches (Chamomile tea and Champignon mushroom)\nDELETE FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Ham' \nAND (lineDescription LIKE '%Chamomile%' OR lineDescription LIKE '%Champignon%');\n\n-- 2. Fix Peppers: \"Poivron rouge 5kg\" means 5kg case, purchaseAmount should be 5\nUPDATE inventoryItems SET purchaseAmount = 5.0 WHERE name = 'Peppers';\n\n-- 3. Fix Mozzarella: the Costco \"Racolli 2.27 kg\" is a 2.27kg package, but GFS \"CHEESE MOZZ BLOCK 19PCT\" is 18.4kg case\n-- The last price was the Costco one which is wrong - delete it and recalculate\nDELETE FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Mozzarella' \nAND lineDescription LIKE '%Racolli%';\n\n-- 4. Delete the $0 and negative Mozzarella matches (returns/credits)\nDELETE FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Mozzarella' \nAND CAST(unitPrice AS DECIMAL(10,4)) <= 0;\n\n-- 5. Fix Olive oil: \"Summum 3L\" is a 3L bottle, GFS \"OIL OLIVE EXTRA VIRGIN\" is a different size\n-- Current purchaseAmount is 3 which is correct for the Summum\nSELECT 'Fixes applied' as status;\n",
+  "rows": [
+    {
+      "status": "Fixes applied"
+    }
+  ],
+  "messages": [],
+  "stdout": "status\nFixes applied\n",
+  "stderr": "",
+  "execution_time_ms": 157
+}

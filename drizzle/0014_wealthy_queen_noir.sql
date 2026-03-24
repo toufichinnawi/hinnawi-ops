@@ -1,0 +1,22 @@
+CREATE TABLE `processedEmails` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`messageId` varchar(512) NOT NULL,
+	`subject` text,
+	`senderName` varchar(256),
+	`senderEmail` varchar(320),
+	`receivedAt` timestamp,
+	`hasAttachments` boolean DEFAULT false,
+	`attachmentCount` int DEFAULT 0,
+	`status` enum('pending','processed','skipped','error') NOT NULL DEFAULT 'pending',
+	`extractedSupplier` varchar(256),
+	`extractedAmount` decimal(12,2),
+	`extractedInvoiceNumber` varchar(128),
+	`extractedDate` varchar(20),
+	`linkedInvoiceId` int,
+	`fileUrl` text,
+	`notes` text,
+	`processedAt` timestamp,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `processedEmails_id` PRIMARY KEY(`id`),
+	CONSTRAINT `processedEmails_messageId_unique` UNIQUE(`messageId`)
+);

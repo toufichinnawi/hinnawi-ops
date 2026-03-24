@@ -1,0 +1,38 @@
+{
+  "query": "SELECT 'locations' as tbl, COUNT(*) as cnt FROM locations UNION ALL SELECT 'suppliers', COUNT(*) FROM suppliers UNION ALL SELECT 'invoices', COUNT(*) FROM invoices UNION ALL SELECT 'dailySales', COUNT(*) FROM dailySales UNION ALL SELECT 'inventoryItems', COUNT(*) FROM inventoryItems UNION ALL SELECT 'alerts', COUNT(*) FROM alerts UNION ALL SELECT 'integrations', COUNT(*) FROM integrations",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT 'locations' as tbl, COUNT(*) as cnt FROM locations UNION ALL SELECT 'suppliers', COUNT(*) FROM suppliers UNION ALL SELECT 'invoices', COUNT(*) FROM invoices UNION ALL SELECT 'dailySales', COUNT(*) FROM dailySales UNION ALL SELECT 'inventoryItems', COUNT(*) FROM inventoryItems UNION ALL SELECT 'alerts', COUNT(*) FROM alerts UNION ALL SELECT 'integrations', COUNT(*) FROM integrations",
+  "rows": [
+    {
+      "tbl": "suppliers",
+      "cnt": "11"
+    },
+    {
+      "tbl": "locations",
+      "cnt": "5"
+    },
+    {
+      "tbl": "invoices",
+      "cnt": "17"
+    },
+    {
+      "tbl": "inventoryItems",
+      "cnt": "10"
+    },
+    {
+      "tbl": "dailySales",
+      "cnt": "219"
+    },
+    {
+      "tbl": "alerts",
+      "cnt": "6"
+    },
+    {
+      "tbl": "integrations",
+      "cnt": "4"
+    }
+  ],
+  "messages": [],
+  "stdout": "tbl\tcnt\nsuppliers\t11\nlocations\t5\ninvoices\t17\ninventoryItems\t10\ndailySales\t219\nalerts\t6\nintegrations\t4\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

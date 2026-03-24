@@ -1,0 +1,26 @@
+{
+  "query": "SELECT 'recipes' as tbl, COUNT(*) as cnt FROM recipes UNION ALL SELECT 'menuItems', COUNT(*) FROM menuItems UNION ALL SELECT 'menuWithRecipe', COUNT(*) FROM menuItems WHERE hasRecipe = 1 UNION ALL SELECT 'productSales', COUNT(*) FROM productSales",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT 'recipes' as tbl, COUNT(*) as cnt FROM recipes UNION ALL SELECT 'menuItems', COUNT(*) FROM menuItems UNION ALL SELECT 'menuWithRecipe', COUNT(*) FROM menuItems WHERE hasRecipe = 1 UNION ALL SELECT 'productSales', COUNT(*) FROM productSales",
+  "rows": [
+    {
+      "tbl": "menuItems",
+      "cnt": "55"
+    },
+    {
+      "tbl": "menuWithRecipe",
+      "cnt": "22"
+    },
+    {
+      "tbl": "recipes",
+      "cnt": "25"
+    },
+    {
+      "tbl": "productSales",
+      "cnt": "177"
+    }
+  ],
+  "messages": [],
+  "stdout": "tbl\tcnt\nmenuItems\t55\nmenuWithRecipe\t22\nrecipes\t25\nproductSales\t177\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

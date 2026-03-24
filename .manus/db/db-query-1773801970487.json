@@ -1,0 +1,38 @@
+{
+  "query": "SELECT DISTINCT li.description, li.unitPrice FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND (UPPER(li.description) LIKE '%MILK%LACTANTIA%' OR UPPER(li.description) LIKE '%BEURRE NON SALÉ 82%NOUVELLE%' OR UPPER(li.description) LIKE '%BUTTER SALTED%') LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT DISTINCT li.description, li.unitPrice FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND (UPPER(li.description) LIKE '%MILK%LACTANTIA%' OR UPPER(li.description) LIKE '%BEURRE NON SALÉ 82%NOUVELLE%' OR UPPER(li.description) LIKE '%BUTTER SALTED%') LIMIT 10;",
+  "rows": [
+    {
+      "description": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "unitPrice": "354.9200"
+    },
+    {
+      "description": "MILK 3.25% LACTANTIA",
+      "unitPrice": "41.6500"
+    },
+    {
+      "description": "BUTTER SALTED (20)",
+      "unitPrice": "8.0000"
+    },
+    {
+      "description": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "unitPrice": "340.6200"
+    },
+    {
+      "description": "BUTTER SALTED (20)",
+      "unitPrice": "7.8500"
+    },
+    {
+      "description": "MILK 3.25% LACTANTIA",
+      "unitPrice": "41.1500"
+    },
+    {
+      "description": "MILK 3.25% LACTANTIA",
+      "unitPrice": "42.1500"
+    }
+  ],
+  "messages": [],
+  "stdout": "description\tunitPrice\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t354.9200\nMILK 3.25% LACTANTIA\t41.6500\nBUTTER SALTED (20)\t8.0000\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t340.6200\nBUTTER SALTED (20)\t7.8500\nMILK 3.25% LACTANTIA\t41.1500\nMILK 3.25% LACTANTIA\t42.1500\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

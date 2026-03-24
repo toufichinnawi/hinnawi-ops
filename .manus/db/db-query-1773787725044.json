@@ -1,0 +1,66 @@
+{
+  "query": "SELECT invoiceNumber, supplierId FROM invoices WHERE invoiceNumber IS NOT NULL ORDER BY invoiceNumber LIMIT 20 OFFSET 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT invoiceNumber, supplierId FROM invoices WHERE invoiceNumber IS NOT NULL ORDER BY invoiceNumber LIMIT 20 OFFSET 10;",
+  "rows": [
+    {
+      "invoiceNumber": "GFS-2025-0880",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "GFS-2025-0881",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "GFS-2025-0892",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "GFS-2025-0893",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "GFS-2025-0894",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "GFS-2026-0311",
+      "supplierId": "1"
+    },
+    {
+      "invoiceNumber": "HYD-2025-0003",
+      "supplierId": "9"
+    },
+    {
+      "invoiceNumber": "JGR-2025-0085",
+      "supplierId": "4"
+    },
+    {
+      "invoiceNumber": "JGR-2025-0089",
+      "supplierId": "4"
+    },
+    {
+      "invoiceNumber": "NAN-2025-0034",
+      "supplierId": "5"
+    },
+    {
+      "invoiceNumber": "PPA-CC1-2026-0313",
+      "supplierId": "4"
+    },
+    {
+      "invoiceNumber": "UNI-MK-2026-0314",
+      "supplierId": "30003"
+    },
+    {
+      "invoiceNumber": "UNI-ONT-2026-0314",
+      "supplierId": "30003"
+    },
+    {
+      "invoiceNumber": "UNI-PK-2026-0314",
+      "supplierId": "30003"
+    }
+  ],
+  "messages": [],
+  "stdout": "invoiceNumber\tsupplierId\nGFS-2025-0880\t1\nGFS-2025-0881\t1\nGFS-2025-0892\t1\nGFS-2025-0893\t1\nGFS-2025-0894\t1\nGFS-2026-0311\t1\nHYD-2025-0003\t9\nJGR-2025-0085\t4\nJGR-2025-0089\t4\nNAN-2025-0034\t5\nPPA-CC1-2026-0313\t4\nUNI-MK-2026-0314\t30003\nUNI-ONT-2026-0314\t30003\nUNI-PK-2026-0314\t30003\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

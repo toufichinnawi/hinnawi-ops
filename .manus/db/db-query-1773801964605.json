@@ -1,0 +1,110 @@
+{
+  "query": "SELECT m.lineDescription, m.unitPrice, m.quantity FROM invoiceLineItemMatches m WHERE m.matchedItemName IN ('Milk 3.25%', 'Butter') AND m.invoiceId BETWEEN 60012 AND 60131 ORDER BY m.matchedItemName, m.unitPrice DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT m.lineDescription, m.unitPrice, m.quantity FROM invoiceLineItemMatches m WHERE m.matchedItemName IN ('Milk 3.25%', 'Butter') AND m.invoiceId BETWEEN 60012 AND 60131 ORDER BY m.matchedItemName, m.unitPrice DESC LIMIT 20;",
+  "rows": [
+    {
+      "lineDescription": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "unitPrice": "70.9840",
+      "quantity": "2.000"
+    },
+    {
+      "lineDescription": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "unitPrice": "70.9840",
+      "quantity": "1.000"
+    },
+    {
+      "lineDescription": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "unitPrice": "70.9840",
+      "quantity": "1.000"
+    },
+    {
+      "lineDescription": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "unitPrice": "70.9840",
+      "quantity": "1.000"
+    },
+    {
+      "lineDescription": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "unitPrice": "68.1240",
+      "quantity": "1.000"
+    },
+    {
+      "lineDescription": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "unitPrice": "68.1240",
+      "quantity": "1.000"
+    },
+    {
+      "lineDescription": "BEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg",
+      "unitPrice": "68.1240",
+      "quantity": "1.000"
+    },
+    {
+      "lineDescription": "BEURRE N/SEL 82PCT EUROPEEN",
+      "unitPrice": "19.3480",
+      "quantity": "3.000"
+    },
+    {
+      "lineDescription": "BEURRE N/SEL 82PCT EUROPEEN",
+      "unitPrice": "19.3480",
+      "quantity": "2.000"
+    },
+    {
+      "lineDescription": "BEURRE N/SEL 82PCT EUROPEEN",
+      "unitPrice": "19.3480",
+      "quantity": "4.000"
+    },
+    {
+      "lineDescription": "BEURRE N/SEL 82PCT EUROPEEN",
+      "unitPrice": "19.3480",
+      "quantity": "2.000"
+    },
+    {
+      "lineDescription": "BUTTER SALTED (20)",
+      "unitPrice": "1.6000",
+      "quantity": "3.000"
+    },
+    {
+      "lineDescription": "BUTTER SALTED (20)",
+      "unitPrice": "1.5700",
+      "quantity": "4.000"
+    },
+    {
+      "lineDescription": "MILK 3.25% LACTANTIA",
+      "unitPrice": "10.5375",
+      "quantity": "2.000"
+    },
+    {
+      "lineDescription": "MILK 3.25% LACTANTIA",
+      "unitPrice": "10.5375",
+      "quantity": "5.000"
+    },
+    {
+      "lineDescription": "MILK 3.25% LACTANTIA",
+      "unitPrice": "10.5375",
+      "quantity": "5.000"
+    },
+    {
+      "lineDescription": "MILK 3.25% LACTANTIA",
+      "unitPrice": "10.5375",
+      "quantity": "3.000"
+    },
+    {
+      "lineDescription": "MILK 3.25% LACTANTIA",
+      "unitPrice": "10.5375",
+      "quantity": "1.000"
+    },
+    {
+      "lineDescription": "MILK 3.25% LACTANTIA",
+      "unitPrice": "10.5375",
+      "quantity": "5.000"
+    },
+    {
+      "lineDescription": "MILK 3.25% LACTANTIA",
+      "unitPrice": "10.5375",
+      "quantity": "4.000"
+    }
+  ],
+  "messages": [],
+  "stdout": "lineDescription\tunitPrice\tquantity\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t70.9840\t2.000\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t70.9840\t1.000\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t70.9840\t1.000\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t70.9840\t1.000\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t68.1240\t1.000\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t68.1240\t1.000\nBEURRE NON SALÉ 82% IMPORTÉ DE NOUVELLE-ZÉLANDE SANS CCL 25 kg\t68.1240\t1.000\nBEURRE N/SEL 82PCT EUROPEEN\t19.3480\t3.000\nBEURRE N/SEL 82PCT EUROPEEN\t19.3480\t2.000\nBEURRE N/SEL 82PCT EUROPEEN\t19.3480\t4.000\nBEURRE N/SEL 82PCT EUROPEEN\t19.3480\t2.000\nBUTTER SALTED (20)\t1.6000\t3.000\nBUTTER SALTED (20)\t1.5700\t4.000\nMILK 3.25% LACTANTIA\t10.5375\t2.000\nMILK 3.25% LACTANTIA\t10.5375\t5.000\nMILK 3.25% LACTANTIA\t10.5375\t5.000\nMILK 3.25% LACTANTIA\t10.5375\t3.000\nMILK 3.25% LACTANTIA\t10.5375\t1.000\nMILK 3.25% LACTANTIA\t10.5375\t5.000\nMILK 3.25% LACTANTIA\t10.5375\t4.000\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

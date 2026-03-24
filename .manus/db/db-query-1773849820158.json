@@ -1,0 +1,24 @@
+{
+  "query": "\n-- Delete false Peppers matches (Peppermint tea bags)\nDELETE FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Peppers' \nAND lineDescription LIKE '%Peppermint%';\n\n-- Now the Peppers match unitPrice values are the CASE prices (divided by old purchaseAmount=1)\n-- \"Poivron rouge 5kg\" = $5.88 per 5kg case = $1.176/kg\n-- So we need to recalculate: the stored unitPrice IS the case price, divide by 5 for per-kg\nUPDATE inventoryItems SET \n  lastCost = (SELECT unitPrice / 5 FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched' AND lineDescription LIKE '%Poivron%' ORDER BY invoiceId DESC LIMIT 1),\n  avgCost = (SELECT AVG(unitPrice / 5) FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched' AND lineDescription LIKE '%Poivron%'),\n  costPerUsableUnit = (SELECT unitPrice / 5 FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched' AND lineDescription LIKE '%Poivron%' ORDER BY invoiceId DESC LIMIT 1) / (yieldPct / 100),\n  updatedAt = NOW()\nWHERE name = 'Peppers';\n\n-- Fix Olive oil: the GFS one is likely a different size container. Check what purchaseAmount should be\n-- OIL OLIVE EXTRA VIRGIN at $17.78 - this is likely a 3L can\n-- Summum 3L at $12.74 - this is a 3L bottle  \n-- So both are ~3L, purchaseAmount=2.73 (liters to kg) is reasonable\n-- But avg is inflated by old batch data. Recalculate from all matches\nUPDATE inventoryItems SET \n  avgCost = (SELECT AVG(unitPrice) FROM invoiceLineItemMatches WHERE matchedItemName = 'Olive oil' AND matchStatus = 'auto_matched'),\n  updatedAt = NOW()\nWHERE name = 'Olive oil';\n\nSELECT name, lastCost, avgCost, costPerUsableUnit, purchaseAmount FROM inventoryItems WHERE name IN ('Peppers', 'Olive oil');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute \n-- Delete false Peppers matches (Peppermint tea bags)\nDELETE FROM invoiceLineItemMatches \nWHERE matchedItemName = 'Peppers' \nAND lineDescription LIKE '%Peppermint%';\n\n-- Now the Peppers match unitPrice values are the CASE prices (divided by old purchaseAmount=1)\n-- \"Poivron rouge 5kg\" = $5.88 per 5kg case = $1.176/kg\n-- So we need to recalculate: the stored unitPrice IS the case price, divide by 5 for per-kg\nUPDATE inventoryItems SET \n  lastCost = (SELECT unitPrice / 5 FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched' AND lineDescription LIKE '%Poivron%' ORDER BY invoiceId DESC LIMIT 1),\n  avgCost = (SELECT AVG(unitPrice / 5) FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched' AND lineDescription LIKE '%Poivron%'),\n  costPerUsableUnit = (SELECT unitPrice / 5 FROM invoiceLineItemMatches WHERE matchedItemName = 'Peppers' AND matchStatus = 'auto_matched' AND lineDescription LIKE '%Poivron%' ORDER BY invoiceId DESC LIMIT 1) / (yieldPct / 100),\n  updatedAt = NOW()\nWHERE name = 'Peppers';\n\n-- Fix Olive oil: the GFS one is likely a different size container. Check what purchaseAmount should be\n-- OIL OLIVE EXTRA VIRGIN at $17.78 - this is likely a 3L can\n-- Summum 3L at $12.74 - this is a 3L bottle  \n-- So both are ~3L, purchaseAmount=2.73 (liters to kg) is reasonable\n-- But avg is inflated by old batch data. Recalculate from all matches\nUPDATE inventoryItems SET \n  avgCost = (SELECT AVG(unitPrice) FROM invoiceLineItemMatches WHERE matchedItemName = 'Olive oil' AND matchStatus = 'auto_matched'),\n  updatedAt = NOW()\nWHERE name = 'Olive oil';\n\nSELECT name, lastCost, avgCost, costPerUsableUnit, purchaseAmount FROM inventoryItems WHERE name IN ('Peppers', 'Olive oil');\n",
+  "rows": [
+    {
+      "name": "Peppers",
+      "lastCost": "1.1760",
+      "avgCost": "1.2536",
+      "costPerUsableUnit": "1.3067",
+      "purchaseAmount": "5.000"
+    },
+    {
+      "name": "Olive oil",
+      "lastCost": "12.7436",
+      "avgCost": "39.7260",
+      "costPerUsableUnit": "12.7436",
+      "purchaseAmount": "2.730"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\tlastCost\tavgCost\tcostPerUsableUnit\tpurchaseAmount\nPeppers\t1.1760\t1.2536\t1.3067\t5.000\nOlive oil\t12.7436\t39.7260\t12.7436\t2.730\n",
+  "stderr": "",
+  "execution_time_ms": 151
+}

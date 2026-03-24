@@ -1,0 +1,28 @@
+{
+  "query": "SELECT li.description, li.quantity, li.unitPrice, li.amount FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND UPPER(li.description) LIKE '%SALMON SMKD COHO SLCD FZN BAP%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT li.description, li.quantity, li.unitPrice, li.amount FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND UPPER(li.description) LIKE '%SALMON SMKD COHO SLCD FZN BAP%';",
+  "rows": [
+    {
+      "description": "SALMON SMKD COHO SLCD FZN BAP",
+      "quantity": "2.000",
+      "unitPrice": "247.0000",
+      "amount": "494.00"
+    },
+    {
+      "description": "SALMON SMKD COHO SLCD FZN BAP",
+      "quantity": "1.000",
+      "unitPrice": "247.0000",
+      "amount": "247.00"
+    },
+    {
+      "description": "SALMON SMKD COHO SLCD FZN BAP",
+      "quantity": "1.000",
+      "unitPrice": "247.0000",
+      "amount": "247.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "description\tquantity\tunitPrice\tamount\nSALMON SMKD COHO SLCD FZN BAP\t2.000\t247.0000\t494.00\nSALMON SMKD COHO SLCD FZN BAP\t1.000\t247.0000\t247.00\nSALMON SMKD COHO SLCD FZN BAP\t1.000\t247.0000\t247.00\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

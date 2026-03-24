@@ -1,0 +1,138 @@
+{
+  "query": "DESCRIBE invoiceLineItemMatches;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute DESCRIBE invoiceLineItemMatches;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "invoiceLineItemId",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "invoiceId",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "inventoryItemId",
+      "Type": "int",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "lineDescription",
+      "Type": "varchar(512)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "matchedItemName",
+      "Type": "varchar(256)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "confidence",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "matchMethod",
+      "Type": "enum('exact','fuzzy','ai','manual')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "ai",
+      "Extra": ""
+    },
+    {
+      "Field": "matchStatus",
+      "Type": "enum('auto_matched','confirmed','rejected','unmatched')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "auto_matched",
+      "Extra": ""
+    },
+    {
+      "Field": "unitPrice",
+      "Type": "decimal(10,4)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "quantity",
+      "Type": "decimal(10,3)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "unit",
+      "Type": "varchar(32)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "priceApplied",
+      "Type": "tinyint(1)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "reviewedBy",
+      "Type": "varchar(256)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "reviewedAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\ninvoiceLineItemId\tint\tNO\t\tNULL\t\ninvoiceId\tint\tNO\t\tNULL\t\ninventoryItemId\tint\tYES\t\tNULL\t\nlineDescription\tvarchar(512)\tYES\t\tNULL\t\nmatchedItemName\tvarchar(256)\tYES\t\tNULL\t\nconfidence\tdecimal(5,2)\tYES\t\tNULL\t\nmatchMethod\tenum('exact','fuzzy','ai','manual')\tYES\t\tai\t\nmatchStatus\tenum('auto_matched','confirmed','rejected','unmatched')\tYES\t\tauto_matched\t\nunitPrice\tdecimal(10,4)\tYES\t\tNULL\t\nquantity\tdecimal(10,3)\tYES\t\tNULL\t\nunit\tvarchar(32)\tYES\t\tNULL\t\npriceApplied\ttinyint(1)\tYES\t\t0\t\nreviewedBy\tvarchar(256)\tYES\t\tNULL\t\nreviewedAt\ttimestamp\tYES\t\tNULL\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

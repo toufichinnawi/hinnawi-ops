@@ -1,0 +1,17 @@
+{
+  "query": "SELECT name, lastCost, avgCost, costPerUsableUnit, yieldPct FROM inventoryItems WHERE name = 'Salmon';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT name, lastCost, avgCost, costPerUsableUnit, yieldPct FROM inventoryItems WHERE name = 'Salmon';",
+  "rows": [
+    {
+      "name": "Salmon",
+      "lastCost": "49.4000",
+      "avgCost": "49.6957",
+      "costPerUsableUnit": "49.4000",
+      "yieldPct": "100.0"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\tlastCost\tavgCost\tcostPerUsableUnit\tyieldPct\nSalmon\t49.4000\t49.6957\t49.4000\t100.0\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

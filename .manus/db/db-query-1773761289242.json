@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE dailySales SET totalSales='477.87', taxableSales='115.31', taxExemptSales='477.87', tipsCollected='60.02', labourCost='204.72', orderCount=78 WHERE locationId=4 AND saleDate='2026-03-17';\nUPDATE dailySales SET totalSales='1463.25', taxableSales='796.52', tipsCollected='142.27', labourCost='263.75', orderCount=185 WHERE locationId=1 AND saleDate='2026-03-17';\nUPDATE dailySales SET totalSales='474.39', taxableSales='328.03', tipsCollected='60.02', labourCost='129.45', orderCount=66 WHERE locationId=2 AND saleDate='2026-03-17';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute UPDATE dailySales SET totalSales='477.87', taxableSales='115.31', taxExemptSales='477.87', tipsCollected='60.02', labourCost='204.72', orderCount=78 WHERE locationId=4 AND saleDate='2026-03-17';\nUPDATE dailySales SET totalSales='1463.25', taxableSales='796.52', tipsCollected='142.27', labourCost='263.75', orderCount=185 WHERE locationId=1 AND saleDate='2026-03-17';\nUPDATE dailySales SET totalSales='474.39', taxableSales='328.03', tipsCollected='60.02', labourCost='129.45', orderCount=66 WHERE locationId=2 AND saleDate='2026-03-17';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 112
+}

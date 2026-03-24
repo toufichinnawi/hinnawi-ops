@@ -1,0 +1,19 @@
+{
+  "query": "SELECT COUNT(*) as price_history_records FROM ingredientPriceHistory WHERE invoiceId BETWEEN 60012 AND 60131;\nSELECT COUNT(*) as alerts_created FROM alerts WHERE title LIKE 'Price %' AND createdAt > DATE_SUB(NOW(), INTERVAL 1 HOUR);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COUNT(*) as price_history_records FROM ingredientPriceHistory WHERE invoiceId BETWEEN 60012 AND 60131;\nSELECT COUNT(*) as alerts_created FROM alerts WHERE title LIKE 'Price %' AND createdAt > DATE_SUB(NOW(), INTERVAL 1 HOUR);",
+  "rows": [
+    {
+      "price_history_records": "109"
+    },
+    {
+      "price_history_records": "alerts_created"
+    },
+    {
+      "price_history_records": "971"
+    }
+  ],
+  "messages": [],
+  "stdout": "price_history_records\n109\nalerts_created\n971\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

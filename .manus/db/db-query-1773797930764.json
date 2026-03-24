@@ -1,0 +1,90 @@
+{
+  "query": "SELECT UPPER(m.lineDescription) as d, COUNT(*) as c FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NULL GROUP BY d ORDER BY c DESC LIMIT 20 OFFSET 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT UPPER(m.lineDescription) as d, COUNT(*) as c FROM invoiceLineItemMatches m WHERE m.invoiceId BETWEEN 60012 AND 60131 AND m.inventoryItemId IS NULL GROUP BY d ORDER BY c DESC LIMIT 20 OFFSET 20;",
+  "rows": [
+    {
+      "d": "NUTS PISTACHIO SHELLED UNS(12",
+      "c": "6"
+    },
+    {
+      "d": "MÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 KG",
+      "c": "6"
+    },
+    {
+      "d": "MILK HOMOGENIZED 3.25PCT",
+      "c": "5"
+    },
+    {
+      "d": "PÉPITES DE CHOCOLAT PUR FONCÉ 4000CT - FOLEY'S 12 KG",
+      "c": "5"
+    },
+    {
+      "d": "JUICE APPLE PLAST BTL OASIS",
+      "c": "5"
+    },
+    {
+      "d": "CONTAINER DEPOSIT",
+      "c": "4"
+    },
+    {
+      "d": "PÉPITES DE CHOCOLAT COMP FONCÉ 4000CT - FOLEY'S - 12 KG",
+      "c": "4"
+    },
+    {
+      "d": "MIEL NATUREL DORÉ DU QUEBEC - 15 KG",
+      "c": "4"
+    },
+    {
+      "d": "CHOCOLAT DE COUVERTURE NOIR 64% PURETÉ EXTRA-BITTER GUAYAQUIL - CACAO BARRY 5 KG",
+      "c": "4"
+    },
+    {
+      "d": "CHIPS REGULAR RIPPLE MENU",
+      "c": "4"
+    },
+    {
+      "d": "HAT (HAIR NET ONLY) INV BROWN",
+      "c": "4"
+    },
+    {
+      "d": "WATER NATURAL SPRING ESKA",
+      "c": "4"
+    },
+    {
+      "d": "PÉPITES DE CHOCOLATS PUR BLANC 4000CT - BARRY CALLEBAUT 30 LBS - 13.608 KG",
+      "c": "4"
+    },
+    {
+      "d": "BAG PAPER SANDWICH GIANT 6X9X2",
+      "c": "4"
+    },
+    {
+      "d": "FARINE FORTE À BOULANGERIE THREE STARS AA40 - ADM - 20 KG",
+      "c": "3"
+    },
+    {
+      "d": "CHOCOLAT DE COUVERTURE NOIR 70% ORIGINE SAINT-DOMINGUE - CACAO BARRY 20 KG",
+      "c": "3"
+    },
+    {
+      "d": "SAUCE CHILI SRIRACHA F. GO (12",
+      "c": "3"
+    },
+    {
+      "d": "POUDRE À PÂTE - FLEISCHMANN'S 5 KG",
+      "c": "3"
+    },
+    {
+      "d": "NAPKIN DISP KRAFT 1PLY XPRESSNAP",
+      "c": "3"
+    },
+    {
+      "d": "JUICE ORANGE BLEND PLAST OASIS",
+      "c": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "d\tc\nNUTS PISTACHIO SHELLED UNS(12\t6\nMÉLASSE QUALITÉ FANTAISIE - GRANDMA 5 KG\t6\nMILK HOMOGENIZED 3.25PCT\t5\nPÉPITES DE CHOCOLAT PUR FONCÉ 4000CT - FOLEY'S 12 KG\t5\nJUICE APPLE PLAST BTL OASIS\t5\nCONTAINER DEPOSIT\t4\nPÉPITES DE CHOCOLAT COMP FONCÉ 4000CT - FOLEY'S - 12 KG\t4\nMIEL NATUREL DORÉ DU QUEBEC - 15 KG\t4\nCHOCOLAT DE COUVERTURE NOIR 64% PURETÉ EXTRA-BITTER GUAYAQUIL - CACAO BARRY 5 KG\t4\nCHIPS REGULAR RIPPLE MENU\t4\nHAT (HAIR NET ONLY) INV BROWN\t4\nWATER NATURAL SPRING ESKA\t4\nPÉPITES DE CHOCOLATS PUR BLANC 4000CT - BARRY CALLEBAUT 30 LBS - 13.608 KG\t4\nBAG PAPER SANDWICH GIANT 6X9X2\t4\nFARINE FORTE À BOULANGERIE THREE STARS AA40 - ADM - 20 KG\t3\nCHOCOLAT DE COUVERTURE NOIR 70% ORIGINE SAINT-DOMINGUE - CACAO BARRY 20 KG\t3\nSAUCE CHILI SRIRACHA F. GO (12\t3\nPOUDRE À PÂTE - FLEISCHMANN'S 5 KG\t3\nNAPKIN DISP KRAFT 1PLY XPRESSNAP\t3\nJUICE ORANGE BLEND PLAST OASIS\t3\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

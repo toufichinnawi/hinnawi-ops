@@ -1,0 +1,25 @@
+{
+  "query": "SELECT COUNT(*) as recipe_count FROM recipes; SELECT COUNT(*) as menu_count FROM menuItems; SELECT COUNT(*) as menu_with_recipe FROM menuItems WHERE hasRecipe = 1",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COUNT(*) as recipe_count FROM recipes; SELECT COUNT(*) as menu_count FROM menuItems; SELECT COUNT(*) as menu_with_recipe FROM menuItems WHERE hasRecipe = 1",
+  "rows": [
+    {
+      "recipe_count": "25"
+    },
+    {
+      "recipe_count": "menu_count"
+    },
+    {
+      "recipe_count": "55"
+    },
+    {
+      "recipe_count": "menu_with_recipe"
+    },
+    {
+      "recipe_count": "22"
+    }
+  ],
+  "messages": [],
+  "stdout": "recipe_count\n25\nmenu_count\n55\nmenu_with_recipe\n22\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

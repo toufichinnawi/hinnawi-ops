@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE integrations SET lastSyncAt = NOW(), status = 'live' WHERE name = 'Koomi POS';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute UPDATE integrations SET lastSyncAt = NOW(), status = 'live' WHERE name = 'Koomi POS';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 72
+}

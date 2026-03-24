@@ -1,0 +1,58 @@
+{
+  "query": "SELECT li.description, li.quantity, li.unitPrice, li.amount FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND UPPER(li.description) LIKE '%FISH SALMON SMOKE COHO%' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT li.description, li.quantity, li.unitPrice, li.amount FROM invoiceLineItems li WHERE li.invoiceId BETWEEN 60012 AND 60131 AND UPPER(li.description) LIKE '%FISH SALMON SMOKE COHO%' LIMIT 10;",
+  "rows": [
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "5.340",
+      "unitPrice": "45.8500",
+      "amount": "244.61"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "4.240",
+      "unitPrice": "45.8500",
+      "amount": "194.45"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "5.410",
+      "unitPrice": "45.8500",
+      "amount": "248.05"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "5.830",
+      "unitPrice": "45.8500",
+      "amount": "267.31"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "4.990",
+      "unitPrice": "45.8500",
+      "amount": "228.84"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "4.720",
+      "unitPrice": "45.8500",
+      "amount": "216.23"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "4.960",
+      "unitPrice": "45.3500",
+      "amount": "224.94"
+    },
+    {
+      "description": "FISH SALMON SMOKE COHO SLICE",
+      "quantity": "7.000",
+      "unitPrice": "45.8500",
+      "amount": "320.95"
+    }
+  ],
+  "messages": [],
+  "stdout": "description\tquantity\tunitPrice\tamount\nFISH SALMON SMOKE COHO SLICE\t5.340\t45.8500\t244.61\nFISH SALMON SMOKE COHO SLICE\t4.240\t45.8500\t194.45\nFISH SALMON SMOKE COHO SLICE\t5.410\t45.8500\t248.05\nFISH SALMON SMOKE COHO SLICE\t5.830\t45.8500\t267.31\nFISH SALMON SMOKE COHO SLICE\t4.990\t45.8500\t228.84\nFISH SALMON SMOKE COHO SLICE\t4.720\t45.8500\t216.23\nFISH SALMON SMOKE COHO SLICE\t4.960\t45.3500\t224.94\nFISH SALMON SMOKE COHO SLICE\t7.000\t45.8500\t320.95\n",
+  "stderr": "",
+  "execution_time_ms": 62
+}

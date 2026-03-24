@@ -1,0 +1,80 @@
+{
+  "query": "SELECT m.lineDescription, m.unitPrice, li.unitPrice as rawPrice FROM invoiceLineItemMatches m JOIN invoiceLineItems li ON li.id = m.invoiceLineItemId WHERE m.matchedItemName = 'Salmon' AND m.invoiceId BETWEEN 60012 AND 60131 LIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT m.lineDescription, m.unitPrice, li.unitPrice as rawPrice FROM invoiceLineItemMatches m JOIN invoiceLineItems li ON li.id = m.invoiceLineItemId WHERE m.matchedItemName = 'Salmon' AND m.invoiceId BETWEEN 60012 AND 60131 LIMIT 15;",
+  "rows": [
+    {
+      "lineDescription": "FISH SALMON SMOKE COHO SLICE",
+      "unitPrice": "45.8500",
+      "rawPrice": "45.8500"
+    },
+    {
+      "lineDescription": "FISH SALMON SMOKE COHO SLICE",
+      "unitPrice": "45.8500",
+      "rawPrice": "45.8500"
+    },
+    {
+      "lineDescription": "FISH SALMON SMOKE COHO SLICE",
+      "unitPrice": "45.8500",
+      "rawPrice": "45.8500"
+    },
+    {
+      "lineDescription": "FISH SALMON SMOKE COHO SLICE",
+      "unitPrice": "45.8500",
+      "rawPrice": "45.8500"
+    },
+    {
+      "lineDescription": "FISH SALMON SMOKE COHO SLICE",
+      "unitPrice": "45.8500",
+      "rawPrice": "45.8500"
+    },
+    {
+      "lineDescription": "FISH SALMON SMOKE COHO SLICE",
+      "unitPrice": "45.8500",
+      "rawPrice": "45.8500"
+    },
+    {
+      "lineDescription": "FISH SALMON SMOKE COHO SLICE",
+      "unitPrice": "45.3500",
+      "rawPrice": "45.3500"
+    },
+    {
+      "lineDescription": "FISH SALMON SMOKE COHO SLICE",
+      "unitPrice": "45.8500",
+      "rawPrice": "45.8500"
+    },
+    {
+      "lineDescription": "FISH SALMON SMOKED ATL",
+      "unitPrice": "95.3000",
+      "rawPrice": "95.3000"
+    },
+    {
+      "lineDescription": "SAUMON COHO FUME EN TRANCHE SU",
+      "unitPrice": "42.9700",
+      "rawPrice": "42.9700"
+    },
+    {
+      "lineDescription": "SALMON COHO SMKD SLCD FZN",
+      "unitPrice": "42.9700",
+      "rawPrice": "42.9700"
+    },
+    {
+      "lineDescription": "SALMON SMKD COHO SLCD FZN BAP",
+      "unitPrice": "247.0000",
+      "rawPrice": "247.0000"
+    },
+    {
+      "lineDescription": "SALMON SMKD COHO SLCD FZN BAP",
+      "unitPrice": "247.0000",
+      "rawPrice": "247.0000"
+    },
+    {
+      "lineDescription": "SALMON SMKD COHO SLCD FZN BAP",
+      "unitPrice": "247.0000",
+      "rawPrice": "247.0000"
+    }
+  ],
+  "messages": [],
+  "stdout": "lineDescription\tunitPrice\trawPrice\nFISH SALMON SMOKE COHO SLICE\t45.8500\t45.8500\nFISH SALMON SMOKE COHO SLICE\t45.8500\t45.8500\nFISH SALMON SMOKE COHO SLICE\t45.8500\t45.8500\nFISH SALMON SMOKE COHO SLICE\t45.8500\t45.8500\nFISH SALMON SMOKE COHO SLICE\t45.8500\t45.8500\nFISH SALMON SMOKE COHO SLICE\t45.8500\t45.8500\nFISH SALMON SMOKE COHO SLICE\t45.3500\t45.3500\nFISH SALMON SMOKE COHO SLICE\t45.8500\t45.8500\nFISH SALMON SMOKED ATL\t95.3000\t95.3000\nSAUMON COHO FUME EN TRANCHE SU\t42.9700\t42.9700\nSALMON COHO SMKD SLCD FZN\t42.9700\t42.9700\nSALMON SMKD COHO SLCD FZN BAP\t247.0000\t247.0000\nSALMON SMKD COHO SLCD FZN BAP\t247.0000\t247.0000\nSALMON SMKD COHO SLCD FZN BAP\t247.0000\t247.0000\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

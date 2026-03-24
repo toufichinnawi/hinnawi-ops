@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO appSettings (`key`, `value`) VALUES ('koomi_auto_sync_enabled', 'true') ON DUPLICATE KEY UPDATE `value` = 'true';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute INSERT INTO appSettings (`key`, `value`) VALUES ('koomi_auto_sync_enabled', 'true') ON DUPLICATE KEY UPDATE `value` = 'true';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 72
+}

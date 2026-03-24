@@ -1,0 +1,138 @@
+{
+  "query": "SELECT ds.saleDate, l.name as location, ds.totalSales, ds.gstCollected, ds.qstCollected, ds.totalDeposit\nFROM dailySales ds \nJOIN locations l ON ds.locationId = l.id \nWHERE ds.saleDate BETWEEN '2026-03-13' AND '2026-03-16' \nORDER BY ds.saleDate, l.name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT ds.saleDate, l.name as location, ds.totalSales, ds.gstCollected, ds.qstCollected, ds.totalDeposit\nFROM dailySales ds \nJOIN locations l ON ds.locationId = l.id \nWHERE ds.saleDate BETWEEN '2026-03-13' AND '2026-03-16' \nORDER BY ds.saleDate, l.name;",
+  "rows": [
+    {
+      "saleDate": "2026-03-13",
+      "location": "Cathcart Tunnel",
+      "totalSales": "1030.79",
+      "gstCollected": "9.16",
+      "qstCollected": "18.28",
+      "totalDeposit": "874.96"
+    },
+    {
+      "saleDate": "2026-03-13",
+      "location": "Mackay",
+      "totalSales": "1857.25",
+      "gstCollected": "33.48",
+      "qstCollected": "66.79",
+      "totalDeposit": "1287.91"
+    },
+    {
+      "saleDate": "2026-03-13",
+      "location": "Ontario",
+      "totalSales": "522.47",
+      "gstCollected": "0.00",
+      "qstCollected": "0.00",
+      "totalDeposit": "0.00"
+    },
+    {
+      "saleDate": "2026-03-13",
+      "location": "President Kennedy",
+      "totalSales": "3079.65",
+      "gstCollected": "47.05",
+      "qstCollected": "93.86",
+      "totalDeposit": "2279.58"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "location": "Cathcart Tunnel",
+      "totalSales": "0.00",
+      "gstCollected": "0.00",
+      "qstCollected": "0.00",
+      "totalDeposit": "0.00"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "location": "Mackay",
+      "totalSales": "1672.57",
+      "gstCollected": "29.81",
+      "qstCollected": "59.47",
+      "totalDeposit": "1165.68"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "location": "Ontario",
+      "totalSales": "792.96",
+      "gstCollected": "0.00",
+      "qstCollected": "0.00",
+      "totalDeposit": "0.00"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "location": "President Kennedy",
+      "totalSales": "2015.85",
+      "gstCollected": "39.83",
+      "qstCollected": "79.45",
+      "totalDeposit": "1338.61"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "location": "Cathcart Tunnel",
+      "totalSales": "0.00",
+      "gstCollected": "0.00",
+      "qstCollected": "0.00",
+      "totalDeposit": "0.00"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "location": "Mackay",
+      "totalSales": "1595.64",
+      "gstCollected": "33.73",
+      "qstCollected": "67.29",
+      "totalDeposit": "1022.04"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "location": "Ontario",
+      "totalSales": "896.63",
+      "gstCollected": "0.00",
+      "qstCollected": "0.00",
+      "totalDeposit": "0.00"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "location": "President Kennedy",
+      "totalSales": "2749.03",
+      "gstCollected": "46.37",
+      "qstCollected": "92.51",
+      "totalDeposit": "1960.51"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "location": "Cathcart Tunnel",
+      "totalSales": "1199.04",
+      "gstCollected": "16.40",
+      "qstCollected": "32.72",
+      "totalDeposit": "920.13"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "location": "Mackay",
+      "totalSales": "1996.59",
+      "gstCollected": "43.82",
+      "qstCollected": "87.42",
+      "totalDeposit": "1251.42"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "location": "Ontario",
+      "totalSales": "911.98",
+      "gstCollected": "0.00",
+      "qstCollected": "0.00",
+      "totalDeposit": "0.00"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "location": "President Kennedy",
+      "totalSales": "3232.53",
+      "gstCollected": "56.70",
+      "qstCollected": "113.12",
+      "totalDeposit": "2268.30"
+    }
+  ],
+  "messages": [],
+  "stdout": "saleDate\tlocation\ttotalSales\tgstCollected\tqstCollected\ttotalDeposit\n2026-03-13\tCathcart Tunnel\t1030.79\t9.16\t18.28\t874.96\n2026-03-13\tMackay\t1857.25\t33.48\t66.79\t1287.91\n2026-03-13\tOntario\t522.47\t0.00\t0.00\t0.00\n2026-03-13\tPresident Kennedy\t3079.65\t47.05\t93.86\t2279.58\n2026-03-14\tCathcart Tunnel\t0.00\t0.00\t0.00\t0.00\n2026-03-14\tMackay\t1672.57\t29.81\t59.47\t1165.68\n2026-03-14\tOntario\t792.96\t0.00\t0.00\t0.00\n2026-03-14\tPresident Kennedy\t2015.85\t39.83\t79.45\t1338.61\n2026-03-15\tCathcart Tunnel\t0.00\t0.00\t0.00\t0.00\n2026-03-15\tMackay\t1595.64\t33.73\t67.29\t1022.04\n2026-03-15\tOntario\t896.63\t0.00\t0.00\t0.00\n2026-03-15\tPresident Kennedy\t2749.03\t46.37\t92.51\t1960.51\n2026-03-16\tCathcart Tunnel\t1199.04\t16.40\t32.72\t920.13\n2026-03-16\tMackay\t1996.59\t43.82\t87.42\t1251.42\n2026-03-16\tOntario\t911.98\t0.00\t0.00\t0.00\n2026-03-16\tPresident Kennedy\t3232.53\t56.70\t113.12\t2268.30\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

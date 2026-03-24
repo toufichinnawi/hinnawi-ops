@@ -1,0 +1,85 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'invoices' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'invoices' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "invoiceNumber"
+    },
+    {
+      "COLUMN_NAME": "supplierId"
+    },
+    {
+      "COLUMN_NAME": "locationId"
+    },
+    {
+      "COLUMN_NAME": "invoiceDate"
+    },
+    {
+      "COLUMN_NAME": "dueDate"
+    },
+    {
+      "COLUMN_NAME": "subtotal"
+    },
+    {
+      "COLUMN_NAME": "gst"
+    },
+    {
+      "COLUMN_NAME": "qst"
+    },
+    {
+      "COLUMN_NAME": "total"
+    },
+    {
+      "COLUMN_NAME": "status"
+    },
+    {
+      "COLUMN_NAME": "glAccount"
+    },
+    {
+      "COLUMN_NAME": "qboSynced"
+    },
+    {
+      "COLUMN_NAME": "qboBillId"
+    },
+    {
+      "COLUMN_NAME": "notes"
+    },
+    {
+      "COLUMN_NAME": "createdAt"
+    },
+    {
+      "COLUMN_NAME": "qboSyncStatus"
+    },
+    {
+      "COLUMN_NAME": "qboSyncError"
+    },
+    {
+      "COLUMN_NAME": "qboSyncedAt"
+    },
+    {
+      "COLUMN_NAME": "fileUrl"
+    },
+    {
+      "COLUMN_NAME": "fileKey"
+    },
+    {
+      "COLUMN_NAME": "deliveryNoteUrl"
+    },
+    {
+      "COLUMN_NAME": "deliveryNoteKey"
+    },
+    {
+      "COLUMN_NAME": "autoApproved"
+    },
+    {
+      "COLUMN_NAME": "quotationId"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nid\ninvoiceNumber\nsupplierId\nlocationId\ninvoiceDate\ndueDate\nsubtotal\ngst\nqst\ntotal\nstatus\nglAccount\nqboSynced\nqboBillId\nnotes\ncreatedAt\nqboSyncStatus\nqboSyncError\nqboSyncedAt\nfileUrl\nfileKey\ndeliveryNoteUrl\ndeliveryNoteKey\nautoApproved\nquotationId\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

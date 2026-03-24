@@ -1,0 +1,28 @@
+{
+  "query": "SELECT locationId, periodStart, COUNT(*) as items, SUM(CAST(totalRevenue AS DECIMAL(12,2))) as revenue FROM productSales WHERE periodStart >= '2026-03-14' GROUP BY locationId, periodStart ORDER BY periodStart DESC, locationId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT locationId, periodStart, COUNT(*) as items, SUM(CAST(totalRevenue AS DECIMAL(12,2))) as revenue FROM productSales WHERE periodStart >= '2026-03-14' GROUP BY locationId, periodStart ORDER BY periodStart DESC, locationId;",
+  "rows": [
+    {
+      "locationId": "1",
+      "periodStart": "2026-03-14",
+      "items": "169",
+      "revenue": "9624.13"
+    },
+    {
+      "locationId": "2",
+      "periodStart": "2026-03-14",
+      "items": "135",
+      "revenue": "5788.00"
+    },
+    {
+      "locationId": "4",
+      "periodStart": "2026-03-14",
+      "items": "94",
+      "revenue": "1675.99"
+    }
+  ],
+  "messages": [],
+  "stdout": "locationId\tperiodStart\titems\trevenue\n1\t2026-03-14\t169\t9624.13\n2\t2026-03-14\t135\t5788.00\n4\t2026-03-14\t94\t1675.99\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

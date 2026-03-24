@@ -1,0 +1,170 @@
+{
+  "query": "SELECT ds.saleDate, l.code, l.name, ds.totalSales, ds.orderCount, ds.labourCost FROM dailySales ds JOIN locations l ON ds.locationId = l.id ORDER BY ds.saleDate DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT ds.saleDate, l.code, l.name, ds.totalSales, ds.orderCount, ds.labourCost FROM dailySales ds JOIN locations l ON ds.locationId = l.id ORDER BY ds.saleDate DESC LIMIT 20;",
+  "rows": [
+    {
+      "saleDate": "2026-03-17",
+      "code": "PK",
+      "name": "President Kennedy",
+      "totalSales": "1216.78",
+      "orderCount": "154",
+      "labourCost": "210.43"
+    },
+    {
+      "saleDate": "2026-03-17",
+      "code": "MK",
+      "name": "Mackay",
+      "totalSales": "347.22",
+      "orderCount": "51",
+      "labourCost": "92.58"
+    },
+    {
+      "saleDate": "2026-03-17",
+      "code": "CT",
+      "name": "Cathcart Tunnel",
+      "totalSales": "385.36",
+      "orderCount": "63",
+      "labourCost": "166.85"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "code": "MK",
+      "name": "Mackay",
+      "totalSales": "1120.18",
+      "orderCount": "185",
+      "labourCost": "463.34"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "code": "PK",
+      "name": "President Kennedy",
+      "totalSales": "2098.48",
+      "orderCount": "330",
+      "labourCost": "649.79"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "code": "CT",
+      "name": "Cathcart Tunnel",
+      "totalSales": "871.01",
+      "orderCount": "95",
+      "labourCost": "358.30"
+    },
+    {
+      "saleDate": "2026-03-16",
+      "code": "ONT",
+      "name": "Ontario",
+      "totalSales": "911.98",
+      "orderCount": "84",
+      "labourCost": "148.75"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "code": "MK",
+      "name": "Mackay",
+      "totalSales": "921.02",
+      "orderCount": "119",
+      "labourCost": "347.74"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "code": "PK",
+      "name": "President Kennedy",
+      "totalSales": "1821.63",
+      "orderCount": "207",
+      "labourCost": "322.94"
+    },
+    {
+      "saleDate": "2026-03-15",
+      "code": "ONT",
+      "name": "Ontario",
+      "totalSales": "896.63",
+      "orderCount": "64",
+      "labourCost": "199.23"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "code": "PK",
+      "name": "President Kennedy",
+      "totalSales": "1219.33",
+      "orderCount": "166",
+      "labourCost": "523.27"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "code": "ONT",
+      "name": "Ontario",
+      "totalSales": "792.96",
+      "orderCount": "56",
+      "labourCost": "195.09"
+    },
+    {
+      "saleDate": "2026-03-14",
+      "code": "MK",
+      "name": "Mackay",
+      "totalSales": "1076.41",
+      "orderCount": "132",
+      "labourCost": "340.15"
+    },
+    {
+      "saleDate": "2026-03-13",
+      "code": "PK",
+      "name": "President Kennedy",
+      "totalSales": "3079.65",
+      "orderCount": "315",
+      "labourCost": "699.47"
+    },
+    {
+      "saleDate": "2026-03-13",
+      "code": "ONT",
+      "name": "Ontario",
+      "totalSales": "522.47",
+      "orderCount": "55",
+      "labourCost": "192.44"
+    },
+    {
+      "saleDate": "2026-03-13",
+      "code": "CT",
+      "name": "Cathcart Tunnel",
+      "totalSales": "1030.79",
+      "orderCount": "98",
+      "labourCost": "322.00"
+    },
+    {
+      "saleDate": "2026-03-13",
+      "code": "MK",
+      "name": "Mackay",
+      "totalSales": "1857.25",
+      "orderCount": "156",
+      "labourCost": "435.68"
+    },
+    {
+      "saleDate": "2026-03-12",
+      "code": "CT",
+      "name": "Cathcart Tunnel",
+      "totalSales": "800.45",
+      "orderCount": "92",
+      "labourCost": "289.67"
+    },
+    {
+      "saleDate": "2026-03-12",
+      "code": "PK",
+      "name": "President Kennedy",
+      "totalSales": "2760.28",
+      "orderCount": "278",
+      "labourCost": "653.31"
+    },
+    {
+      "saleDate": "2026-03-12",
+      "code": "ONT",
+      "name": "Ontario",
+      "totalSales": "402.12",
+      "orderCount": "41",
+      "labourCost": "145.92"
+    }
+  ],
+  "messages": [],
+  "stdout": "saleDate\tcode\tname\ttotalSales\torderCount\tlabourCost\n2026-03-17\tPK\tPresident Kennedy\t1216.78\t154\t210.43\n2026-03-17\tMK\tMackay\t347.22\t51\t92.58\n2026-03-17\tCT\tCathcart Tunnel\t385.36\t63\t166.85\n2026-03-16\tMK\tMackay\t1120.18\t185\t463.34\n2026-03-16\tPK\tPresident Kennedy\t2098.48\t330\t649.79\n2026-03-16\tCT\tCathcart Tunnel\t871.01\t95\t358.30\n2026-03-16\tONT\tOntario\t911.98\t84\t148.75\n2026-03-15\tMK\tMackay\t921.02\t119\t347.74\n2026-03-15\tPK\tPresident Kennedy\t1821.63\t207\t322.94\n2026-03-15\tONT\tOntario\t896.63\t64\t199.23\n2026-03-14\tPK\tPresident Kennedy\t1219.33\t166\t523.27\n2026-03-14\tONT\tOntario\t792.96\t56\t195.09\n2026-03-14\tMK\tMackay\t1076.41\t132\t340.15\n2026-03-13\tPK\tPresident Kennedy\t3079.65\t315\t699.47\n2026-03-13\tONT\tOntario\t522.47\t55\t192.44\n2026-03-13\tCT\tCathcart Tunnel\t1030.79\t98\t322.00\n2026-03-13\tMK\tMackay\t1857.25\t156\t435.68\n2026-03-12\tCT\tCathcart Tunnel\t800.45\t92\t289.67\n2026-03-12\tPK\tPresident Kennedy\t2760.28\t278\t653.31\n2026-03-12\tONT\tOntario\t402.12\t41\t145.92\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

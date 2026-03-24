@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(DISTINCT UPPER(description)) as total_distinct FROM invoiceLineItems WHERE invoiceId BETWEEN 60012 AND 60131;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT COUNT(DISTINCT UPPER(description)) as total_distinct FROM invoiceLineItems WHERE invoiceId BETWEEN 60012 AND 60131;",
+  "rows": [
+    {
+      "total_distinct": "201"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_distinct\n201\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

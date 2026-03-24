@@ -1,0 +1,160 @@
+{
+  "query": "SELECT id, name, isActive, isSubRecipe FROM recipes ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3M4hPncfDS8MBAb.82b03a6e50f8 --database h46y7gAGiyBszkHNcCdSHx --execute SELECT id, name, isActive, isSubRecipe FROM recipes ORDER BY id;",
+  "rows": [
+    {
+      "id": "30002",
+      "name": "Spicy Mayo",
+      "isActive": "1",
+      "isSubRecipe": "1"
+    },
+    {
+      "id": "30003",
+      "name": "Honey Mustard",
+      "isActive": "1",
+      "isSubRecipe": "1"
+    },
+    {
+      "id": "30004",
+      "name": "Bacon jam",
+      "isActive": "1",
+      "isSubRecipe": "1"
+    },
+    {
+      "id": "30005",
+      "name": "New York",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30006",
+      "name": "Toronto",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30007",
+      "name": "Mila",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30008",
+      "name": "Amelia with turkey",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30009",
+      "name": "Amelia with ham",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30010",
+      "name": "Montréal",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30011",
+      "name": "Petit-déjeuner",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30012",
+      "name": "Petit-Quebec",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30013",
+      "name": "Petit-Quebec with bacon",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30014",
+      "name": "Petit-Quebec with ham",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30015",
+      "name": "Quebec",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30016",
+      "name": "Wake up",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30017",
+      "name": "Cream cheese bagel",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30018",
+      "name": "Cream cheese with Lox",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30019",
+      "name": "George",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30020",
+      "name": "Shanghai",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30021",
+      "name": "Vegetarian",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30022",
+      "name": "BLT",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30023",
+      "name": "Bacon jam",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30024",
+      "name": "Chicken Salad",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30025",
+      "name": "Avocado Salad",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    },
+    {
+      "id": "30026",
+      "name": "Tofu Salad",
+      "isActive": "1",
+      "isSubRecipe": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tisActive\tisSubRecipe\n30002\tSpicy Mayo\t1\t1\n30003\tHoney Mustard\t1\t1\n30004\tBacon jam\t1\t1\n30005\tNew York\t1\t0\n30006\tToronto\t1\t0\n30007\tMila\t1\t0\n30008\tAmelia with turkey\t1\t0\n30009\tAmelia with ham\t1\t0\n30010\tMontréal\t1\t0\n30011\tPetit-déjeuner\t1\t0\n30012\tPetit-Quebec\t1\t0\n30013\tPetit-Quebec with bacon\t1\t0\n30014\tPetit-Quebec with ham\t1\t0\n30015\tQuebec\t1\t0\n30016\tWake up\t1\t0\n30017\tCream cheese bagel\t1\t0\n30018\tCream cheese with Lox\t1\t0\n30019\tGeorge\t1\t0\n30020\tShanghai\t1\t0\n30021\tVegetarian\t1\t0\n30022\tBLT\t1\t0\n30023\tBacon jam\t1\t0\n30024\tChicken Salad\t1\t0\n30025\tAvocado Salad\t1\t0\n30026\tTofu Salad\t1\t0\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}
