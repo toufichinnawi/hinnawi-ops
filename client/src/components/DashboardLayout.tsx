@@ -83,6 +83,9 @@ export default function DashboardLayout({
             <p className="text-sm text-muted-foreground text-center max-w-sm">
               Restaurant operations command center. Sign in to access your dashboard.
             </p>
+            <p className="text-xs text-muted-foreground/60 text-center">
+              v2.1 — Dev workflow connected
+            </p>
           </div>
           <Button onClick={() => { window.location.href = getLoginUrl(); }} size="lg" className="w-full shadow-lg hover:shadow-xl transition-all">
             Sign in
