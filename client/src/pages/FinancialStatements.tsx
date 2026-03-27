@@ -2,38 +2,52 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   FileText, BarChart3, Settings2, Share2, RefreshCw, Building2, Clock,
-  AlertCircle, CheckCircle2,
+  AlertCircle, CheckCircle2, Loader2, Zap, Database,
 } from "lucide-react";
+import { toast } from "sonner";
 import ProfitAndLoss from "./financial/ProfitAndLoss";
 import BalanceSheet from "./financial/BalanceSheet";
 import AccountMapping from "./financial/AccountMapping";
 import SharedExpenses from "./financial/SharedExpenses";
 
-// Entity mapping: location name → QBO company
-const ENTITY_MAP: Record<string, { label: string; legalName: string }> = {
-  "PK Cafe": { label: "PK Cafe", legalName: "9427-0659 Quebec Inc" },
-  "MK Cafe": { label: "MK Cafe", legalName: "9427-0659 Quebec Inc" },
-  "ONT Cafe": { label: "ONT Cafe", legalName: "9287-8982 Quebec Inc" },
-  "CT Cafe": { label: "CT Cafe", legalName: "9364-1009 Quebec Inc" },
-  "Factory": { label: "Factory & Central Kitchen", legalName: "Hinnawi Bros Bagel & Cafe" },
-};
-
 export default function FinancialStatements() {
   const [activeTab, setActiveTab] = useState("profit-loss");
   const [selectedEntityId, setSelectedEntityId] = useState<number | null>(null);
 
-  const { data: entities, isLoading: entitiesLoading } = trpc.financialStatements.entities.list.useQuery();
+  const { data: entities, isLoading: entitiesLoading, refetch: refetchEntities } = trpc.financialStatements.entities.list.useQuery();
   const { data: locations } = trpc.locations.list.useQuery();
 
-  const selectedEntity = entities?.find(e => e.id === selectedEntityId) || null;
+  const autoSetup = trpc.financialStatements.entities.autoSetup.useMutation({
+    onSuccess: (result) => {
+      toast.success(`Setup complete! ${result.entitiesCreated} entities created.`);
+      refetchEntities();
+    },
+    onError: (err) => {
+      toast.error(`Setup failed: ${err.message}`);
+    },
+  });
+
+  const syncAccounts = trpc.financialStatements.entities.syncAccounts.useMutation({
+    onSuccess: (result) => {
+      toast.success(`Synced ${result.accountCount} accounts from QuickBooks`);
+      refetchEntities();
+    },
+    onError: (err) => {
+      toast.error(`Sync failed: ${err.message}`);
+    },
+  });
+
+  const selectedEntity = entities?.find((e: any) => e.id === selectedEntityId) || null;
   const selectedLocation = selectedEntity
-    ? locations?.find(l => l.id === selectedEntity.locationId)
+    ? locations?.find((l: any) => l.id === selectedEntity.locationId)
     : null;
+
+  const hasEntities = entities && entities.length > 0;
 
   return (
     <div className="space-y-6">
@@ -70,25 +84,72 @@ export default function FinancialStatements() {
         </div>
       </div>
 
-      {/* Entity Selector */}
-      <Card>
-        <CardContent className="pt-4 pb-4">
-          <div className="flex items-center gap-4">
-            <Building2 className="h-5 w-5 text-muted-foreground" />
-            <div className="flex-1">
-              <Select
-                value={selectedEntityId?.toString() || ""}
-                onValueChange={(val) => setSelectedEntityId(Number(val))}
+      {/* Setup Banner — shown when no entities exist */}
+      {!entitiesLoading && !hasEntities && (
+        <Card className="border-amber-200 bg-amber-50/50">
+          <CardContent className="py-8">
+            <div className="text-center max-w-lg mx-auto">
+              <div className="h-16 w-16 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <Database className="h-8 w-8 text-amber-600" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Set Up Financial Entities</h3>
+              <p className="text-muted-foreground mb-2">
+                Your QuickBooks companies need to be linked to your cafe locations before you can generate financial statements.
+              </p>
+              <div className="text-sm text-muted-foreground mb-6 space-y-1">
+                <p>This will create entities for:</p>
+                <div className="flex flex-wrap justify-center gap-2 mt-2">
+                  {[
+                    { name: "PK Cafe", legal: "9427-0659 Quebec Inc" },
+                    { name: "MK Cafe", legal: "9427-0659 Quebec Inc" },
+                    { name: "ONT Cafe", legal: "9287-8982 Quebec Inc" },
+                    { name: "CT Cafe", legal: "9364-1009 Quebec Inc" },
+                    { name: "Factory & Central Kitchen", legal: "Hinnawi Bros Bagel & Cafe" },
+                  ].map((e) => (
+                    <Badge key={e.name} variant="outline" className="text-xs">
+                      {e.name} <span className="text-muted-foreground ml-1">→ {e.legal}</span>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <Button
+                size="lg"
+                onClick={() => autoSetup.mutate()}
+                disabled={autoSetup.isPending}
+                className="gap-2"
               >
-                <SelectTrigger className="w-[350px]">
-                  <SelectValue placeholder="Select an entity..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {entitiesLoading ? (
-                    <SelectItem value="loading" disabled>Loading entities...</SelectItem>
-                  ) : entities && entities.length > 0 ? (
-                    entities.map(entity => {
-                      const loc = locations?.find(l => l.id === entity.locationId);
+                {autoSetup.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Zap className="h-4 w-4" />
+                )}
+                {autoSetup.isPending ? "Setting up..." : "Auto-Setup All Entities"}
+              </Button>
+              <p className="text-xs text-muted-foreground mt-3">
+                Fiscal year: September 1 — August 31 | Line definitions will be seeded automatically
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Entity Selector — shown when entities exist */}
+      {hasEntities && (
+        <Card>
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center gap-4">
+              <Building2 className="h-5 w-5 text-muted-foreground" />
+              <div className="flex-1">
+                <Select
+                  value={selectedEntityId?.toString() || ""}
+                  onValueChange={(val) => setSelectedEntityId(Number(val))}
+                >
+                  <SelectTrigger className="w-[350px]">
+                    <SelectValue placeholder="Select an entity..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(entities || []).map((entity: any) => {
+                      const loc = locations?.find((l: any) => l.id === entity.locationId);
                       return (
                         <SelectItem key={entity.id} value={entity.id.toString()}>
                           <div className="flex items-center gap-2">
@@ -99,29 +160,41 @@ export default function FinancialStatements() {
                           </div>
                         </SelectItem>
                       );
-                    })
-                  ) : (
-                    <SelectItem value="none" disabled>
-                      No entities configured. Set up QBO connections first.
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-            {selectedEntity && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <span>QBO Realm: {selectedEntity.realmId}</span>
-                <span className="mx-1">|</span>
-                <span>Fiscal Year: Sep 1 - Aug 31</span>
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+              {selectedEntity && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Realm: {selectedEntity.realmId}</span>
+                    <span className="mx-1">|</span>
+                    <span>FY: Sep 1 — Aug 31</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => syncAccounts.mutate({ entityId: selectedEntityId! })}
+                    disabled={syncAccounts.isPending}
+                    className="gap-1 ml-2"
+                  >
+                    {syncAccounts.isPending ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-3 w-3" />
+                    )}
+                    Sync Accounts
+                  </Button>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* No entity selected state */}
-      {!selectedEntityId && (
+      {hasEntities && !selectedEntityId && (
         <Card>
           <CardContent className="py-16 text-center">
             <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -129,16 +202,6 @@ export default function FinancialStatements() {
             <p className="text-muted-foreground max-w-md mx-auto">
               Choose a business entity above to view its financial statements. Each entity is connected to a QuickBooks company.
             </p>
-            {(!entities || entities.length === 0) && !entitiesLoading && (
-              <div className="mt-4">
-                <p className="text-sm text-muted-foreground mb-2">
-                  No entities are configured yet. Go to Integrations to connect your QuickBooks companies.
-                </p>
-                <Button variant="outline" onClick={() => window.location.href = "/integrations"}>
-                  Go to Integrations
-                </Button>
-              </div>
-            )}
           </CardContent>
         </Card>
       )}

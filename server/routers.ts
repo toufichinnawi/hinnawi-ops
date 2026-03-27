@@ -2449,6 +2449,51 @@ If a field cannot be determined, use null. Always return valid JSON.`,
       accountCache: publicProcedure.input(z.object({ entityId: z.number() })).query(async ({ input }) => {
         return financialDb.getQboAccountCacheForEntity(input.entityId);
       }),
+      /**
+       * Auto-setup: creates QBO entities from existing locations + QBO tokens.
+       * Uses the known cafe→company mapping from the spec.
+       */
+      autoSetup: protectedProcedure.mutation(async () => {
+        const allLocations = await db.getAllLocations();
+        const activeTokens = await qbo.getActiveTokens();
+        const realmId = activeTokens?.realmId || "pending";
+
+        // Known mapping: location code → legal name
+        const CAFE_LEGAL_MAP: Record<string, { legalName: string; companyName: string }> = {
+          "PK": { legalName: "9427-0659 Quebec Inc", companyName: "PK Cafe" },
+          "MK": { legalName: "9427-0659 Quebec Inc", companyName: "MK Cafe" },
+          "ONT": { legalName: "9287-8982 Quebec Inc", companyName: "ONT Cafe" },
+          "CT": { legalName: "9364-1009 Quebec Inc", companyName: "CT Cafe" },
+          "FAC": { legalName: "Hinnawi Bros Bagel & Cafe", companyName: "Factory & Central Kitchen" },
+          "FACTORY": { legalName: "Hinnawi Bros Bagel & Cafe", companyName: "Factory & Central Kitchen" },
+        };
+
+        const created: Array<{ locationId: number; entityId: number; name: string }> = [];
+
+        for (const loc of allLocations) {
+          const code = loc.code?.toUpperCase() || "";
+          const mapping = CAFE_LEGAL_MAP[code];
+          if (!mapping) continue;
+
+          const entityId = await financialDb.upsertQboEntity({
+            locationId: loc.id,
+            realmId,
+            companyName: mapping.companyName,
+            legalName: mapping.legalName,
+            fiscalYearStartMonth: 9,
+          });
+          created.push({ locationId: loc.id, entityId, name: mapping.companyName });
+        }
+
+        // Also seed line definitions if not already done
+        await financialDb.seedDefaultLineDefinitions();
+
+        return { success: true, entitiesCreated: created.length, entities: created };
+      }),
+      seedLineDefinitions: protectedProcedure.mutation(async () => {
+        await financialDb.seedDefaultLineDefinitions();
+        return { success: true };
+      }),
     }),
 
     // ─── Account Mappings ───
