@@ -46,6 +46,7 @@ const menuItems = [
   { icon: ClipboardList, label: "Progress Report", path: "/progress" },
   { icon: Mail, label: "Email Inbox", path: "/email" },
   { icon: DollarSign, label: "Cost Pipeline", path: "/cost-pipeline" },
+  { icon: FileText, label: "Financial Statements", path: "/financial-statements" },
   { icon: Plug, label: "Integrations", path: "/integrations" },
 ];
 

@@ -22,6 +22,7 @@ import Quotations from "./pages/Quotations";
 import ChartOfAccounts from "./pages/ChartOfAccounts";
 import EmailInbox from "./pages/EmailInbox";
 import CostPipeline from "./pages/CostPipeline";
+import FinancialStatements from "./pages/FinancialStatements";
 
 function Router() {
   return (
@@ -44,6 +45,7 @@ function Router() {
         <Route path="/chart-of-accounts" component={ChartOfAccounts} />
         <Route path="/email" component={EmailInbox} />
         <Route path="/cost-pipeline" component={CostPipeline} />
+        <Route path="/financial-statements" component={FinancialStatements} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

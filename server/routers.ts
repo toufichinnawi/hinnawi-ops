@@ -13,6 +13,10 @@ import * as csvExport from "./csvExport";
 import * as sevenShiftsScheduler from "./sevenShiftsScheduler";
 import * as msgraph from "./msgraph";
 import * as costPipeline from "./invoiceCostPipeline";
+import * as financialDb from "./financialDb";
+import * as financialReports from "./financialReports";
+import * as financialExport from "./financialExport";
+import * as qboReports from "./qboReports";
 
 export const appRouter = router({
   system: systemRouter,
@@ -2412,6 +2416,332 @@ If a field cannot be determined, use null. Always return valid JSON.`,
     recalculateAll: protectedProcedure.mutation(async () => {
       const updated = await costPipeline.recalculateAllRecipeCosts();
       return { updated };
+    }),
+  }),
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // FINANCIAL STATEMENTS MODULE
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  financialStatements: router({
+    // ─── QBO Entities ───
+    entities: router({
+      list: publicProcedure.query(async () => {
+        return financialDb.getQboEntities();
+      }),
+      get: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+        return financialDb.getQboEntityById(input.id);
+      }),
+      upsert: protectedProcedure.input(z.object({
+        locationId: z.number(),
+        realmId: z.string(),
+        companyName: z.string().optional(),
+        legalName: z.string().optional(),
+        fiscalYearStartMonth: z.number().optional(),
+      })).mutation(async ({ input }) => {
+        const id = await financialDb.upsertQboEntity(input);
+        return { success: true, id };
+      }),
+      syncAccounts: protectedProcedure.input(z.object({ entityId: z.number() })).mutation(async ({ input }) => {
+        const count = await qboReports.syncEntityAccounts(input.entityId);
+        return { success: true, accountCount: count };
+      }),
+      accountCache: publicProcedure.input(z.object({ entityId: z.number() })).query(async ({ input }) => {
+        return financialDb.getQboAccountCacheForEntity(input.entityId);
+      }),
+    }),
+
+    // ─── Account Mappings ───
+    mappings: router({
+      getForEntity: publicProcedure.input(z.object({ entityId: z.number() })).query(async ({ input }) => {
+        return financialDb.getMappingsForEntity(input.entityId);
+      }),
+      getActiveVersion: publicProcedure.input(z.object({ entityId: z.number() })).query(async ({ input }) => {
+        return financialDb.getActiveMappingVersion(input.entityId);
+      }),
+      createVersion: protectedProcedure.input(z.object({
+        qboEntityId: z.number(),
+        label: z.string().optional(),
+        effectiveFrom: z.string(),
+      })).mutation(async ({ input, ctx }) => {
+        const id = await financialDb.createMappingVersion({
+          ...input,
+          createdBy: ctx.user?.name || "Unknown",
+        });
+        return { success: true, id };
+      }),
+      upsert: protectedProcedure.input(z.object({
+        versionId: z.number(),
+        qboEntityId: z.number(),
+        qboAccountId: z.string(),
+        qboAccountName: z.string().optional(),
+        statementType: z.enum(["profit_loss", "balance_sheet"]),
+        category: z.string(),
+        subcategory: z.string().optional(),
+        customLabel: z.string().optional(),
+        sortOrder: z.number().optional(),
+        isHidden: z.boolean().optional(),
+        flags: z.record(z.string(), z.unknown()).optional(),
+      })).mutation(async ({ input, ctx }) => {
+        const id = await financialDb.upsertMapping({
+          ...input,
+          changedBy: ctx.user?.name || "Unknown",
+        });
+        return { success: true, id };
+      }),
+      delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input, ctx }) => {
+        await financialDb.deleteMapping(input.id, ctx.user?.name || "Unknown");
+        return { success: true };
+      }),
+      reorder: protectedProcedure.input(z.object({
+        updates: z.array(z.object({ id: z.number(), sortOrder: z.number() })),
+      })).mutation(async ({ input, ctx }) => {
+        await financialDb.updateMappingSortOrder(input.updates, ctx.user?.name || "Unknown");
+        return { success: true };
+      }),
+      auditTrail: publicProcedure.input(z.object({ entityId: z.number(), limit: z.number().optional() })).query(async ({ input }) => {
+        return financialDb.getMappingAuditTrail(input.entityId, input.limit);
+      }),
+    }),
+
+    // ─── Line Definitions ───
+    lineDefinitions: router({
+      get: publicProcedure.input(z.object({ statementType: z.enum(["profit_loss", "balance_sheet"]) })).query(async ({ input }) => {
+        return financialDb.getFsLineDefinitions(input.statementType);
+      }),
+      seed: protectedProcedure.mutation(async () => {
+        await financialDb.seedDefaultLineDefinitions();
+        return { success: true };
+      }),
+    }),
+
+    // ─── Reports ───
+    reports: router({
+      profitAndLoss: publicProcedure.input(z.object({
+        entityId: z.number(),
+        startDate: z.string(),
+        endDate: z.string(),
+        includeComparison: z.boolean().optional(),
+        includeYoY: z.boolean().optional(),
+        includeSharedExpenses: z.boolean().optional(),
+        locationId: z.number().optional(),
+      })).query(async ({ input }) => {
+        return financialReports.buildProfitAndLoss({
+          ...input,
+          includeComparison: input.includeComparison ?? false,
+          includeYoY: input.includeYoY ?? false,
+          includeSharedExpenses: input.includeSharedExpenses ?? false,
+        });
+      }),
+      balanceSheet: publicProcedure.input(z.object({
+        entityId: z.number(),
+        asOfDate: z.string(),
+        compareDate: z.string().optional(),
+        includeSharedExpenses: z.boolean().optional(),
+      })).query(async ({ input }) => {
+        return financialReports.buildBalanceSheet({
+          ...input,
+          includeSharedExpenses: input.includeSharedExpenses ?? false,
+        });
+      }),
+      exportCsv: publicProcedure.input(z.object({
+        entityId: z.number(),
+        statementType: z.enum(["profit_loss", "balance_sheet"]),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        asOfDate: z.string().optional(),
+        includeComparison: z.boolean().optional(),
+        includeYoY: z.boolean().optional(),
+        includeSharedExpenses: z.boolean().optional(),
+        locationId: z.number().optional(),
+      })).query(async ({ input }) => {
+        let statement;
+        if (input.statementType === "profit_loss") {
+          statement = await financialReports.buildProfitAndLoss({
+            entityId: input.entityId,
+            startDate: input.startDate!,
+            endDate: input.endDate!,
+            includeComparison: input.includeComparison ?? false,
+            includeYoY: input.includeYoY ?? false,
+            includeSharedExpenses: input.includeSharedExpenses ?? false,
+            locationId: input.locationId,
+          });
+        } else {
+          statement = await financialReports.buildBalanceSheet({
+            entityId: input.entityId,
+            asOfDate: input.asOfDate!,
+            includeSharedExpenses: input.includeSharedExpenses ?? false,
+          });
+        }
+        return { csv: financialExport.statementToCsv(statement), fileName: `${statement.entityName}_${input.statementType}_${new Date().toISOString().split("T")[0]}.csv` };
+      }),
+      exportHtml: publicProcedure.input(z.object({
+        entityId: z.number(),
+        statementType: z.enum(["profit_loss", "balance_sheet"]),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        asOfDate: z.string().optional(),
+        includeComparison: z.boolean().optional(),
+        includeYoY: z.boolean().optional(),
+        includeSharedExpenses: z.boolean().optional(),
+        locationId: z.number().optional(),
+      })).query(async ({ input }) => {
+        let statement;
+        if (input.statementType === "profit_loss") {
+          statement = await financialReports.buildProfitAndLoss({
+            entityId: input.entityId,
+            startDate: input.startDate!,
+            endDate: input.endDate!,
+            includeComparison: input.includeComparison ?? false,
+            includeYoY: input.includeYoY ?? false,
+            includeSharedExpenses: input.includeSharedExpenses ?? false,
+            locationId: input.locationId,
+          });
+        } else {
+          statement = await financialReports.buildBalanceSheet({
+            entityId: input.entityId,
+            asOfDate: input.asOfDate!,
+            includeSharedExpenses: input.includeSharedExpenses ?? false,
+          });
+        }
+        return { html: financialExport.statementToHtml(statement), fileName: `${statement.entityName}_${input.statementType}_${new Date().toISOString().split("T")[0]}.html` };
+      }),
+      exportExcel: publicProcedure.input(z.object({
+        entityId: z.number(),
+        statementType: z.enum(["profit_loss", "balance_sheet"]),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        asOfDate: z.string().optional(),
+        includeComparison: z.boolean().optional(),
+        includeYoY: z.boolean().optional(),
+        includeSharedExpenses: z.boolean().optional(),
+        locationId: z.number().optional(),
+      })).query(async ({ input }) => {
+        let statement;
+        if (input.statementType === "profit_loss") {
+          statement = await financialReports.buildProfitAndLoss({
+            entityId: input.entityId,
+            startDate: input.startDate!,
+            endDate: input.endDate!,
+            includeComparison: input.includeComparison ?? false,
+            includeYoY: input.includeYoY ?? false,
+            includeSharedExpenses: input.includeSharedExpenses ?? false,
+            locationId: input.locationId,
+          });
+        } else {
+          statement = await financialReports.buildBalanceSheet({
+            entityId: input.entityId,
+            asOfDate: input.asOfDate!,
+            includeSharedExpenses: input.includeSharedExpenses ?? false,
+          });
+        }
+        return { xml: financialExport.statementToExcelXml(statement), fileName: `${statement.entityName}_${input.statementType}_${new Date().toISOString().split("T")[0]}.xls` };
+      }),
+    }),
+
+    // ─── Shared Expenses ───
+    sharedExpenses: router({
+      list: publicProcedure.input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        status: z.string().optional(),
+        category: z.string().optional(),
+      }).optional()).query(async ({ input }) => {
+        return financialDb.getSharedExpenses(input || undefined);
+      }),
+      get: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+        const expense = await financialDb.getSharedExpenseById(input.id);
+        const allocations = await financialDb.getAllocationsForExpense(input.id);
+        return { expense, allocations };
+      }),
+      create: protectedProcedure.input(z.object({
+        expenseDate: z.string(),
+        vendor: z.string().optional(),
+        description: z.string().optional(),
+        amount: z.string(),
+        reportingPeriodStart: z.string().optional(),
+        reportingPeriodEnd: z.string().optional(),
+        expenseCategory: z.string().optional(),
+        statementCategory: z.string().optional(),
+        statementSubcategory: z.string().optional(),
+        customLabel: z.string().optional(),
+        allocationBasis: z.enum(["revenue", "fixed_pct", "equal", "manual", "payroll", "sqft"]).optional(),
+        entitiesIncluded: z.array(z.number()).optional(),
+        sourceType: z.enum(["manual", "credit_card", "journal_entry", "import"]).optional(),
+        approvalStatus: z.enum(["draft", "approved", "posted"]).optional(),
+        notes: z.string().optional(),
+      })).mutation(async ({ input, ctx }) => {
+        const id = await financialDb.createSharedExpense({
+          ...input,
+          createdBy: ctx.user?.name || "Unknown",
+        });
+        return { success: true, id };
+      }),
+      update: protectedProcedure.input(z.object({
+        id: z.number(),
+        expenseDate: z.string().optional(),
+        vendor: z.string().optional(),
+        description: z.string().optional(),
+        amount: z.string().optional(),
+        reportingPeriodStart: z.string().optional(),
+        reportingPeriodEnd: z.string().optional(),
+        expenseCategory: z.string().optional(),
+        statementCategory: z.string().optional(),
+        statementSubcategory: z.string().optional(),
+        customLabel: z.string().optional(),
+        allocationBasis: z.enum(["revenue", "fixed_pct", "equal", "manual", "payroll", "sqft"]).optional(),
+        entitiesIncluded: z.array(z.number()).optional(),
+        sourceType: z.enum(["manual", "credit_card", "journal_entry", "import"]).optional(),
+        approvalStatus: z.enum(["draft", "approved", "posted"]).optional(),
+        notes: z.string().optional(),
+      })).mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await financialDb.updateSharedExpense(id, data);
+        return { success: true };
+      }),
+      delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+        await financialDb.deleteSharedExpense(input.id);
+        return { success: true };
+      }),
+      computeAllocation: protectedProcedure.input(z.object({
+        sharedExpenseId: z.number(),
+        periodStart: z.string(),
+        periodEnd: z.string(),
+        entityLocationIds: z.array(z.number()),
+      })).mutation(async ({ input, ctx }) => {
+        const allocations = await financialDb.computeRevenueAllocation(
+          input.sharedExpenseId,
+          input.periodStart,
+          input.periodEnd,
+          input.entityLocationIds,
+          ctx.user?.name || "Unknown",
+        );
+        return { success: true, allocations };
+      }),
+      allocationsForExpense: publicProcedure.input(z.object({ sharedExpenseId: z.number() })).query(async ({ input }) => {
+        return financialDb.getAllocationsForExpense(input.sharedExpenseId);
+      }),
+      allocationsForLocation: publicProcedure.input(z.object({
+        locationId: z.number(),
+        periodStart: z.string(),
+        periodEnd: z.string(),
+      })).query(async ({ input }) => {
+        return financialDb.getAllocationsForLocation(input.locationId, input.periodStart, input.periodEnd);
+      }),
+      uploadFile: protectedProcedure.input(z.object({
+        sharedExpenseId: z.number(),
+        fileData: z.string(),
+        fileName: z.string(),
+        contentType: z.string(),
+      })).mutation(async ({ input }) => {
+        const { storagePut } = await import('./storage');
+        const buffer = Buffer.from(input.fileData, 'base64');
+        const suffix = Math.random().toString(36).substring(2, 8);
+        const key = `shared-expenses/${input.sharedExpenseId}/${suffix}-${input.fileName}`;
+        const { url } = await storagePut(key, buffer, input.contentType);
+        await financialDb.updateSharedExpense(input.sharedExpenseId, { fileUrl: url, fileKey: key });
+        return { success: true, url };
+      }),
     }),
   }),
 });

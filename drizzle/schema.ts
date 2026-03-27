@@ -424,3 +424,148 @@ export const invoiceLineItemMatches = mysqlTable("invoiceLineItemMatches", {
   reviewedAt: timestamp("reviewedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FINANCIAL STATEMENTS MODULE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ─── QBO Entity Connections (multi-company) ───
+export const qboEntities = mysqlTable("qboEntities", {
+  id: int("id").autoincrement().primaryKey(),
+  locationId: int("locationId").notNull(),
+  realmId: varchar("realmId", { length: 64 }).notNull(),
+  companyName: varchar("companyName", { length: 256 }),
+  legalName: varchar("legalName", { length: 256 }),
+  fiscalYearStartMonth: int("fiscalYearStartMonth").default(9),
+  lastSyncAt: timestamp("lastSyncAt"),
+  syncStatus: mysqlEnum("qboEntitySyncStatus", ["idle", "syncing", "error"]).default("idle"),
+  syncError: text("syncError"),
+  isActive: boolean("isActive").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// ─── QBO Account Cache (synced from QuickBooks) ───
+export const qboAccountCache = mysqlTable("qboAccountCache", {
+  id: int("id").autoincrement().primaryKey(),
+  qboEntityId: int("qboEntityId").notNull(),
+  qboAccountId: varchar("qboAccountId", { length: 64 }).notNull(),
+  name: varchar("name", { length: 256 }).notNull(),
+  fullyQualifiedName: varchar("fullyQualifiedName", { length: 512 }),
+  accountType: varchar("accountType", { length: 64 }),
+  accountSubType: varchar("accountSubType", { length: 64 }),
+  classification: varchar("classification", { length: 32 }),
+  currentBalance: decimal("currentBalance", { precision: 14, scale: 2 }),
+  acctNum: varchar("acctNum", { length: 32 }),
+  isActive: boolean("isActive").default(true),
+  syncedAt: timestamp("syncedAt").defaultNow().notNull(),
+});
+
+// ─── Account Mapping Versions (for historical stability) ───
+export const accountMappingVersions = mysqlTable("accountMappingVersions", {
+  id: int("id").autoincrement().primaryKey(),
+  qboEntityId: int("qboEntityId").notNull(),
+  versionNumber: int("versionNumber").notNull(),
+  label: varchar("label", { length: 128 }),
+  effectiveFrom: date("effectiveFrom").notNull(),
+  effectiveTo: date("effectiveTo"),
+  isActive: boolean("isActive").default(true),
+  createdBy: varchar("createdBy", { length: 256 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// ─── Account Mappings (QBO account → statement line) ───
+export const accountMappings = mysqlTable("accountMappings", {
+  id: int("id").autoincrement().primaryKey(),
+  versionId: int("versionId").notNull(),
+  qboEntityId: int("qboEntityId").notNull(),
+  qboAccountId: varchar("qboAccountId", { length: 64 }).notNull(),
+  qboAccountName: varchar("qboAccountName", { length: 256 }),
+  statementType: mysqlEnum("statementType", ["profit_loss", "balance_sheet"]).notNull(),
+  category: varchar("category", { length: 128 }).notNull(),
+  subcategory: varchar("subcategory", { length: 128 }),
+  customLabel: varchar("customLabel", { length: 256 }),
+  sortOrder: int("sortOrder").default(0),
+  isHidden: boolean("isHidden").default(false),
+  flags: json("flags"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// ─── Account Mapping Audit Trail ───
+export const accountMappingAudit = mysqlTable("accountMappingAudit", {
+  id: int("id").autoincrement().primaryKey(),
+  mappingId: int("mappingId"),
+  versionId: int("versionId"),
+  action: mysqlEnum("auditAction", ["create", "update", "delete", "reorder", "hide", "unhide"]).notNull(),
+  fieldChanged: varchar("fieldChanged", { length: 64 }),
+  oldValue: text("oldValue"),
+  newValue: text("newValue"),
+  changedBy: varchar("changedBy", { length: 256 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// ─── Financial Statement Line Definitions (target structure) ───
+export const fsLineDefinitions = mysqlTable("fsLineDefinitions", {
+  id: int("id").autoincrement().primaryKey(),
+  statementType: mysqlEnum("fsLineStatementType", ["profit_loss", "balance_sheet"]).notNull(),
+  category: varchar("category", { length: 128 }).notNull(),
+  subcategory: varchar("subcategory", { length: 128 }),
+  displayLabel: varchar("displayLabel", { length: 256 }).notNull(),
+  lineType: mysqlEnum("lineType", ["header", "detail", "subtotal", "total", "spacer"]).default("detail"),
+  sortOrder: int("sortOrder").default(0),
+  isDefault: boolean("isDefault").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// ─── Shared Expenses ───
+export const sharedExpenses = mysqlTable("sharedExpenses", {
+  id: int("id").autoincrement().primaryKey(),
+  expenseDate: date("expenseDate").notNull(),
+  vendor: varchar("vendor", { length: 256 }),
+  description: text("description"),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  reportingPeriodStart: date("reportingPeriodStart"),
+  reportingPeriodEnd: date("reportingPeriodEnd"),
+  expenseCategory: varchar("expenseCategory", { length: 128 }),
+  statementCategory: varchar("statementCategory", { length: 128 }),
+  statementSubcategory: varchar("statementSubcategory", { length: 128 }),
+  customLabel: varchar("customLabel", { length: 256 }),
+  allocationBasis: mysqlEnum("allocationBasis", ["revenue", "fixed_pct", "equal", "manual", "payroll", "sqft"]).default("revenue"),
+  entitiesIncluded: json("entitiesIncluded"),
+  sourceType: mysqlEnum("expenseSourceType", ["manual", "credit_card", "journal_entry", "import"]).default("manual"),
+  approvalStatus: mysqlEnum("approvalStatus", ["draft", "approved", "posted"]).default("draft"),
+  fileUrl: text("fileUrl"),
+  fileKey: varchar("fileKey", { length: 512 }),
+  notes: text("notes"),
+  createdBy: varchar("createdBy", { length: 256 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// ─── Shared Expense Allocations (computed results) ───
+export const sharedExpenseAllocations = mysqlTable("sharedExpenseAllocations", {
+  id: int("id").autoincrement().primaryKey(),
+  sharedExpenseId: int("sharedExpenseId").notNull(),
+  locationId: int("locationId").notNull(),
+  allocationBasis: mysqlEnum("seAllocationBasis", ["revenue", "fixed_pct", "equal", "manual", "payroll", "sqft"]).default("revenue"),
+  basisValue: decimal("basisValue", { precision: 14, scale: 2 }),
+  allocationPct: decimal("allocationPct", { precision: 8, scale: 4 }),
+  allocatedAmount: decimal("allocatedAmount", { precision: 12, scale: 2 }).notNull(),
+  revenueUsed: decimal("revenueUsed", { precision: 14, scale: 2 }),
+  totalRevenue: decimal("totalRevenue", { precision: 14, scale: 2 }),
+  computedAt: timestamp("computedAt").defaultNow().notNull(),
+  computedBy: varchar("computedBy", { length: 256 }),
+});
+
+// ─── QBO Report Cache (cached P&L / Balance Sheet data from QBO API) ───
+export const qboReportCache = mysqlTable("qboReportCache", {
+  id: int("id").autoincrement().primaryKey(),
+  qboEntityId: int("qboEntityId").notNull(),
+  reportType: mysqlEnum("reportType", ["ProfitAndLoss", "BalanceSheet"]).notNull(),
+  startDate: date("startDate"),
+  endDate: date("endDate"),
+  asOfDate: date("asOfDate"),
+  reportData: json("reportData"),
+  fetchedAt: timestamp("fetchedAt").defaultNow().notNull(),
+});
