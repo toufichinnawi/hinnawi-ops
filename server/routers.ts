@@ -2427,7 +2427,41 @@ If a field cannot be determined, use null. Always return valid JSON.`,
     // ─── QBO Entities ───
     entities: router({
       list: publicProcedure.query(async () => {
-        return financialDb.getQboEntities();
+        let entities = await financialDb.getQboEntities();
+        // Auto-create entities on first access if table is empty
+        if (entities.length === 0) {
+          try {
+            const allLocations = await db.getAllLocations();
+            const activeTokens = await qbo.getActiveTokens();
+            const realmId = activeTokens?.realmId || "pending";
+            const CAFE_LEGAL_MAP: Record<string, { legalName: string; companyName: string }> = {
+              "PK": { legalName: "9427-0659 Quebec Inc", companyName: "PK Cafe" },
+              "MK": { legalName: "9427-0659 Quebec Inc", companyName: "MK Cafe" },
+              "ONT": { legalName: "9287-8982 Quebec Inc", companyName: "ONT Cafe" },
+              "CT": { legalName: "9364-1009 Quebec Inc", companyName: "CT Cafe" },
+              "FAC": { legalName: "Hinnawi Bros Bagel & Cafe", companyName: "Factory & Central Kitchen" },
+              "FACTORY": { legalName: "Hinnawi Bros Bagel & Cafe", companyName: "Factory & Central Kitchen" },
+            };
+            for (const loc of allLocations) {
+              const code = loc.code?.toUpperCase() || "";
+              const mapping = CAFE_LEGAL_MAP[code];
+              if (!mapping) continue;
+              await financialDb.upsertQboEntity({
+                locationId: loc.id,
+                realmId,
+                companyName: mapping.companyName,
+                legalName: mapping.legalName,
+                fiscalYearStartMonth: 9,
+              });
+            }
+            await financialDb.seedDefaultLineDefinitions();
+            entities = await financialDb.getQboEntities();
+            console.log(`[FinancialStatements] Auto-created ${entities.length} entities`);
+          } catch (err) {
+            console.error("[FinancialStatements] Auto-setup failed:", err);
+          }
+        }
+        return entities;
       }),
       get: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
         return financialDb.getQboEntityById(input.id);
