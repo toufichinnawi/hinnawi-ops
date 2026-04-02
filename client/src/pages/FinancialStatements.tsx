@@ -239,6 +239,7 @@ export default function FinancialStatements() {
           <TabsContent value="balance-sheet" className="mt-4">
             <BalanceSheet
               entityId={selectedEntityId}
+              locationId={selectedEntity?.locationId || 0}
               entityName={selectedLocation?.name || selectedEntity?.companyName || ""}
             />
           </TabsContent>

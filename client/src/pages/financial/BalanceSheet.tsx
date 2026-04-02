@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,13 @@ import { Separator } from "@/components/ui/separator";
 import {
   Download, Calendar as CalendarIcon, RefreshCw,
   ChevronDown, ChevronRight, FileSpreadsheet, FileText as FileTextIcon,
+  Loader2,
 } from "lucide-react";
 import { format, subYears } from "date-fns";
 
 interface Props {
   entityId: number;
+  locationId: number;
   entityName: string;
 }
 
@@ -39,16 +41,34 @@ function fmtVar(val: number | null | undefined) {
   }).format(val);
 }
 
-export default function BalanceSheet({ entityId, entityName }: Props) {
+function downloadBlob(content: string, filename: string, mimeType: string) {
+  const blob = new Blob(['\uFEFF' + content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+export default function BalanceSheet({ entityId, locationId, entityName }: Props) {
   const [asOfDate, setAsOfDate] = useState<Date>(new Date());
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [exporting, setExporting] = useState<string | null>(null);
 
   const asOfStr = format(asOfDate, "yyyy-MM-dd");
+  const priorYearStr = format(subYears(asOfDate, 1), "yyyy-MM-dd");
 
-  const { data: report, isLoading, refetch } = trpc.financialStatements.reports.balanceSheet.useQuery({
+  // Fetch Balance Sheet — always request comparison data
+  const { data: report, isLoading, error, refetch } = trpc.financialStatements.reports.balanceSheet.useQuery({
     entityId,
     asOfDate: asOfStr,
+    compareDate: priorYearStr,
   }, { enabled: !!entityId });
+
+  const utils = trpc.useUtils();
 
   const toggleRow = (key: string) => {
     const next = new Set(expandedRows);
@@ -57,8 +77,49 @@ export default function BalanceSheet({ entityId, entityName }: Props) {
     setExpandedRows(next);
   };
 
-  const handleExport = (exportFormat: "pdf" | "excel" | "csv") => {
-    console.log("Export BS", exportFormat, asOfStr);
+  const handleExport = useCallback(async (exportFormat: "pdf" | "excel" | "csv") => {
+    setExporting(exportFormat);
+    try {
+      if (exportFormat === "csv") {
+        const result = await utils.financialStatements.reports.exportCsv.fetch({
+          entityId,
+          statementType: "balance_sheet",
+          asOfDate: asOfStr,
+          compareDate: priorYearStr,
+        });
+        downloadBlob(result.csv, result.fileName, 'text/csv;charset=utf-8;');
+      } else if (exportFormat === "excel") {
+        const result = await utils.financialStatements.reports.exportExcel.fetch({
+          entityId,
+          statementType: "balance_sheet",
+          asOfDate: asOfStr,
+          compareDate: priorYearStr,
+        });
+        downloadBlob(result.excel, result.fileName, 'application/vnd.ms-excel');
+      } else if (exportFormat === "pdf") {
+        const result = await utils.financialStatements.reports.exportHtml.fetch({
+          entityId,
+          statementType: "balance_sheet",
+          asOfDate: asOfStr,
+          compareDate: priorYearStr,
+        });
+        const w = window.open('', '_blank');
+        if (w) {
+          w.document.write(result.html);
+          w.document.close();
+          setTimeout(() => w.print(), 500);
+        }
+      }
+    } catch (err) {
+      console.error('Export failed:', err);
+    } finally {
+      setExporting(null);
+    }
+  }, [entityId, asOfStr, priorYearStr, utils]);
+
+  const varColor = (val: number | null) => {
+    if (val == null) return "";
+    return val >= 0 ? "text-green-600" : "text-red-600";
   };
 
   return (
@@ -94,6 +155,12 @@ export default function BalanceSheet({ entityId, entityName }: Props) {
               <Button variant="ghost" size="sm" onClick={() => setAsOfDate(subYears(new Date(), 1))}>1 Year Ago</Button>
             </div>
 
+            <Separator orientation="vertical" className="h-8" />
+
+            <div className="text-sm text-muted-foreground">
+              Comparing: <span className="font-medium">{asOfStr}</span> vs <span className="font-medium">{priorYearStr}</span>
+            </div>
+
             <div className="ml-auto flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isLoading}>
                 <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? "animate-spin" : ""}`} />
@@ -101,20 +168,20 @@ export default function BalanceSheet({ entityId, entityName }: Props) {
               </Button>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-1" />
+                  <Button variant="outline" size="sm" disabled={!!exporting}>
+                    {exporting ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Download className="h-4 w-4 mr-1" />}
                     Export
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-48" align="end">
                   <div className="space-y-1">
-                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("pdf")}>
-                      <FileTextIcon className="h-4 w-4 mr-2" /> PDF
+                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("pdf")} disabled={!!exporting}>
+                      <FileTextIcon className="h-4 w-4 mr-2" /> PDF (Print)
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("excel")}>
+                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("excel")} disabled={!!exporting}>
                       <FileSpreadsheet className="h-4 w-4 mr-2" /> Excel
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("csv")}>
+                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("csv")} disabled={!!exporting}>
                       <FileSpreadsheet className="h-4 w-4 mr-2" /> CSV
                     </Button>
                   </div>
@@ -132,7 +199,7 @@ export default function BalanceSheet({ entityId, entityName }: Props) {
             <div>
               <CardTitle className="text-lg">{entityName} — Balance Sheet</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                {report?.periodLabel || `As of ${format(asOfDate, "MMMM d, yyyy")}`}
+                {report?.periodLabel || `As of ${asOfStr}`}
               </p>
             </div>
           </div>
@@ -143,7 +210,17 @@ export default function BalanceSheet({ entityId, entityName }: Props) {
               <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-3" />
               Loading balance sheet from QuickBooks...
             </div>
-          ) : !report || !report.lines ? (
+          ) : error ? (
+            <div className="py-16 text-center">
+              <div className="text-red-500 font-medium mb-2">Error loading report</div>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                {error.message || "Failed to fetch data from QuickBooks. Please check the entity's QBO connection and try again."}
+              </p>
+              <Button variant="outline" size="sm" className="mt-4" onClick={() => refetch()}>
+                <RefreshCw className="h-4 w-4 mr-1" /> Retry
+              </Button>
+            </div>
+          ) : !report || !report.lines || report.lines.length === 0 ? (
             <div className="py-16 text-center text-muted-foreground">
               <p>No data available for the selected date.</p>
               <p className="text-sm mt-1">Ensure QuickBooks is synced and the entity is properly connected.</p>
@@ -154,42 +231,36 @@ export default function BalanceSheet({ entityId, entityName }: Props) {
                 <thead>
                   <tr className="border-b bg-muted/50">
                     <th className="text-left py-2 px-3 font-semibold w-[300px]">Account</th>
-                    <th className="text-right py-2 px-3 font-semibold">Current</th>
-                    <th className="text-right py-2 px-3 font-semibold">Prior Year-End</th>
+                    <th className="text-right py-2 px-3 font-semibold">Current ({asOfStr})</th>
+                    <th className="text-right py-2 px-3 font-semibold">Prior Year ({priorYearStr})</th>
                     <th className="text-right py-2 px-3 font-semibold">Variance $</th>
                     <th className="text-right py-2 px-3 font-semibold">Variance %</th>
-                    <th className="text-right py-2 px-3 font-semibold">Prior Year</th>
-                    <th className="text-right py-2 px-3 font-semibold">YoY $</th>
-                    <th className="text-right py-2 px-3 font-semibold">YoY %</th>
                   </tr>
                 </thead>
                 <tbody>
                   {report.lines.map((line: any, idx: number) => {
                     const isTotal = line.lineType === "total";
                     const isSubtotal = line.lineType === "subtotal";
+                    const isHeader = line.lineType === "header";
                     const isBold = isTotal || isSubtotal;
                     const rowKey = `bs-${line.category}::${line.subcategory || ""}::${idx}`;
                     const hasAccounts = line.accounts && line.accounts.length > 0;
                     const isExpanded = expandedRows.has(rowKey);
-                    const varColor = (val: number | null) => {
-                      if (val == null) return "";
-                      return val >= 0 ? "text-green-600" : "text-red-600";
-                    };
 
                     return (
                       <tr key={idx}>
-                        <td colSpan={8} className="p-0">
+                        <td colSpan={5} className="p-0">
                           <table className="w-full">
                             <tbody>
-                              <tr className={`border-b hover:bg-muted/30 ${isTotal ? "bg-primary/5 font-bold" : isSubtotal ? "bg-muted/30 font-semibold" : ""}`}>
+                              <tr className={`border-b hover:bg-muted/30 ${isTotal ? "bg-primary/5 font-bold" : isSubtotal ? "bg-muted/30 font-semibold" : isHeader ? "bg-muted/20" : ""}`}>
                                 <td className="py-2 px-3 w-[300px]">
                                   <div className="flex items-center gap-1">
-                                    {hasAccounts && !isBold && (
+                                    {hasAccounts && !isBold && !isHeader && (
                                       <button onClick={() => toggleRow(rowKey)} className="p-0.5 hover:bg-muted rounded">
                                         {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                                       </button>
                                     )}
-                                    <span className={`${isBold ? "" : "pl-4"} ${isTotal ? "text-base" : ""}`}>
+                                    <span className={`${isBold || isHeader ? "" : "pl-4"} ${isTotal ? "text-base" : ""}`}>
                                       {line.label}
                                     </span>
                                   </div>
@@ -198,18 +269,12 @@ export default function BalanceSheet({ entityId, entityName }: Props) {
                                 <td className="text-right py-2 px-3 text-muted-foreground">{fmt(line.priorAmount)}</td>
                                 <td className={`text-right py-2 px-3 ${varColor(line.varianceDollar)}`}>{fmtVar(line.varianceDollar)}</td>
                                 <td className={`text-right py-2 px-3 ${varColor(line.variancePct)}`}>{fmtPct(line.variancePct)}</td>
-                                <td className="text-right py-2 px-3 text-muted-foreground">{fmt(line.priorYearAmount)}</td>
-                                <td className={`text-right py-2 px-3 ${varColor(line.varianceYoyDollar)}`}>{fmtVar(line.varianceYoyDollar)}</td>
-                                <td className={`text-right py-2 px-3 ${varColor(line.varianceYoyPct)}`}>{fmtPct(line.varianceYoyPct)}</td>
                               </tr>
                               {isExpanded && hasAccounts && line.accounts.map((acct: any, ai: number) => (
                                 <tr key={`${idx}-${ai}`} className="border-b bg-muted/10 text-xs text-muted-foreground">
                                   <td className="py-1 px-3 pl-10">{acct.name || acct.accountName}</td>
                                   <td className="text-right py-1 px-3">{fmt(acct.amount)}</td>
                                   <td className="text-right py-1 px-3">{fmt(acct.priorAmount)}</td>
-                                  <td className="text-right py-1 px-3">—</td>
-                                  <td className="text-right py-1 px-3">—</td>
-                                  <td className="text-right py-1 px-3">{fmt(acct.priorYearAmount)}</td>
                                   <td className="text-right py-1 px-3">—</td>
                                   <td className="text-right py-1 px-3">—</td>
                                 </tr>

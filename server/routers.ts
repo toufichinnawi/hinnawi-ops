@@ -2629,6 +2629,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         startDate: z.string().optional(),
         endDate: z.string().optional(),
         asOfDate: z.string().optional(),
+        compareDate: z.string().optional(),
         includeComparison: z.boolean().optional(),
         includeYoY: z.boolean().optional(),
         includeSharedExpenses: z.boolean().optional(),
@@ -2649,6 +2650,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
           statement = await financialReports.buildBalanceSheet({
             entityId: input.entityId,
             asOfDate: input.asOfDate!,
+            compareDate: input.compareDate,
             includeSharedExpenses: input.includeSharedExpenses ?? false,
           });
         }
@@ -2660,6 +2662,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         startDate: z.string().optional(),
         endDate: z.string().optional(),
         asOfDate: z.string().optional(),
+        compareDate: z.string().optional(),
         includeComparison: z.boolean().optional(),
         includeYoY: z.boolean().optional(),
         includeSharedExpenses: z.boolean().optional(),
@@ -2680,6 +2683,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
           statement = await financialReports.buildBalanceSheet({
             entityId: input.entityId,
             asOfDate: input.asOfDate!,
+            compareDate: input.compareDate,
             includeSharedExpenses: input.includeSharedExpenses ?? false,
           });
         }
@@ -2691,6 +2695,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         startDate: z.string().optional(),
         endDate: z.string().optional(),
         asOfDate: z.string().optional(),
+        compareDate: z.string().optional(),
         includeComparison: z.boolean().optional(),
         includeYoY: z.boolean().optional(),
         includeSharedExpenses: z.boolean().optional(),
@@ -2711,10 +2716,11 @@ If a field cannot be determined, use null. Always return valid JSON.`,
           statement = await financialReports.buildBalanceSheet({
             entityId: input.entityId,
             asOfDate: input.asOfDate!,
+            compareDate: input.compareDate,
             includeSharedExpenses: input.includeSharedExpenses ?? false,
           });
         }
-        return { xml: financialExport.statementToExcelXml(statement), fileName: `${statement.entityName}_${input.statementType}_${new Date().toISOString().split("T")[0]}.xls` };
+        return { excel: financialExport.statementToExcelXml(statement), fileName: `${statement.entityName}_${input.statementType}_${new Date().toISOString().split("T")[0]}.xls` };
       }),
     }),
 

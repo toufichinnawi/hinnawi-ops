@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   Download, Calendar as CalendarIcon, RefreshCw, TrendingUp, TrendingDown,
   ChevronDown, ChevronRight, Eye, EyeOff, FileSpreadsheet, FileText as FileTextIcon,
+  Loader2,
 } from "lucide-react";
 import { format, subMonths, subYears } from "date-fns";
 
@@ -55,6 +56,18 @@ function fmtVar(val: number | null | undefined) {
   }).format(val);
 }
 
+function downloadBlob(content: string, filename: string, mimeType: string) {
+  const blob = new Blob(['\uFEFF' + content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 type PeriodMode = "monthly" | "yearly" | "custom";
 
 export default function ProfitAndLoss({ entityId, locationId, entityName }: Props) {
@@ -69,6 +82,7 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
   const [customEnd, setCustomEnd] = useState<Date | undefined>(undefined);
   const [includeShared, setIncludeShared] = useState(false);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [exporting, setExporting] = useState<string | null>(null);
 
   // Compute date range
   const dateRange = useMemo(() => {
@@ -90,13 +104,18 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
     return { startDate: format(subMonths(new Date(), 1), "yyyy-MM-01"), endDate: format(new Date(), "yyyy-MM-dd") };
   }, [periodMode, selectedMonth, selectedFY, customStart, customEnd]);
 
-  // Fetch P&L
-  const { data: report, isLoading, refetch } = trpc.financialStatements.reports.profitAndLoss.useQuery({
+  // Fetch P&L — ALWAYS request comparison and YoY data
+  const { data: report, isLoading, error, refetch } = trpc.financialStatements.reports.profitAndLoss.useQuery({
     entityId,
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
+    includeComparison: true,
+    includeYoY: true,
     includeSharedExpenses: includeShared,
+    locationId: includeShared ? locationId : undefined,
   }, { enabled: !!entityId });
+
+  const utils = trpc.useUtils();
 
   // Generate month options (last 24 months)
   const monthOptions = useMemo(() => {
@@ -131,10 +150,58 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
     setExpandedRows(next);
   };
 
-  const handleExport = (exportFormat: "pdf" | "excel" | "csv") => {
-    // TODO: Wire up export endpoint
-    console.log("Export", exportFormat, dateRange);
-  };
+  const handleExport = useCallback(async (exportFormat: "pdf" | "excel" | "csv") => {
+    setExporting(exportFormat);
+    try {
+      if (exportFormat === "csv") {
+        const result = await utils.financialStatements.reports.exportCsv.fetch({
+          entityId,
+          statementType: "profit_loss",
+          startDate: dateRange.startDate,
+          endDate: dateRange.endDate,
+          includeComparison: true,
+          includeYoY: true,
+          includeSharedExpenses: includeShared,
+          locationId: includeShared ? locationId : undefined,
+        });
+        downloadBlob(result.csv, result.fileName, 'text/csv;charset=utf-8;');
+      } else if (exportFormat === "excel") {
+        const result = await utils.financialStatements.reports.exportExcel.fetch({
+          entityId,
+          statementType: "profit_loss",
+          startDate: dateRange.startDate,
+          endDate: dateRange.endDate,
+          includeComparison: true,
+          includeYoY: true,
+          includeSharedExpenses: includeShared,
+          locationId: includeShared ? locationId : undefined,
+        });
+        downloadBlob(result.excel, result.fileName, 'application/vnd.ms-excel');
+      } else if (exportFormat === "pdf") {
+        const result = await utils.financialStatements.reports.exportHtml.fetch({
+          entityId,
+          statementType: "profit_loss",
+          startDate: dateRange.startDate,
+          endDate: dateRange.endDate,
+          includeComparison: true,
+          includeYoY: true,
+          includeSharedExpenses: includeShared,
+          locationId: includeShared ? locationId : undefined,
+        });
+        // Open HTML in new window for print-to-PDF
+        const w = window.open('', '_blank');
+        if (w) {
+          w.document.write(result.html);
+          w.document.close();
+          setTimeout(() => w.print(), 500);
+        }
+      }
+    } catch (err) {
+      console.error('Export failed:', err);
+    } finally {
+      setExporting(null);
+    }
+  }, [entityId, dateRange, includeShared, locationId, utils]);
 
   return (
     <div className="space-y-4">
@@ -229,20 +296,20 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
               </Button>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-1" />
+                  <Button variant="outline" size="sm" disabled={!!exporting}>
+                    {exporting ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Download className="h-4 w-4 mr-1" />}
                     Export
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-48" align="end">
                   <div className="space-y-1">
-                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("pdf")}>
-                      <FileTextIcon className="h-4 w-4 mr-2" /> PDF
+                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("pdf")} disabled={!!exporting}>
+                      <FileTextIcon className="h-4 w-4 mr-2" /> PDF (Print)
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("excel")}>
+                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("excel")} disabled={!!exporting}>
                       <FileSpreadsheet className="h-4 w-4 mr-2" /> Excel
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("csv")}>
+                    <Button variant="ghost" className="w-full justify-start" size="sm" onClick={() => handleExport("csv")} disabled={!!exporting}>
                       <FileSpreadsheet className="h-4 w-4 mr-2" /> CSV
                     </Button>
                   </div>
@@ -276,7 +343,17 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
               <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-3" />
               Loading financial data from QuickBooks...
             </div>
-          ) : !report || !report.lines ? (
+          ) : error ? (
+            <div className="py-16 text-center">
+              <div className="text-red-500 font-medium mb-2">Error loading report</div>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                {error.message || "Failed to fetch data from QuickBooks. Please check the entity's QBO connection and try again."}
+              </p>
+              <Button variant="outline" size="sm" className="mt-4" onClick={() => refetch()}>
+                <RefreshCw className="h-4 w-4 mr-1" /> Retry
+              </Button>
+            </div>
+          ) : !report || !report.lines || report.lines.length === 0 ? (
             <div className="py-16 text-center text-muted-foreground">
               <p>No data available for the selected period.</p>
               <p className="text-sm mt-1">Ensure QuickBooks is synced and the entity is properly connected.</p>
@@ -306,6 +383,7 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
                   {report.lines.map((line: any, idx: number) => {
                     const isTotal = line.lineType === "total";
                     const isSubtotal = line.lineType === "subtotal";
+                    const isHeader = line.lineType === "header";
                     const isBold = isTotal || isSubtotal;
                     const rowKey = `${line.category}::${line.subcategory || ""}::${idx}`;
                     const hasAccounts = line.accounts && line.accounts.length > 0;
@@ -321,15 +399,15 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
                           <table className="w-full">
                             <tbody>
                               {/* Main row */}
-                              <tr className={`border-b hover:bg-muted/30 ${isTotal ? "bg-primary/5 font-bold" : isSubtotal ? "bg-muted/30 font-semibold" : ""}`}>
+                              <tr className={`border-b hover:bg-muted/30 ${isTotal ? "bg-primary/5 font-bold" : isSubtotal ? "bg-muted/30 font-semibold" : isHeader ? "bg-muted/20" : ""}`}>
                                 <td className="py-2 px-3 w-[300px]">
                                   <div className="flex items-center gap-1">
-                                    {hasAccounts && !isBold && (
+                                    {hasAccounts && !isBold && !isHeader && (
                                       <button onClick={() => toggleRow(rowKey)} className="p-0.5 hover:bg-muted rounded">
                                         {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                                       </button>
                                     )}
-                                    <span className={`${isBold ? "" : "pl-4"} ${isTotal ? "text-base" : ""}`}>
+                                    <span className={`${isBold || isHeader ? "" : "pl-4"} ${isTotal ? "text-base" : ""}`}>
                                       {line.label}
                                     </span>
                                   </div>
