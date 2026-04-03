@@ -11,9 +11,11 @@ import { qboTokens, qboEntities } from "../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
 import * as financialDb from "./financialDb";
 
-const QBO_BASE_URL = ENV.qboEnvironment === "sandbox"
-  ? "https://sandbox-quickbooks.api.intuit.com"
-  : "https://quickbooks.api.intuit.com";
+// ─── Production QBO Configuration ───
+// Financial Statements ALWAYS uses production QBO (not sandbox)
+const QBO_PROD_CLIENT_ID = "AB1l3yvNjbzID6Qjg6sWWxYh6bJLUjVDKqbcisw8KNkYMyAmlB";
+const QBO_PROD_CLIENT_SECRET = "eur57dkXRw3ZDZMrhsDK5wFIiMlgx73WMfbQQxEa";
+const QBO_BASE_URL = "https://quickbooks.api.intuit.com"; // Always production
 
 const QBO_TOKEN_URL = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer";
 
@@ -30,7 +32,8 @@ async function getTokensForRealm(realmId: string) {
 }
 
 async function refreshToken(tokenRow: typeof qboTokens.$inferSelect) {
-  const basicAuth = Buffer.from(`${ENV.qboClientId}:${ENV.qboClientSecret}`).toString("base64");
+  // Use production credentials for Financial Statements
+  const basicAuth = Buffer.from(`${QBO_PROD_CLIENT_ID}:${QBO_PROD_CLIENT_SECRET}`).toString("base64");
   const res = await fetch(QBO_TOKEN_URL, {
     method: "POST",
     headers: {

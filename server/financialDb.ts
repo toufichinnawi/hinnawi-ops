@@ -32,11 +32,13 @@ export async function upsertQboEntity(data: {
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  // Match on locationId only so we can update realmId from sandbox/pending to production
   const existing = await db.select().from(qboEntities)
-    .where(and(eq(qboEntities.locationId, data.locationId), eq(qboEntities.realmId, data.realmId)))
+    .where(eq(qboEntities.locationId, data.locationId))
     .limit(1);
   if (existing.length > 0) {
     await db.update(qboEntities).set({
+      realmId: data.realmId,
       companyName: data.companyName,
       legalName: data.legalName,
       fiscalYearStartMonth: data.fiscalYearStartMonth,

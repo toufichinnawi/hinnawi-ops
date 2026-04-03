@@ -121,13 +121,15 @@ export async function getActiveTokens() {
   const db = await getDb();
   if (!db) return null;
 
+  // Only return sandbox tokens (exclude production tokens used by Financial Statements)
   const rows = await db.select().from(qboTokens)
     .where(eq(qboTokens.isActive, true))
-    .orderBy(desc(qboTokens.updatedAt))
-    .limit(1);
+    .orderBy(desc(qboTokens.updatedAt));
 
-  if (rows.length === 0) return null;
-  return rows[0];
+  // Filter out production tokens (connectedBy = 'prod-oauth-callback')
+  const sandboxRows = rows.filter(r => r.connectedBy !== 'prod-oauth-callback');
+  if (sandboxRows.length === 0) return rows[0] || null; // fallback to any token
+  return sandboxRows[0];
 }
 
 async function getValidAccessToken(): Promise<{ accessToken: string; realmId: string } | null> {

@@ -2489,17 +2489,15 @@ If a field cannot be determined, use null. Always return valid JSON.`,
        */
       autoSetup: protectedProcedure.mutation(async () => {
         const allLocations = await db.getAllLocations();
-        const activeTokens = await qbo.getActiveTokens();
-        const realmId = activeTokens?.realmId || "pending";
 
-        // Known mapping: location code → legal name
-        const CAFE_LEGAL_MAP: Record<string, { legalName: string; companyName: string }> = {
-          "PK": { legalName: "9427-0659 Quebec Inc", companyName: "PK Cafe" },
-          "MK": { legalName: "9427-0659 Quebec Inc", companyName: "MK Cafe" },
-          "ONT": { legalName: "9287-8982 Quebec Inc", companyName: "ONT Cafe" },
-          "CT": { legalName: "9364-1009 Quebec Inc", companyName: "CT Cafe" },
-          "FAC": { legalName: "Hinnawi Bros Bagel & Cafe", companyName: "Factory & Central Kitchen" },
-          "FACTORY": { legalName: "Hinnawi Bros Bagel & Cafe", companyName: "Factory & Central Kitchen" },
+        // Known mapping: location code → legal name + PRODUCTION realm ID
+        const CAFE_LEGAL_MAP: Record<string, { legalName: string; companyName: string; realmId: string }> = {
+          "PK": { legalName: "9427-0659 Quebec Inc", companyName: "PK Cafe", realmId: "9130346671806126" },
+          "MK": { legalName: "9427-0659 Quebec Inc", companyName: "MK Cafe", realmId: "9130346671806126" },
+          "ONT": { legalName: "9287-8982 Quebec Inc", companyName: "ONT Cafe", realmId: "123146517406139" },
+          "CT": { legalName: "9364-1009 Quebec Inc", companyName: "CT Cafe", realmId: "123146517409489" },
+          "FAC": { legalName: "Hinnawi Bros Bagel & Cafe", companyName: "Factory & Central Kitchen", realmId: "193514694951044" },
+          "FACTORY": { legalName: "Hinnawi Bros Bagel & Cafe", companyName: "Factory & Central Kitchen", realmId: "193514694951044" },
         };
 
         const created: Array<{ locationId: number; entityId: number; name: string }> = [];
@@ -2511,7 +2509,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
 
           const entityId = await financialDb.upsertQboEntity({
             locationId: loc.id,
-            realmId,
+            realmId: mapping.realmId,
             companyName: mapping.companyName,
             legalName: mapping.legalName,
             fiscalYearStartMonth: 9,
