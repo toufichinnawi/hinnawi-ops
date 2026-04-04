@@ -17,6 +17,7 @@ import * as financialDb from "./financialDb";
 import * as financialReports from "./financialReports";
 import * as financialExport from "./financialExport";
 import * as qboReports from "./qboReports";
+import * as qboReclassify from "./qboReclassify";
 
 export const appRouter = router({
   system: systemRouter,
@@ -2472,9 +2473,24 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         companyName: z.string().optional(),
         legalName: z.string().optional(),
         fiscalYearStartMonth: z.number().optional(),
+        qboDepartmentId: z.string().optional(),
+        qboClassId: z.string().optional(),
       })).mutation(async ({ input }) => {
         const id = await financialDb.upsertQboEntity(input);
         return { success: true, id };
+      }),
+      updateFilter: protectedProcedure.input(z.object({
+        entityId: z.number(),
+        qboDepartmentId: z.string().nullable().optional(),
+        qboClassId: z.string().nullable().optional(),
+      })).mutation(async ({ input }) => {
+        const entity = await financialDb.getQboEntityById(input.entityId);
+        if (!entity) throw new Error("Entity not found");
+        await financialDb.updateQboEntityFilter(input.entityId, {
+          qboDepartmentId: input.qboDepartmentId,
+          qboClassId: input.qboClassId,
+        });
+        return { success: true };
       }),
       syncAccounts: protectedProcedure.input(z.object({ entityId: z.number() })).mutation(async ({ input }) => {
         const count = await qboReports.syncEntityAccounts(input.entityId);
@@ -2525,6 +2541,15 @@ If a field cannot be determined, use null. Always return valid JSON.`,
       seedLineDefinitions: protectedProcedure.mutation(async () => {
         await financialDb.seedDefaultLineDefinitions();
         return { success: true };
+      }),
+      /**
+       * Reclassify transactions in QBO company 9427-0659 Quebec Inc.
+       * Creates MK and PK as Locations/Departments, then assigns transactions
+       * based on bank accounts: CIBC 553 → PK, BMO 720 → MK.
+       */
+      reclassifyTransactions: protectedProcedure.mutation(async () => {
+        const result = await qboReclassify.reclassifyTransactions();
+        return result;
       }),
     }),
 

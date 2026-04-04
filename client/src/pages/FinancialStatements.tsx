@@ -64,6 +64,19 @@ export default function FinancialStatements() {
     },
   });
 
+  const reclassify = trpc.financialStatements.entities.reclassifyTransactions.useMutation({
+    onSuccess: (result) => {
+      toast.success(`Reclassification complete! ${result.classified} transactions classified (${result.skipped} skipped, ${result.errors} errors)`, {
+        description: `PK Dept ID: ${result.departmentsPK.Id}, MK Dept ID: ${result.departmentsMK.Id}`,
+        duration: 10000,
+      });
+      refetchEntities();
+    },
+    onError: (err) => {
+      toast.error(`Reclassification failed: ${err.message}`);
+    },
+  });
+
   const selectedEntity = entities?.find((e: any) => e.id === selectedEntityId) || null;
   const selectedLocation = selectedEntity
     ? locations?.find((l: any) => l.id === selectedEntity.locationId)
@@ -255,7 +268,7 @@ export default function FinancialStatements() {
               )}
             </div>
 
-            {/* Re-setup button */}
+            {/* Re-setup and Reclassify buttons */}
             <div className="flex items-center gap-2 mt-3 pt-3 border-t">
               <Button
                 variant="ghost"
@@ -270,6 +283,20 @@ export default function FinancialStatements() {
                   <Zap className="h-3 w-3" />
                 )}
                 Re-run Auto-Setup (update realm IDs)
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => reclassify.mutate()}
+                disabled={reclassify.isPending}
+                className="gap-1 text-xs text-amber-700 hover:text-amber-800 hover:bg-amber-50"
+              >
+                {reclassify.isPending ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Settings2 className="h-3 w-3" />
+                )}
+                {reclassify.isPending ? "Reclassifying..." : "Reclassify MK/PK Transactions"}
               </Button>
             </div>
           </CardContent>

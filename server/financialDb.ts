@@ -29,6 +29,8 @@ export async function upsertQboEntity(data: {
   companyName?: string;
   legalName?: string;
   fiscalYearStartMonth?: number;
+  qboDepartmentId?: string;
+  qboClassId?: string;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -42,11 +44,27 @@ export async function upsertQboEntity(data: {
       companyName: data.companyName,
       legalName: data.legalName,
       fiscalYearStartMonth: data.fiscalYearStartMonth,
+      qboDepartmentId: data.qboDepartmentId || existing[0].qboDepartmentId,
+      qboClassId: data.qboClassId || existing[0].qboClassId,
     }).where(eq(qboEntities.id, existing[0].id));
     return existing[0].id;
   }
   const result = await db.insert(qboEntities).values(data);
   return Number(result[0].insertId);
+}
+
+export async function updateQboEntityFilter(id: number, data: {
+  qboDepartmentId?: string | null;
+  qboClassId?: string | null;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  const updateData: Record<string, any> = {};
+  if (data.qboDepartmentId !== undefined) updateData.qboDepartmentId = data.qboDepartmentId;
+  if (data.qboClassId !== undefined) updateData.qboClassId = data.qboClassId;
+  if (Object.keys(updateData).length > 0) {
+    await db.update(qboEntities).set(updateData).where(eq(qboEntities.id, id));
+  }
 }
 
 export async function updateQboEntitySync(id: number, status: "idle" | "syncing" | "error", error?: string) {
