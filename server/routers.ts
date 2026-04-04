@@ -2474,24 +2474,9 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         companyName: z.string().optional(),
         legalName: z.string().optional(),
         fiscalYearStartMonth: z.number().optional(),
-        qboDepartmentId: z.string().optional(),
-        qboClassId: z.string().optional(),
       })).mutation(async ({ input }) => {
         const id = await financialDb.upsertQboEntity(input);
         return { success: true, id };
-      }),
-      updateFilter: protectedProcedure.input(z.object({
-        entityId: z.number(),
-        qboDepartmentId: z.string().nullable().optional(),
-        qboClassId: z.string().nullable().optional(),
-      })).mutation(async ({ input }) => {
-        const entity = await financialDb.getQboEntityById(input.entityId);
-        if (!entity) throw new Error("Entity not found");
-        await financialDb.updateQboEntityFilter(input.entityId, {
-          qboDepartmentId: input.qboDepartmentId,
-          qboClassId: input.qboClassId,
-        });
-        return { success: true };
       }),
       syncAccounts: protectedProcedure.input(z.object({ entityId: z.number() })).mutation(async ({ input }) => {
         const count = await qboReports.syncEntityAccounts(input.entityId);

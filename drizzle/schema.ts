@@ -437,8 +437,6 @@ export const qboEntities = mysqlTable("qboEntities", {
   companyName: varchar("companyName", { length: 256 }),
   legalName: varchar("legalName", { length: 256 }),
   fiscalYearStartMonth: int("fiscalYearStartMonth").default(9),
-  qboDepartmentId: varchar("qboDepartmentId", { length: 64 }),
-  qboClassId: varchar("qboClassId", { length: 64 }),
   lastSyncAt: timestamp("lastSyncAt"),
   syncStatus: mysqlEnum("qboEntitySyncStatus", ["idle", "syncing", "error"]).default("idle"),
   syncError: text("syncError"),

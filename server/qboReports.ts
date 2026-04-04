@@ -416,10 +416,6 @@ export async function fetchProfitAndLoss(entityId: number, startDate: string, en
       end_date: endDate,
       accounting_method: "Accrual",
     };
-    // Filter by Location (Department) or Class if configured for this entity
-    if (entity.qboDepartmentId) reportParams.department = entity.qboDepartmentId;
-    if (entity.qboClassId) reportParams.class = entity.qboClassId;
-
     const raw = await fetchQboReport(entity.realmId, "ProfitAndLoss", reportParams);
 
     const rows = parseQboReportRows(
@@ -480,10 +476,6 @@ export async function fetchBalanceSheet(entityId: number, asOfDate: string, useC
       as_of: asOfDate,
       accounting_method: "Accrual",
     };
-    // Filter by Location (Department) or Class if configured for this entity
-    if (entity.qboDepartmentId) reportParams.department = entity.qboDepartmentId;
-    if (entity.qboClassId) reportParams.class = entity.qboClassId;
-
     const raw = await fetchQboReport(entity.realmId, "BalanceSheet", reportParams);
 
     const rows = parseQboReportRows(
