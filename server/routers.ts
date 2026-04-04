@@ -18,6 +18,7 @@ import * as financialReports from "./financialReports";
 import * as financialExport from "./financialExport";
 import * as qboReports from "./qboReports";
 import * as qboReclassify from "./qboReclassify";
+import * as consolidatedReports from "./consolidatedReports";
 
 export const appRouter = router({
   system: systemRouter,
@@ -2807,6 +2808,42 @@ If a field cannot be determined, use null. Always return valid JSON.`,
           });
         }
         return { excel: financialExport.statementToExcelXml(statement), fileName: `${statement.entityName}_${input.statementType}_${new Date().toISOString().split("T")[0]}.xls` };
+      }),
+    }),
+
+    // ─── Consolidated Reports ───
+    consolidated: router({
+      profitAndLoss: publicProcedure.input(z.object({
+        startDate: z.string(),
+        endDate: z.string(),
+        includeComparison: z.boolean().optional(),
+        eliminateIntercompany: z.boolean().optional(),
+        customIntercompanyPatterns: z.array(z.string()).optional(),
+        excludeEntityIds: z.array(z.number()).optional(),
+      })).query(async ({ input }) => {
+        return consolidatedReports.buildConsolidatedProfitAndLoss({
+          startDate: input.startDate,
+          endDate: input.endDate,
+          includeComparison: input.includeComparison ?? false,
+          eliminateIntercompany: input.eliminateIntercompany ?? true,
+          customIntercompanyPatterns: input.customIntercompanyPatterns,
+          excludeEntityIds: input.excludeEntityIds,
+        });
+      }),
+      balanceSheet: publicProcedure.input(z.object({
+        asOfDate: z.string(),
+        compareDate: z.string().optional(),
+        eliminateIntercompany: z.boolean().optional(),
+        customIntercompanyPatterns: z.array(z.string()).optional(),
+        excludeEntityIds: z.array(z.number()).optional(),
+      })).query(async ({ input }) => {
+        return consolidatedReports.buildConsolidatedBalanceSheet({
+          asOfDate: input.asOfDate,
+          compareDate: input.compareDate,
+          eliminateIntercompany: input.eliminateIntercompany ?? true,
+          customIntercompanyPatterns: input.customIntercompanyPatterns,
+          excludeEntityIds: input.excludeEntityIds,
+        });
       }),
     }),
 

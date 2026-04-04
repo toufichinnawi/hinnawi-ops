@@ -14,6 +14,8 @@ import ProfitAndLoss from "./financial/ProfitAndLoss";
 import BalanceSheet from "./financial/BalanceSheet";
 import AccountMapping from "./financial/AccountMapping";
 import SharedExpenses from "./financial/SharedExpenses";
+import ConsolidatedPL from "./financial/ConsolidatedPL";
+import ConsolidatedBS from "./financial/ConsolidatedBS";
 
 // Production realm ID mapping
 const PROD_REALM_MAP: Record<string, string> = {
@@ -25,6 +27,7 @@ const PROD_REALM_MAP: Record<string, string> = {
 
 export default function FinancialStatements() {
   const [activeTab, setActiveTab] = useState("profit-loss");
+  const [viewMode, setViewMode] = useState<"entity" | "consolidated">("entity");
   const [selectedEntityId, setSelectedEntityId] = useState<number | null>(null);
 
   const { data: entities, isLoading: entitiesLoading, refetch: refetchEntities } = trpc.financialStatements.entities.list.useQuery();
@@ -183,12 +186,32 @@ export default function FinancialStatements() {
         </Card>
       )}
 
-      {/* Entity Selector — shown when entities exist */}
+      {/* View Mode Toggle + Entity Selector — shown when entities exist */}
       {hasEntities && (
         <Card>
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center gap-4">
               <Building2 className="h-5 w-5 text-muted-foreground" />
+              {/* View Mode Toggle */}
+              <div className="flex border rounded-md overflow-hidden">
+                <button
+                  onClick={() => { setViewMode("entity"); }}
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                    viewMode === "entity" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-muted"
+                  }`}
+                >
+                  Single Entity
+                </button>
+                <button
+                  onClick={() => { setViewMode("consolidated"); setActiveTab("consolidated-pl"); }}
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                    viewMode === "consolidated" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-muted"
+                  }`}
+                >
+                  Consolidated
+                </button>
+              </div>
+              {viewMode === "entity" && (
               <div className="flex-1">
                 <Select
                   value={selectedEntityId?.toString() || ""}
@@ -220,7 +243,8 @@ export default function FinancialStatements() {
                   </SelectContent>
                 </Select>
               </div>
-              {selectedEntity && (
+              )}
+              {viewMode === "entity" && selectedEntity && (
                 <div className="flex items-center gap-2">
                   {isProductionConnected(selectedEntity) ? (
                     <>
@@ -266,6 +290,14 @@ export default function FinancialStatements() {
                   )}
                 </div>
               )}
+              {viewMode === "consolidated" && (
+                <div className="flex-1">
+                  <Badge variant="outline" className="gap-1 border-blue-300 text-blue-700 bg-blue-50">
+                    <Building2 className="h-3 w-3" />
+                    All entities combined with intercompany elimination
+                  </Badge>
+                </div>
+              )}
             </div>
 
             {/* Re-setup and Reclassify buttons */}
@@ -303,8 +335,8 @@ export default function FinancialStatements() {
         </Card>
       )}
 
-      {/* No entity selected state */}
-      {hasEntities && !selectedEntityId && (
+      {/* No entity selected state — only in entity mode */}
+      {hasEntities && viewMode === "entity" && !selectedEntityId && (
         <Card>
           <CardContent className="py-16 text-center">
             <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -316,8 +348,8 @@ export default function FinancialStatements() {
         </Card>
       )}
 
-      {/* Connection required warning */}
-      {selectedEntityId && selectedEntity && !isProductionConnected(selectedEntity) && (
+      {/* Connection required warning — only in entity mode */}
+      {viewMode === "entity" && selectedEntityId && selectedEntity && !isProductionConnected(selectedEntity) && (
         <Card className="border-amber-200 bg-amber-50/50">
           <CardContent className="py-8 text-center">
             <Link2 className="h-12 w-12 text-amber-500 mx-auto mb-4" />
@@ -342,8 +374,32 @@ export default function FinancialStatements() {
         </Card>
       )}
 
-      {/* Main Tabs — only show when entity is production-connected */}
-      {selectedEntityId && selectedEntity && isProductionConnected(selectedEntity) && (
+      {/* Consolidated Tabs — shown when consolidated mode is selected */}
+      {viewMode === "consolidated" && hasEntities && (
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="consolidated-pl" className="gap-1">
+              <BarChart3 className="h-4 w-4" />
+              Consolidated P&L
+            </TabsTrigger>
+            <TabsTrigger value="consolidated-bs" className="gap-1">
+              <FileText className="h-4 w-4" />
+              Consolidated Balance Sheet
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="consolidated-pl" className="mt-4">
+            <ConsolidatedPL />
+          </TabsContent>
+
+          <TabsContent value="consolidated-bs" className="mt-4">
+            <ConsolidatedBS />
+          </TabsContent>
+        </Tabs>
+      )}
+
+      {/* Single Entity Tabs — only show when entity is production-connected */}
+      {viewMode === "entity" && selectedEntityId && selectedEntity && isProductionConnected(selectedEntity) && (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profit-loss" className="gap-1">
