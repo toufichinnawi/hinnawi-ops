@@ -2617,6 +2617,69 @@ If a field cannot be determined, use null. Always return valid JSON.`,
       }),
     }),
 
+    // ─── Classified Accounts (for mapping review) ───
+    classifiedAccounts: router({
+      /**
+       * Returns every QBO account from the P&L and BS reports with its auto-classified
+       * category and subcategory, plus any manual mapping override.
+       */
+      get: publicProcedure.input(z.object({
+        entityId: z.number(),
+        startDate: z.string(),
+        endDate: z.string(),
+        asOfDate: z.string().optional(),
+      })).query(async ({ input }) => {
+        // Fetch P&L report rows
+        const plReport = await qboReports.fetchProfitAndLoss(input.entityId, input.startDate, input.endDate);
+        const plClassified = qboReports.autoClassifyRows(plReport.rows, "profit_loss");
+
+        // Fetch BS report rows
+        const bsDate = input.asOfDate || input.endDate;
+        const bsReport = await qboReports.fetchBalanceSheet(input.entityId, bsDate);
+        const bsClassified = qboReports.autoClassifyRows(bsReport.rows, "balance_sheet");
+
+        // Get manual mappings
+        const mappings = await financialDb.getMappingsForEntity(input.entityId);
+        const mappingMap = new Map(mappings.map((m: any) => [m.qboAccountId, m]));
+
+        // Combine into a single list
+        const accounts = [
+          ...plClassified.map(row => ({
+            accountId: row.accountId || null,
+            accountName: row.accountName,
+            amount: row.amount,
+            statementType: "profit_loss" as const,
+            qboSection: row.section || null,
+            qboSubSection: row.subSection || null,
+            autoCategory: row.autoCategory,
+            autoSubcategory: row.autoSubcategory,
+            manualCategory: mappingMap.get(row.accountId || "")?.category || null,
+            manualSubcategory: mappingMap.get(row.accountId || "")?.subcategory || null,
+            manualLabel: mappingMap.get(row.accountId || "")?.customLabel || null,
+            isHidden: mappingMap.get(row.accountId || "")?.isHidden || false,
+            mappingId: mappingMap.get(row.accountId || "")?.id || null,
+          })),
+          ...bsClassified.map(row => ({
+            accountId: row.accountId || null,
+            accountName: row.accountName,
+            amount: row.amount,
+            statementType: "balance_sheet" as const,
+            qboSection: row.section || null,
+            qboSubSection: row.subSection || null,
+            autoCategory: row.autoCategory,
+            autoSubcategory: row.autoSubcategory,
+            manualCategory: mappingMap.get(row.accountId || "")?.category || null,
+            manualSubcategory: mappingMap.get(row.accountId || "")?.subcategory || null,
+            manualLabel: mappingMap.get(row.accountId || "")?.customLabel || null,
+            isHidden: mappingMap.get(row.accountId || "")?.isHidden || false,
+            mappingId: mappingMap.get(row.accountId || "")?.id || null,
+          })),
+        ];
+
+        return { accounts, plRowCount: plClassified.length, bsRowCount: bsClassified.length };
+      }),
+    }),
+
     // ─── Reports ───
     reports: router({
       profitAndLoss: publicProcedure.input(z.object({

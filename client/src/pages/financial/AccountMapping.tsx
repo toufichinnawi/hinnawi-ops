@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,186 +6,296 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { toast } from "sonner";
 import {
-  Settings2, Plus, Save, GripVertical, Eye, EyeOff, Pencil, Trash2,
-  History, ChevronDown, ChevronRight, AlertCircle, CheckCircle2, Search,
-  ArrowUpDown, Tag, FolderTree, Clock,
+  Settings2, Save, Pencil, Search, RefreshCw,
+  AlertCircle, CheckCircle2, ArrowUpDown, FolderTree,
+  FileText, BarChart3, Loader2, ChevronDown, ChevronRight,
 } from "lucide-react";
 
 interface Props {
   entityId: number;
 }
 
-// P&L categories from the spec
+// P&L standard categories (matching the report builder)
 const PL_CATEGORIES = [
-  "Revenue", "COGS", "Gross Profit",
-  "Payroll", "Rent / Occupancy", "Utilities", "Repairs & Maintenance",
-  "Professional Fees", "Marketing", "Delivery / Vehicle", "Office / Admin",
-  "Merchant Fees", "Interest", "Depreciation",
-  "Other Income", "Other Expenses", "Net Income",
+  "Revenue", "COGS", "Operating Expenses", "Other Income", "Other Expenses", "Uncategorized",
 ];
 
-// Balance Sheet categories
+const PL_SUBCATEGORIES: Record<string, string[]> = {
+  "Revenue": [""],
+  "COGS": [""],
+  "Operating Expenses": [
+    "", "Payroll", "Rent / Occupancy", "Utilities", "Repairs & Maintenance",
+    "Professional Fees", "Marketing", "Delivery / Vehicle", "Office / Admin",
+    "Merchant Fees", "Interest", "Depreciation",
+  ],
+  "Other Income": [""],
+  "Other Expenses": [""],
+  "Uncategorized": [""],
+};
+
+// BS standard categories
 const BS_CATEGORIES = [
-  "Cash", "Accounts Receivable", "Inventory", "Prepaids",
-  "Fixed Assets", "Accumulated Depreciation",
-  "Accounts Payable", "Credit Cards", "Sales Taxes",
-  "Payroll Liabilities", "Shareholder Loans", "Debt",
-  "Equity", "Retained Earnings",
+  "Assets", "Liabilities", "Equity", "Uncategorized",
 ];
+
+const BS_SUBCATEGORIES: Record<string, string[]> = {
+  "Assets": [
+    "", "Cash", "Accounts Receivable", "Inventory", "Prepaids",
+    "Fixed Assets", "Accumulated Depreciation",
+  ],
+  "Liabilities": [
+    "", "Accounts Payable", "Credit Cards", "Sales Taxes",
+    "Payroll Liabilities", "Shareholder Loans", "Debt",
+  ],
+  "Equity": ["", "Equity", "Retained Earnings"],
+  "Uncategorized": [""],
+};
+
+type SortField = "accountName" | "amount" | "category" | "qboSection";
+type SortDir = "asc" | "desc";
+
+interface ClassifiedAccount {
+  accountId: string | null;
+  accountName: string;
+  amount: number;
+  statementType: "profit_loss" | "balance_sheet";
+  qboSection: string | null;
+  qboSubSection: string | null;
+  autoCategory: string;
+  autoSubcategory: string | null;
+  manualCategory: string | null;
+  manualSubcategory: string | null;
+  manualLabel: string | null;
+  isHidden: boolean;
+  mappingId: number | null;
+}
 
 export default function AccountMapping({ entityId }: Props) {
   const [statementType, setStatementType] = useState<"profit_loss" | "balance_sheet">("profit_loss");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showHidden, setShowHidden] = useState(false);
-  const [editingMapping, setEditingMapping] = useState<any>(null);
-  const [showAudit, setShowAudit] = useState(false);
-  const [showNewVersion, setShowNewVersion] = useState(false);
-  const [newVersionLabel, setNewVersionLabel] = useState("");
-  const [draggedItem, setDraggedItem] = useState<number | null>(null);
+  const [sortField, setSortField] = useState<SortField>("category");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [editingAccount, setEditingAccount] = useState<ClassifiedAccount | null>(null);
+  const [editCategory, setEditCategory] = useState("");
+  const [editSubcategory, setEditSubcategory] = useState("");
+  const [editLabel, setEditLabel] = useState("");
+  const [editHidden, setEditHidden] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
-  // Fetch data
-  const { data: accounts } = trpc.financialStatements.entities.accountCache.useQuery({ entityId });
-  const { data: mappings, refetch: refetchMappings } = trpc.financialStatements.mappings.getForEntity.useQuery({ entityId });
+  // Get current fiscal dates (Sep 1 - Aug 31)
+  const dateRange = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const fiscalYear = month >= 9 ? year : year - 1;
+    return {
+      startDate: `${fiscalYear}-09-01`,
+      endDate: `${fiscalYear + 1}-08-31`,
+      asOfDate: now.toISOString().split("T")[0],
+    };
+  }, []);
+
+  // Fetch classified accounts from the new endpoint
+  const { data, isLoading, refetch } = trpc.financialStatements.classifiedAccounts.get.useQuery({
+    entityId,
+    startDate: dateRange.startDate,
+    endDate: dateRange.endDate,
+    asOfDate: dateRange.asOfDate,
+  });
+
+  // Fetch mapping version for saving
   const { data: version } = trpc.financialStatements.mappings.getActiveVersion.useQuery({ entityId });
-  const { data: auditTrail } = trpc.financialStatements.mappings.auditTrail.useQuery(
-    { entityId, limit: 50 },
-    { enabled: showAudit }
-  );
 
-  // Mutations
+  // Upsert mutation
   const upsertMutation = trpc.financialStatements.mappings.upsert.useMutation({
-    onSuccess: () => refetchMappings(),
-  });
-  const deleteMutation = trpc.financialStatements.mappings.delete.useMutation({
-    onSuccess: () => refetchMappings(),
-  });
-  const reorderMutation = trpc.financialStatements.mappings.reorder.useMutation({
-    onSuccess: () => refetchMappings(),
-  });
-  const createVersionMutation = trpc.financialStatements.mappings.createVersion.useMutation({
     onSuccess: () => {
-      refetchMappings();
-      setShowNewVersion(false);
-      setNewVersionLabel("");
+      toast.success("Mapping saved successfully");
+      refetch();
+    },
+    onError: (err) => {
+      toast.error(`Failed to save mapping: ${err.message}`);
     },
   });
 
-  // Filter mappings
-  const filteredMappings = useMemo(() => {
-    if (!mappings) return [];
-    return mappings.filter((m: any) => {
-      if (m.statementType !== statementType) return false;
-      if (!showHidden && m.isHidden) return false;
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        return (
-          m.qboAccountName?.toLowerCase().includes(q) ||
-          m.category.toLowerCase().includes(q) ||
-          m.customLabel?.toLowerCase().includes(q)
-        );
-      }
-      return true;
-    });
-  }, [mappings, statementType, showHidden, searchQuery]);
+  // Create version mutation (auto-create if none exists)
+  const createVersionMutation = trpc.financialStatements.mappings.createVersion.useMutation({
+    onSuccess: () => {
+      toast.success("Mapping version created");
+      refetch();
+    },
+  });
 
-  // Unmapped accounts
-  const unmappedAccounts = useMemo(() => {
-    if (!accounts || !mappings) return [];
-    const mappedIds = new Set(mappings.map((m: any) => m.qboAccountId));
-    return accounts.filter((a: any) => !mappedIds.has(a.qboAccountId));
-  }, [accounts, mappings]);
+  // Filter and sort accounts
+  const filteredAccounts = useMemo(() => {
+    if (!data?.accounts) return [];
+    let accounts = data.accounts.filter((a: ClassifiedAccount) => a.statementType === statementType);
 
-  // Group by category
-  const groupedMappings = useMemo(() => {
-    const groups: Record<string, typeof filteredMappings> = {};
-    for (const m of filteredMappings) {
-      const key = m.category;
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(m);
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      accounts = accounts.filter((a: ClassifiedAccount) =>
+        a.accountName.toLowerCase().includes(q) ||
+        (a.manualCategory || a.autoCategory).toLowerCase().includes(q) ||
+        (a.manualSubcategory || a.autoSubcategory || "").toLowerCase().includes(q) ||
+        (a.qboSection || "").toLowerCase().includes(q)
+      );
     }
-    // Sort within groups by sortOrder
-    for (const key of Object.keys(groups)) {
-      groups[key].sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+    accounts.sort((a: ClassifiedAccount, b: ClassifiedAccount) => {
+      let aVal: string | number = "";
+      let bVal: string | number = "";
+      switch (sortField) {
+        case "accountName":
+          aVal = a.accountName.toLowerCase();
+          bVal = b.accountName.toLowerCase();
+          break;
+        case "amount":
+          aVal = Math.abs(a.amount);
+          bVal = Math.abs(b.amount);
+          break;
+        case "category":
+          aVal = (a.manualCategory || a.autoCategory).toLowerCase();
+          bVal = (b.manualCategory || b.autoCategory).toLowerCase();
+          break;
+        case "qboSection":
+          aVal = (a.qboSection || "").toLowerCase();
+          bVal = (b.qboSection || "").toLowerCase();
+          break;
+      }
+      if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return accounts;
+  }, [data, statementType, searchQuery, sortField, sortDir]);
+
+  // Group by effective category
+  const groupedAccounts = useMemo(() => {
+    const groups: Record<string, ClassifiedAccount[]> = {};
+    for (const a of filteredAccounts) {
+      const cat = a.manualCategory || a.autoCategory;
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(a);
     }
     return groups;
-  }, [filteredMappings]);
+  }, [filteredAccounts]);
 
-  const categories = statementType === "profit_loss" ? PL_CATEGORIES : BS_CATEGORIES;
+  // Stats
+  const stats = useMemo(() => {
+    if (!filteredAccounts.length) return { total: 0, manual: 0, auto: 0, uncategorized: 0 };
+    return {
+      total: filteredAccounts.length,
+      manual: filteredAccounts.filter((a: ClassifiedAccount) => a.manualCategory).length,
+      auto: filteredAccounts.filter((a: ClassifiedAccount) => !a.manualCategory && a.autoCategory !== "Uncategorized").length,
+      uncategorized: filteredAccounts.filter((a: ClassifiedAccount) => !a.manualCategory && a.autoCategory === "Uncategorized").length,
+    };
+  }, [filteredAccounts]);
 
-  const handleSaveMapping = (mapping: any) => {
-    if (!version) return;
+  const toggleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDir(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDir("asc");
+    }
+  };
+
+  const toggleGroup = (cat: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  };
+
+  const openEdit = (account: ClassifiedAccount) => {
+    setEditingAccount(account);
+    setEditCategory(account.manualCategory || account.autoCategory);
+    setEditSubcategory(account.manualSubcategory || account.autoSubcategory || "");
+    setEditLabel(account.manualLabel || "");
+    setEditHidden(account.isHidden);
+  };
+
+  const handleSave = async () => {
+    if (!editingAccount || !editCategory) return;
+
+    // Auto-create version if none exists
+    if (!version) {
+      createVersionMutation.mutate({
+        qboEntityId: entityId,
+        label: "Auto-created",
+        effectiveFrom: new Date().toISOString().split("T")[0],
+      });
+      toast.info("Creating mapping version first... Please try saving again in a moment.");
+      return;
+    }
+
     upsertMutation.mutate({
       versionId: version.id,
       qboEntityId: entityId,
-      qboAccountId: mapping.qboAccountId,
-      qboAccountName: mapping.qboAccountName,
+      qboAccountId: editingAccount.accountId || "",
+      qboAccountName: editingAccount.accountName,
       statementType,
-      category: mapping.category,
-      subcategory: mapping.subcategory || undefined,
-      customLabel: mapping.customLabel || undefined,
-      sortOrder: mapping.sortOrder,
-      isHidden: mapping.isHidden,
+      category: editCategory,
+      subcategory: editSubcategory || undefined,
+      customLabel: editLabel || undefined,
+      sortOrder: 0,
+      isHidden: editHidden,
     });
-    setEditingMapping(null);
+    setEditingAccount(null);
   };
 
-  const handleDragStart = (id: number) => setDraggedItem(id);
-  const handleDragOver = (e: React.DragEvent) => e.preventDefault();
-  const handleDrop = (targetId: number) => {
-    if (draggedItem === null || draggedItem === targetId) return;
-    const items = [...filteredMappings];
-    const dragIdx = items.findIndex(m => m.id === draggedItem);
-    const dropIdx = items.findIndex(m => m.id === targetId);
-    if (dragIdx === -1 || dropIdx === -1) return;
-    const [moved] = items.splice(dragIdx, 1);
-    items.splice(dropIdx, 0, moved);
-    const updates = items.map((m, i) => ({ id: m.id, sortOrder: i * 10 }));
-    reorderMutation.mutate({ updates });
-    setDraggedItem(null);
+  const categories = statementType === "profit_loss" ? PL_CATEGORIES : BS_CATEGORIES;
+  const subcategories = statementType === "profit_loss" ? PL_SUBCATEGORIES : BS_SUBCATEGORIES;
+
+  const formatAmount = (amount: number) => {
+    return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(amount);
+  };
+
+  const getCategoryColor = (cat: string, isManual: boolean) => {
+    if (cat === "Uncategorized") return "bg-red-100 text-red-800 border-red-200";
+    if (isManual) return "bg-blue-100 text-blue-800 border-blue-200";
+    return "bg-green-100 text-green-800 border-green-200";
   };
 
   return (
     <div className="space-y-4">
-      {/* Header & Version Info */}
+      {/* Header Controls */}
       <Card>
         <CardContent className="pt-4 pb-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <Settings2 className="h-5 w-5 text-muted-foreground" />
-              <span className="font-medium">Mapping Version:</span>
-              {version ? (
-                <Badge variant="outline" className="gap-1">
-                  {version.label} (v{version.versionNumber})
-                  <CheckCircle2 className="h-3 w-3 text-green-500" />
-                </Badge>
-              ) : (
-                <Badge variant="destructive" className="gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  No version — create one to start mapping
-                </Badge>
-              )}
+              <span className="font-medium">Account Classification Review</span>
             </div>
-
-            <Separator orientation="vertical" className="h-8" />
 
             {/* Statement Type Toggle */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Statement:</span>
               <Select value={statementType} onValueChange={(v) => setStatementType(v as any)}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="profit_loss">Profit & Loss</SelectItem>
-                  <SelectItem value="balance_sheet">Balance Sheet</SelectItem>
+                  <SelectItem value="profit_loss">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Profit & Loss
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="balance_sheet">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4" />
+                      Balance Sheet
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
-            <Separator orientation="vertical" className="h-8" />
 
             {/* Search */}
             <div className="relative flex-1 max-w-xs">
@@ -198,217 +308,248 @@ export default function AccountMapping({ entityId }: Props) {
               />
             </div>
 
-            <div className="flex items-center gap-2">
-              <Switch checked={showHidden} onCheckedChange={setShowHidden} />
-              <span className="text-sm">Show Hidden</span>
-            </div>
-
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => setShowAudit(!showAudit)}>
-                <History className="h-4 w-4 mr-1" />
-                Audit Trail
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                disabled={isLoading}
+              >
+                <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? "animate-spin" : ""}`} />
+                Refresh
               </Button>
-              <Dialog open={showNewVersion} onOpenChange={setShowNewVersion}>
-                <DialogTrigger asChild>
-                  <Button size="sm">
-                    <Plus className="h-4 w-4 mr-1" />
-                    New Version
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Create New Mapping Version</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 pt-4">
-                    <div>
-                      <label className="text-sm font-medium">Version Label</label>
-                      <Input
-                        value={newVersionLabel}
-                        onChange={(e) => setNewVersionLabel(e.target.value)}
-                        placeholder="e.g., FY 2025/26 Mapping"
-                      />
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Creating a new version will deactivate the current version. Historical reports will continue to use the version that was active at the time.
-                    </p>
-                    <Button
-                      onClick={() => createVersionMutation.mutate({
-                        qboEntityId: entityId,
-                        label: newVersionLabel,
-                        effectiveFrom: new Date().toISOString().split("T")[0],
-                      })}
-                      disabled={createVersionMutation.isPending}
-                    >
-                      Create Version
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
             </div>
+          </div>
+
+          {/* Stats Row */}
+          <div className="flex items-center gap-4 mt-3 text-sm">
+            <div className="flex items-center gap-1.5">
+              <span className="text-muted-foreground">Total:</span>
+              <Badge variant="secondary">{stats.total}</Badge>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+              <span className="text-muted-foreground">Auto-classified:</span>
+              <Badge variant="secondary">{stats.auto}</Badge>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
+              <span className="text-muted-foreground">Manual override:</span>
+              <Badge variant="secondary">{stats.manual}</Badge>
+            </div>
+            {stats.uncategorized > 0 && (
+              <div className="flex items-center gap-1.5">
+                <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                <span className="text-red-600 font-medium">Uncategorized:</span>
+                <Badge variant="destructive">{stats.uncategorized}</Badge>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Unmapped Accounts Alert */}
-      {unmappedAccounts.length > 0 && (
-        <Card className="border-amber-200 bg-amber-50/50">
-          <CardContent className="pt-4 pb-4">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
-              <div>
-                <p className="font-medium text-amber-800">
-                  {unmappedAccounts.length} Unmapped Account{unmappedAccounts.length > 1 ? "s" : ""}
-                </p>
-                <p className="text-sm text-amber-700 mt-1">
-                  These QuickBooks accounts are not mapped to any statement category. Click to map them.
-                </p>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {unmappedAccounts.slice(0, 10).map((a: any) => (
-                    <Badge
-                      key={a.qboAccountId}
-                      variant="outline"
-                      className="cursor-pointer hover:bg-amber-100 border-amber-300"
-                      onClick={() => setEditingMapping({
-                        qboAccountId: a.qboAccountId,
-                        qboAccountName: a.name,
-                        category: "",
-                        subcategory: "",
-                        customLabel: "",
-                        sortOrder: 0,
-                        isHidden: false,
-                        isNew: true,
-                      })}
-                    >
-                      <Plus className="h-3 w-3 mr-1" />
-                      {a.name}
-                    </Badge>
-                  ))}
-                  {unmappedAccounts.length > 10 && (
-                    <Badge variant="outline" className="border-amber-300">
-                      +{unmappedAccounts.length - 10} more
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Mapping Table */}
+      {/* Accounts Table */}
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <FolderTree className="h-4 w-4" />
-            {statementType === "profit_loss" ? "Profit & Loss" : "Balance Sheet"} Mappings
-            <Badge variant="secondary" className="ml-2">{filteredMappings.length} accounts</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {!version ? (
-            <div className="py-12 text-center text-muted-foreground">
-              <Settings2 className="h-10 w-10 mx-auto mb-3 opacity-50" />
-              <p>No mapping version exists yet.</p>
-              <p className="text-sm mt-1">Create a new version to start mapping QuickBooks accounts.</p>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="py-16 text-center text-muted-foreground">
+              <Loader2 className="h-8 w-8 mx-auto mb-3 animate-spin" />
+              <p>Loading accounts from QuickBooks...</p>
             </div>
-          ) : filteredMappings.length === 0 ? (
-            <div className="py-12 text-center text-muted-foreground">
-              <Tag className="h-10 w-10 mx-auto mb-3 opacity-50" />
-              <p>No mappings found for this statement type.</p>
-              <p className="text-sm mt-1">Map unmapped accounts above or create new mappings.</p>
+          ) : filteredAccounts.length === 0 ? (
+            <div className="py-16 text-center text-muted-foreground">
+              <FolderTree className="h-8 w-8 mx-auto mb-3 opacity-50" />
+              <p>No accounts found. Sync data from QuickBooks first.</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {Object.entries(groupedMappings).map(([category, items]) => (
-                <div key={category} className="border rounded-lg">
-                  <div className="bg-muted/50 px-3 py-2 font-semibold text-sm flex items-center gap-2 rounded-t-lg">
-                    <FolderTree className="h-4 w-4 text-muted-foreground" />
-                    {category}
-                    <Badge variant="secondary" className="text-xs">{items.length}</Badge>
-                  </div>
-                  <div className="divide-y">
-                    {items.map((mapping: any) => (
-                      <div
-                        key={mapping.id}
-                        className={`flex items-center gap-3 px-3 py-2 hover:bg-muted/30 ${mapping.isHidden ? "opacity-50" : ""}`}
-                        draggable
-                        onDragStart={() => handleDragStart(mapping.id)}
-                        onDragOver={handleDragOver}
-                        onDrop={() => handleDrop(mapping.id)}
-                      >
-                        <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-sm truncate">
-                              {mapping.customLabel || mapping.qboAccountName}
-                            </span>
-                            {mapping.customLabel && mapping.qboAccountName && (
-                              <span className="text-xs text-muted-foreground truncate">
-                                ({mapping.qboAccountName})
-                              </span>
-                            )}
-                          </div>
-                          {mapping.subcategory && (
-                            <span className="text-xs text-muted-foreground">{mapping.subcategory}</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          {mapping.isHidden && (
-                            <Badge variant="outline" className="text-xs gap-1">
-                              <EyeOff className="h-3 w-3" /> Hidden
-                            </Badge>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0"
-                            onClick={() => setEditingMapping({ ...mapping, isNew: false })}
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 text-destructive hover:text-destructive"
-                            onClick={() => {
-                              if (confirm("Delete this mapping?")) {
-                                deleteMutation.mutate({ id: mapping.id });
-                              }
-                            }}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead
+                      className="cursor-pointer select-none w-[250px]"
+                      onClick={() => toggleSort("accountName")}
+                    >
+                      <div className="flex items-center gap-1">
+                        QBO Account Name
+                        <ArrowUpDown className="h-3 w-3" />
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                    </TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none w-[120px]"
+                      onClick={() => toggleSort("qboSection")}
+                    >
+                      <div className="flex items-center gap-1">
+                        QBO Section
+                        <ArrowUpDown className="h-3 w-3" />
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none text-right w-[120px]"
+                      onClick={() => toggleSort("amount")}
+                    >
+                      <div className="flex items-center gap-1 justify-end">
+                        Amount
+                        <ArrowUpDown className="h-3 w-3" />
+                      </div>
+                    </TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none w-[180px]"
+                      onClick={() => toggleSort("category")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Mapped Category
+                        <ArrowUpDown className="h-3 w-3" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="w-[160px]">Subcategory</TableHead>
+                    <TableHead className="w-[80px]">Source</TableHead>
+                    <TableHead className="w-[60px] text-center">Edit</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Object.entries(groupedAccounts).map(([category, accounts]) => {
+                    const isCollapsed = collapsedGroups.has(category);
+                    const groupTotal = accounts.reduce((sum: number, a: ClassifiedAccount) => sum + a.amount, 0);
+                    return (
+                      <>
+                        {/* Group Header */}
+                        <TableRow
+                          key={`group-${category}`}
+                          className="bg-muted/30 cursor-pointer hover:bg-muted/50"
+                          onClick={() => toggleGroup(category)}
+                        >
+                          <TableCell colSpan={2} className="font-semibold text-sm">
+                            <div className="flex items-center gap-2">
+                              {isCollapsed ? (
+                                <ChevronRight className="h-4 w-4" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4" />
+                              )}
+                              <FolderTree className="h-4 w-4 text-muted-foreground" />
+                              {category}
+                              <Badge variant="secondary" className="text-xs ml-1">
+                                {accounts.length}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right font-semibold text-sm">
+                            {formatAmount(groupTotal)}
+                          </TableCell>
+                          <TableCell colSpan={4} />
+                        </TableRow>
+
+                        {/* Account Rows */}
+                        {!isCollapsed && accounts.map((account: ClassifiedAccount, idx: number) => {
+                          const effectiveCategory = account.manualCategory || account.autoCategory;
+                          const effectiveSubcategory = account.manualSubcategory || account.autoSubcategory;
+                          const isManual = !!account.manualCategory;
+                          const isUncategorized = effectiveCategory === "Uncategorized";
+
+                          return (
+                            <TableRow
+                              key={`${account.accountId || account.accountName}-${idx}`}
+                              className={`${isUncategorized ? "bg-red-50/50" : ""} ${account.isHidden ? "opacity-50" : ""}`}
+                            >
+                              <TableCell className="font-medium text-sm">
+                                <div className="flex items-center gap-2">
+                                  {account.accountName}
+                                  {account.isHidden && (
+                                    <Badge variant="outline" className="text-xs">Hidden</Badge>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-xs text-muted-foreground">
+                                <div>
+                                  {account.qboSection || "—"}
+                                  {account.qboSubSection && (
+                                    <span className="block text-xs opacity-70">{account.qboSubSection}</span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell className={`text-right text-sm tabular-nums ${account.amount < 0 ? "text-red-600" : ""}`}>
+                                {formatAmount(account.amount)}
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant="outline"
+                                  className={`text-xs ${getCategoryColor(effectiveCategory, isManual)}`}
+                                >
+                                  {effectiveCategory}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-xs text-muted-foreground">
+                                {effectiveSubcategory || "—"}
+                              </TableCell>
+                              <TableCell>
+                                {isManual ? (
+                                  <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200">
+                                    Manual
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline" className="text-xs bg-green-50 border-green-200">
+                                    Auto
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0"
+                                  onClick={() => openEdit(account)}
+                                >
+                                  <Pencil className="h-3.5 w-3.5" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </>
+                    );
+                  })}
+                </TableBody>
+              </Table>
             </div>
           )}
         </CardContent>
       </Card>
 
       {/* Edit Mapping Dialog */}
-      {editingMapping && (
-        <Dialog open={!!editingMapping} onOpenChange={() => setEditingMapping(null)}>
+      {editingAccount && (
+        <Dialog open={!!editingAccount} onOpenChange={() => setEditingAccount(null)}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>
-                {editingMapping.isNew ? "Map Account" : "Edit Mapping"}
-              </DialogTitle>
+              <DialogTitle>Edit Account Mapping</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-2">
-              <div>
-                <label className="text-sm font-medium">QuickBooks Account</label>
-                <Input value={editingMapping.qboAccountName || ""} disabled className="bg-muted" />
+              {/* Account Info */}
+              <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">{editingAccount.accountName}</span>
+                  <Badge variant="secondary" className="text-xs">
+                    {editingAccount.statementType === "profit_loss" ? "P&L" : "BS"}
+                  </Badge>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  QBO Section: {editingAccount.qboSection || "None"} {editingAccount.qboSubSection ? `> ${editingAccount.qboSubSection}` : ""}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Auto-classified as: <span className="font-medium">{editingAccount.autoCategory}</span>
+                  {editingAccount.autoSubcategory && <span> / {editingAccount.autoSubcategory}</span>}
+                </div>
+                <div className="text-sm font-medium">
+                  Amount: {formatAmount(editingAccount.amount)}
+                </div>
               </div>
+
+              {/* Category */}
               <div>
-                <label className="text-sm font-medium">Statement Category</label>
-                <Select
-                  value={editingMapping.category}
-                  onValueChange={(v) => setEditingMapping({ ...editingMapping, category: v })}
-                >
+                <label className="text-sm font-medium">Category</label>
+                <Select value={editCategory} onValueChange={(v) => {
+                  setEditCategory(v);
+                  setEditSubcategory(""); // Reset subcategory when category changes
+                }}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select category..." />
                   </SelectTrigger>
@@ -419,89 +560,75 @@ export default function AccountMapping({ entityId }: Props) {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <label className="text-sm font-medium">Subcategory (optional)</label>
-                <Input
-                  value={editingMapping.subcategory || ""}
-                  onChange={(e) => setEditingMapping({ ...editingMapping, subcategory: e.target.value })}
-                  placeholder="e.g., Rent, Insurance..."
-                />
-              </div>
+
+              {/* Subcategory */}
+              {editCategory && subcategories[editCategory] && subcategories[editCategory].length > 1 && (
+                <div>
+                  <label className="text-sm font-medium">Subcategory</label>
+                  <Select value={editSubcategory} onValueChange={setEditSubcategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select subcategory..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subcategories[editCategory].map(s => (
+                        <SelectItem key={s || "__none__"} value={s || "__none__"}>
+                          {s || "(General)"}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Custom Label */}
               <div>
                 <label className="text-sm font-medium">Custom Label (optional)</label>
                 <Input
-                  value={editingMapping.customLabel || ""}
-                  onChange={(e) => setEditingMapping({ ...editingMapping, customLabel: e.target.value })}
-                  placeholder="Rename this line on the statement"
+                  value={editLabel}
+                  onChange={(e) => setEditLabel(e.target.value)}
+                  placeholder="Override the display name on statements"
                 />
               </div>
+
+              {/* Hidden Toggle */}
               <div className="flex items-center gap-2">
-                <Switch
-                  checked={editingMapping.isHidden}
-                  onCheckedChange={(v) => setEditingMapping({ ...editingMapping, isHidden: v })}
-                />
-                <span className="text-sm">Hide from statements</span>
+                <Switch checked={editHidden} onCheckedChange={setEditHidden} />
+                <span className="text-sm">Hide from financial statements</span>
               </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="outline" onClick={() => setEditingMapping(null)}>Cancel</Button>
-                <Button
-                  onClick={() => handleSaveMapping(editingMapping)}
-                  disabled={!editingMapping.category || upsertMutation.isPending}
-                >
-                  <Save className="h-4 w-4 mr-1" />
-                  Save Mapping
-                </Button>
+
+              {/* Actions */}
+              <div className="flex justify-between items-center pt-2">
+                <div className="text-xs text-muted-foreground">
+                  {editingAccount.manualCategory ? (
+                    <span className="flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3 text-blue-500" />
+                      Currently has manual override
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3 text-green-500" />
+                      Using auto-classification
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setEditingAccount(null)}>Cancel</Button>
+                  <Button
+                    onClick={handleSave}
+                    disabled={!editCategory || upsertMutation.isPending}
+                  >
+                    {upsertMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-1" />
+                    )}
+                    Save Override
+                  </Button>
+                </div>
               </div>
             </div>
           </DialogContent>
         </Dialog>
-      )}
-
-      {/* Audit Trail */}
-      {showAudit && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <History className="h-4 w-4" />
-              Audit Trail
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!auditTrail || auditTrail.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">No audit records yet.</p>
-            ) : (
-              <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                {auditTrail.map((entry: any, idx: number) => (
-                  <div key={idx} className="flex items-start gap-3 text-sm border-b pb-2">
-                    <Clock className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">{entry.action}</Badge>
-                        {entry.fieldChanged && (
-                          <span className="text-muted-foreground">Field: {entry.fieldChanged}</span>
-                        )}
-                      </div>
-                      {entry.oldValue && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Old: <code className="bg-muted px-1 rounded">{entry.oldValue}</code>
-                        </p>
-                      )}
-                      {entry.newValue && (
-                        <p className="text-xs text-muted-foreground">
-                          New: <code className="bg-muted px-1 rounded">{entry.newValue}</code>
-                        </p>
-                      )}
-                    </div>
-                    <div className="text-xs text-muted-foreground text-right flex-shrink-0">
-                      <div>{entry.changedBy || "System"}</div>
-                      <div>{new Date(entry.createdAt).toLocaleString("en-CA")}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
       )}
     </div>
   );
