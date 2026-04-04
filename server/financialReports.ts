@@ -176,6 +176,39 @@ async function smartMap(
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /**
+ * Aggregate all mapped entries for a category, excluding entries that have their own specific subcategory line definition.
+ * This collects "remainder" amounts that would otherwise fall through as unmapped.
+ */
+function aggregateCategoryRemainder(
+  mapped: Map<string, MappedLine>,
+  category: string,
+  specificSubcats: Set<string | null>,
+): MappedLine | undefined {
+  let total = 0;
+  const allAccounts: Array<{ accountId?: string; accountName: string; amount: number }> = [];
+  let found = false;
+
+  for (const [key, data] of mapped.entries()) {
+    if (!key.startsWith(category + "::")) continue;
+    const subcat = key.substring(category.length + 2) || null;
+    // Skip entries that have their own dedicated line definition
+    if (subcat && specificSubcats.has(subcat)) continue;
+    total += data.amount;
+    allAccounts.push(...data.accounts);
+    found = true;
+  }
+
+  if (!found) return undefined;
+  return {
+    category,
+    subcategory: null,
+    label: category,
+    amount: total,
+    accounts: allAccounts,
+  };
+}
+
+/**
  * Build structured statement lines from mapped data + line definitions.
  * Computes totals for subtotal/total rows and adds unmapped categories.
  */
@@ -210,9 +243,28 @@ function buildLines(
 
   for (const def of lineDefinitions) {
     const key = `${def.category}::${def.subcategory || ""}`;
-    const currentData = currentMapped.get(key);
-    const priorData = priorMapped?.get(key);
-    const priorYearData = priorYearMapped?.get(key);
+    
+    // For detail rows with subcategory=null, aggregate ALL subcategories for that category
+    // This ensures Revenue::, COGS::, etc. collect all their sub-entries
+    let currentData: MappedLine | undefined;
+    let priorData: MappedLine | undefined;
+    let priorYearData: MappedLine | undefined;
+    
+    if (def.lineType === "detail" && !def.subcategory) {
+      // Aggregate all entries for this category that don't have a specific subcategory line definition
+      const specificSubcats = new Set(
+        lineDefinitions
+          .filter(d => d.category === def.category && d.subcategory && d.lineType === "detail")
+          .map(d => d.subcategory)
+      );
+      currentData = aggregateCategoryRemainder(currentMapped, def.category, specificSubcats);
+      priorData = priorMapped ? aggregateCategoryRemainder(priorMapped, def.category, specificSubcats) : undefined;
+      priorYearData = priorYearMapped ? aggregateCategoryRemainder(priorYearMapped, def.category, specificSubcats) : undefined;
+    } else {
+      currentData = currentMapped.get(key);
+      priorData = priorMapped?.get(key) ?? undefined;
+      priorYearData = priorYearMapped?.get(key) ?? undefined;
+    }
 
     let currentAmt = currentData?.amount || 0;
     let priorAmt = priorData?.amount ?? null;

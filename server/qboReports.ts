@@ -239,9 +239,9 @@ function classifyPLAccount(accountName: string, section?: string, subSection?: s
     const name = accountName.toLowerCase();
     if (name.includes("sales") || name.includes("revenue") || name.includes("income") || name.includes("discount")) {
       baseCategory = "Revenue";
-    } else if (name.includes("cost of goods") || name.includes("cogs") || name.includes("cost of sales")) {
+    } else if (name.includes("cost of goods") || name.includes("cogs") || name.includes("cost of sales") || name.includes("purchase") || name.includes("food cost") || name.includes("bakery") || name.includes("ingredient") || name.includes("packaging") || name.includes("raw material")) {
       baseCategory = "COGS";
-    } else if (name.includes("expense") || name.includes("payroll") || name.includes("rent") || name.includes("utilit") || name.includes("merchant") || name.includes("cleaning") || name.includes("insurance")) {
+    } else if (name.includes("expense") || name.includes("payroll") || name.includes("rent") || name.includes("utilit") || name.includes("merchant") || name.includes("cleaning") || name.includes("insurance") || name.includes("wage") || name.includes("salary") || name.includes("freight") || name.includes("delivery") || name.includes("repair") || name.includes("maintenance") || name.includes("office") || name.includes("supplies") || name.includes("professional") || name.includes("marketing") || name.includes("advertising") || name.includes("depreciation") || name.includes("amortization") || name.includes("interest") || name.includes("bank charge") || name.includes("miscellaneous") || name.includes("sundry") || name.includes("general") || name.includes("telephone") || name.includes("travel") || name.includes("training") || name.includes("license") || name.includes("permit") || name.includes("dues") || name.includes("subscription")) {
       baseCategory = "Operating Expenses";
     }
   }
@@ -271,7 +271,7 @@ function classifyPLAccount(accountName: string, section?: string, subSection?: s
     if (name.includes("marketing") || name.includes("advertising") || name.includes("promotion")) {
       return { category: "Operating Expenses", subcategory: "Marketing" };
     }
-    if (name.includes("delivery") || name.includes("vehicle") || name.includes("fuel") || name.includes("auto") || name.includes("transport") || name.includes("shipping")) {
+    if (name.includes("delivery") || name.includes("vehicle") || name.includes("fuel") || name.includes("auto") || name.includes("transport") || name.includes("shipping") || name.includes("freight")) {
       return { category: "Operating Expenses", subcategory: "Delivery / Vehicle" };
     }
     if (name.includes("office") || name.includes("admin") || name.includes("supplies") || name.includes("postage") || name.includes("cleaning") || name.includes("janitorial")) {
@@ -296,6 +296,15 @@ function classifyPLAccount(accountName: string, section?: string, subSection?: s
   // For COGS, just return the base category
   if (baseCategory === "COGS") {
     return { category: "COGS", subcategory: null };
+  }
+  
+  // For Revenue, check if the account is actually COGS based on name
+  if (baseCategory === "Revenue") {
+    const name = accountName.toLowerCase();
+    // Some accounts under Income section are actually contra-revenue or COGS
+    if (name.includes("cost of") || name.includes("purchase")) {
+      return { category: "COGS", subcategory: null };
+    }
   }
   
   return sectionMapping || { category: baseCategory, subcategory: null };
