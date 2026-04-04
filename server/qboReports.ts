@@ -132,17 +132,16 @@ function parseQboReportRows(columns: any[], rows: any[]): ReportRow[] {
   function processRows(rowList: any[], sectionName?: string, subSectionName?: string) {
     for (const row of rowList) {
       // Section with header + nested rows
-      if (row.Header && row.Rows?.Row) {
-        const headerName = row.Header.ColData?.[0]?.value || sectionName;
-        // Process nested rows with this section context
-        processRows(row.Rows.Row, headerName, undefined);
-        continue;
-      }
-
-      // Sub-section pattern: row has type "Section" with nested rows
-      if (row.type === "Section" && row.Rows?.Row) {
-        const subName = row.Header?.ColData?.[0]?.value || subSectionName;
-        processRows(row.Rows.Row, sectionName, subName);
+      if ((row.Header || row.type === "Section") && row.Rows?.Row) {
+        const headerName = row.Header?.ColData?.[0]?.value;
+        
+        if (!sectionName) {
+          // Top-level section (e.g., "Income", "Cost of Goods Sold", "Expenses")
+          processRows(row.Rows.Row, headerName || sectionName, undefined);
+        } else {
+          // Nested section within a top-level section → treat as sub-section
+          processRows(row.Rows.Row, sectionName, headerName || subSectionName);
+        }
         continue;
       }
 
@@ -165,8 +164,8 @@ function parseQboReportRows(columns: any[], rows: any[]): ReportRow[] {
         }
       }
 
-      // Recursively process any nested rows
-      if (row.Rows?.Row && !row.Header) {
+      // Recursively process any nested rows (fallback for unusual structures)
+      if (row.Rows?.Row && !row.Header && row.type !== "Section") {
         processRows(row.Rows.Row, sectionName, subSectionName);
       }
     }
@@ -182,133 +181,191 @@ function parseQboReportRows(columns: any[], rows: any[]): ReportRow[] {
 const PL_SECTION_MAP: Record<string, { category: string; subcategory: string | null }> = {
   "Income": { category: "Revenue", subcategory: null },
   "Revenue": { category: "Revenue", subcategory: null },
+  "Gross Receipts": { category: "Revenue", subcategory: null },
+  "Sales": { category: "Revenue", subcategory: null },
+  "Service Revenue": { category: "Revenue", subcategory: null },
   "Other Income": { category: "Other Income", subcategory: null },
+  "Other Revenue": { category: "Other Income", subcategory: null },
   "Cost of Goods Sold": { category: "COGS", subcategory: null },
+  "Cost of Sales": { category: "COGS", subcategory: null },
   "COGS": { category: "COGS", subcategory: null },
   "Expenses": { category: "Operating Expenses", subcategory: null },
   "Expense": { category: "Operating Expenses", subcategory: null },
+  "Operating Expenses": { category: "Operating Expenses", subcategory: null },
   "Other Expenses": { category: "Other Expenses", subcategory: null },
   "Other Expense": { category: "Other Expenses", subcategory: null },
+  "Net Other Income": { category: "Other Income", subcategory: null },
 };
 
 /** Map QBO Balance Sheet section names to our standard categories */
 const BS_SECTION_MAP: Record<string, { category: string; subcategory: string | null }> = {
   "ASSETS": { category: "Assets", subcategory: null },
   "Assets": { category: "Assets", subcategory: null },
+  "Current Assets": { category: "Assets", subcategory: null },
   "Bank": { category: "Assets", subcategory: "Cash" },
+  "Bank Accounts": { category: "Assets", subcategory: "Cash" },
+  "Cash and cash equivalents": { category: "Assets", subcategory: "Cash" },
   "Accounts Receivable": { category: "Assets", subcategory: "Accounts Receivable" },
+  "Accounts receivable (A/R)": { category: "Assets", subcategory: "Accounts Receivable" },
   "Other Current Assets": { category: "Assets", subcategory: "Prepaids" },
   "Fixed Assets": { category: "Assets", subcategory: "Fixed Assets" },
+  "Property, plant and equipment": { category: "Assets", subcategory: "Fixed Assets" },
   "Other Assets": { category: "Assets", subcategory: null },
   "LIABILITIES AND EQUITY": { category: "Liabilities", subcategory: null },
   "Liabilities": { category: "Liabilities", subcategory: null },
+  "Current Liabilities": { category: "Liabilities", subcategory: null },
   "Accounts Payable": { category: "Liabilities", subcategory: "Accounts Payable" },
+  "Accounts payable (A/P)": { category: "Liabilities", subcategory: "Accounts Payable" },
   "Credit Cards": { category: "Liabilities", subcategory: "Credit Cards" },
+  "Credit Card": { category: "Liabilities", subcategory: "Credit Cards" },
   "Other Current Liabilities": { category: "Liabilities", subcategory: null },
   "Long-Term Liabilities": { category: "Liabilities", subcategory: "Debt" },
+  "Non-Current Liabilities": { category: "Liabilities", subcategory: "Debt" },
   "Equity": { category: "Equity", subcategory: "Equity" },
+  "Stockholders' Equity": { category: "Equity", subcategory: "Equity" },
+  "Owner's Equity": { category: "Equity", subcategory: "Equity" },
 };
 
-/** Sub-section keyword matching for more granular P&L classification */
+/** Classify P&L accounts using section context + account name keyword matching */
 function classifyPLAccount(accountName: string, section?: string, subSection?: string): { category: string; subcategory: string | null } {
+  // Try section mapping first
   const sectionMapping = section ? PL_SECTION_MAP[section] : null;
-  if (sectionMapping) {
-    // For Operating Expenses, try to auto-detect subcategory from account name
-    if (sectionMapping.category === "Operating Expenses") {
-      const name = accountName.toLowerCase();
-      if (name.includes("payroll") || name.includes("salary") || name.includes("wage") || name.includes("benefit")) {
-        return { category: "Operating Expenses", subcategory: "Payroll" };
-      }
-      if (name.includes("rent") || name.includes("occupancy") || name.includes("lease")) {
-        return { category: "Operating Expenses", subcategory: "Rent / Occupancy" };
-      }
-      if (name.includes("utilit") || name.includes("hydro") || name.includes("electric") || name.includes("gas") || name.includes("water")) {
-        return { category: "Operating Expenses", subcategory: "Utilities" };
-      }
-      if (name.includes("repair") || name.includes("maintenance")) {
-        return { category: "Operating Expenses", subcategory: "Repairs & Maintenance" };
-      }
-      if (name.includes("professional") || name.includes("legal") || name.includes("accounting") || name.includes("consulting")) {
-        return { category: "Operating Expenses", subcategory: "Professional Fees" };
-      }
-      if (name.includes("marketing") || name.includes("advertising") || name.includes("promotion")) {
-        return { category: "Operating Expenses", subcategory: "Marketing" };
-      }
-      if (name.includes("delivery") || name.includes("vehicle") || name.includes("fuel") || name.includes("auto") || name.includes("transport")) {
-        return { category: "Operating Expenses", subcategory: "Delivery / Vehicle" };
-      }
-      if (name.includes("office") || name.includes("admin") || name.includes("supplies") || name.includes("postage")) {
-        return { category: "Operating Expenses", subcategory: "Office / Admin" };
-      }
-      if (name.includes("merchant") || name.includes("processing") || name.includes("stripe") || name.includes("square") || name.includes("bank charge")) {
-        return { category: "Operating Expenses", subcategory: "Merchant Fees" };
-      }
-      if (name.includes("interest")) {
-        return { category: "Operating Expenses", subcategory: "Interest" };
-      }
-      if (name.includes("depreciation") || name.includes("amortization")) {
-        return { category: "Operating Expenses", subcategory: "Depreciation" };
-      }
-      // Default: general operating expense
-      return { category: "Operating Expenses", subcategory: null };
+  
+  // Determine the base category from section, or fallback to account name analysis
+  let baseCategory = sectionMapping?.category;
+  
+  // If section mapping failed, try to classify from account name alone
+  if (!baseCategory) {
+    const name = accountName.toLowerCase();
+    if (name.includes("sales") || name.includes("revenue") || name.includes("income") || name.includes("discount")) {
+      baseCategory = "Revenue";
+    } else if (name.includes("cost of goods") || name.includes("cogs") || name.includes("cost of sales")) {
+      baseCategory = "COGS";
+    } else if (name.includes("expense") || name.includes("payroll") || name.includes("rent") || name.includes("utilit") || name.includes("merchant") || name.includes("cleaning") || name.includes("insurance")) {
+      baseCategory = "Operating Expenses";
     }
-    return sectionMapping;
   }
-  return { category: "Uncategorized", subcategory: null };
+  
+  if (!baseCategory) {
+    return { category: "Uncategorized", subcategory: null };
+  }
+  
+  // For Operating Expenses, auto-detect subcategory from account name
+  if (baseCategory === "Operating Expenses") {
+    const name = accountName.toLowerCase();
+    if (name.includes("payroll") || name.includes("salary") || name.includes("wage") || name.includes("benefit") || name.includes("employee")) {
+      return { category: "Operating Expenses", subcategory: "Payroll" };
+    }
+    if (name.includes("rent") || name.includes("occupancy") || name.includes("lease")) {
+      return { category: "Operating Expenses", subcategory: "Rent / Occupancy" };
+    }
+    if (name.includes("utilit") || name.includes("hydro") || name.includes("electric") || name.includes("gas") || name.includes("water") || name.includes("internet") || name.includes("phone") || name.includes("telecom")) {
+      return { category: "Operating Expenses", subcategory: "Utilities" };
+    }
+    if (name.includes("repair") || name.includes("maintenance")) {
+      return { category: "Operating Expenses", subcategory: "Repairs & Maintenance" };
+    }
+    if (name.includes("professional") || name.includes("legal") || name.includes("accounting") || name.includes("consulting") || name.includes("bookkeeping")) {
+      return { category: "Operating Expenses", subcategory: "Professional Fees" };
+    }
+    if (name.includes("marketing") || name.includes("advertising") || name.includes("promotion")) {
+      return { category: "Operating Expenses", subcategory: "Marketing" };
+    }
+    if (name.includes("delivery") || name.includes("vehicle") || name.includes("fuel") || name.includes("auto") || name.includes("transport") || name.includes("shipping")) {
+      return { category: "Operating Expenses", subcategory: "Delivery / Vehicle" };
+    }
+    if (name.includes("office") || name.includes("admin") || name.includes("supplies") || name.includes("postage") || name.includes("cleaning") || name.includes("janitorial")) {
+      return { category: "Operating Expenses", subcategory: "Office / Admin" };
+    }
+    if (name.includes("merchant") || name.includes("processing") || name.includes("stripe") || name.includes("square") || name.includes("bank charge") || name.includes("transaction fee")) {
+      return { category: "Operating Expenses", subcategory: "Merchant Fees" };
+    }
+    if (name.includes("interest")) {
+      return { category: "Operating Expenses", subcategory: "Interest" };
+    }
+    if (name.includes("depreciation") || name.includes("amortization")) {
+      return { category: "Operating Expenses", subcategory: "Depreciation" };
+    }
+    if (name.includes("insurance")) {
+      return { category: "Operating Expenses", subcategory: "Office / Admin" };
+    }
+    // Default: general operating expense
+    return { category: "Operating Expenses", subcategory: null };
+  }
+  
+  // For COGS, just return the base category
+  if (baseCategory === "COGS") {
+    return { category: "COGS", subcategory: null };
+  }
+  
+  return sectionMapping || { category: baseCategory, subcategory: null };
 }
 
 function classifyBSAccount(accountName: string, section?: string, subSection?: string): { category: string; subcategory: string | null } {
   // Try sub-section first for more specific classification
   if (subSection) {
     const subMapping = BS_SECTION_MAP[subSection];
-    if (subMapping) return subMapping;
+    if (subMapping) {
+      // Even with sub-section mapping, try to refine subcategory from account name
+      return refineBSSubcategory(accountName, subMapping);
+    }
   }
   // Fall back to section
   if (section) {
     const sectionMapping = BS_SECTION_MAP[section];
     if (sectionMapping) {
-      // Try to auto-detect subcategory from account name
-      const name = accountName.toLowerCase();
-      if (sectionMapping.category === "Assets") {
-        if (name.includes("cash") || name.includes("chequing") || name.includes("checking") || name.includes("savings") || name.includes("bank")) {
-          return { category: "Assets", subcategory: "Cash" };
-        }
-        if (name.includes("receivable")) return { category: "Assets", subcategory: "Accounts Receivable" };
-        if (name.includes("inventory")) return { category: "Assets", subcategory: "Inventory" };
-        if (name.includes("prepaid")) return { category: "Assets", subcategory: "Prepaids" };
-        if (name.includes("accumulated depreciation") || name.includes("accum. depreciation")) {
-          return { category: "Assets", subcategory: "Accumulated Depreciation" };
-        }
-        if (name.includes("equipment") || name.includes("furniture") || name.includes("leasehold") || name.includes("vehicle") || name.includes("computer")) {
-          return { category: "Assets", subcategory: "Fixed Assets" };
-        }
-      }
-      if (sectionMapping.category === "Liabilities") {
-        if (name.includes("payable")) return { category: "Liabilities", subcategory: "Accounts Payable" };
-        if (name.includes("credit card")) return { category: "Liabilities", subcategory: "Credit Cards" };
-        if (name.includes("sales tax") || name.includes("gst") || name.includes("qst") || name.includes("hst")) {
-          return { category: "Liabilities", subcategory: "Sales Taxes" };
-        }
-        if (name.includes("payroll") || name.includes("ei ") || name.includes("cpp") || name.includes("qpip") || name.includes("source deduction")) {
-          return { category: "Liabilities", subcategory: "Payroll Liabilities" };
-        }
-        if (name.includes("shareholder") || name.includes("director") || name.includes("due to")) {
-          return { category: "Liabilities", subcategory: "Shareholder Loans" };
-        }
-        if (name.includes("loan") || name.includes("mortgage") || name.includes("note payable") || name.includes("line of credit")) {
-          return { category: "Liabilities", subcategory: "Debt" };
-        }
-      }
-      if (sectionMapping.category === "Equity") {
-        if (name.includes("retained earnings") || name.includes("net income")) {
-          return { category: "Equity", subcategory: "Retained Earnings" };
-        }
-        return { category: "Equity", subcategory: "Equity" };
-      }
-      return sectionMapping;
+      return refineBSSubcategory(accountName, sectionMapping);
     }
   }
+  // Final fallback: classify from account name alone
+  const name = accountName.toLowerCase();
+  if (name.includes("cash") || name.includes("bank") || name.includes("chequing")) return { category: "Assets", subcategory: "Cash" };
+  if (name.includes("receivable")) return { category: "Assets", subcategory: "Accounts Receivable" };
+  if (name.includes("inventory")) return { category: "Assets", subcategory: "Inventory" };
+  if (name.includes("payable")) return { category: "Liabilities", subcategory: "Accounts Payable" };
+  if (name.includes("equity") || name.includes("retained")) return { category: "Equity", subcategory: "Equity" };
   return { category: "Uncategorized", subcategory: null };
+}
+
+function refineBSSubcategory(accountName: string, baseMapping: { category: string; subcategory: string | null }): { category: string; subcategory: string | null } {
+  const name = accountName.toLowerCase();
+  if (baseMapping.category === "Assets") {
+    if (name.includes("cash") || name.includes("chequing") || name.includes("checking") || name.includes("savings") || name.includes("bank")) {
+      return { category: "Assets", subcategory: "Cash" };
+    }
+    if (name.includes("receivable")) return { category: "Assets", subcategory: "Accounts Receivable" };
+    if (name.includes("inventory")) return { category: "Assets", subcategory: "Inventory" };
+    if (name.includes("prepaid")) return { category: "Assets", subcategory: "Prepaids" };
+    if (name.includes("accumulated depreciation") || name.includes("accum. depreciation")) {
+      return { category: "Assets", subcategory: "Accumulated Depreciation" };
+    }
+    if (name.includes("equipment") || name.includes("furniture") || name.includes("leasehold") || name.includes("vehicle") || name.includes("computer")) {
+      return { category: "Assets", subcategory: "Fixed Assets" };
+    }
+  }
+  if (baseMapping.category === "Liabilities") {
+    if (name.includes("payable") && !name.includes("note payable")) return { category: "Liabilities", subcategory: "Accounts Payable" };
+    if (name.includes("credit card")) return { category: "Liabilities", subcategory: "Credit Cards" };
+    if (name.includes("sales tax") || name.includes("gst") || name.includes("qst") || name.includes("hst") || name.includes("tps") || name.includes("tvq")) {
+      return { category: "Liabilities", subcategory: "Sales Taxes" };
+    }
+    if (name.includes("payroll") || name.includes("ei ") || name.includes("cpp") || name.includes("qpip") || name.includes("source deduction")) {
+      return { category: "Liabilities", subcategory: "Payroll Liabilities" };
+    }
+    if (name.includes("shareholder") || name.includes("director") || name.includes("due to")) {
+      return { category: "Liabilities", subcategory: "Shareholder Loans" };
+    }
+    if (name.includes("loan") || name.includes("mortgage") || name.includes("note payable") || name.includes("line of credit")) {
+      return { category: "Liabilities", subcategory: "Debt" };
+    }
+  }
+  if (baseMapping.category === "Equity") {
+    if (name.includes("retained earnings") || name.includes("net income")) {
+      return { category: "Equity", subcategory: "Retained Earnings" };
+    }
+    return { category: "Equity", subcategory: "Equity" };
+  }
+  return baseMapping;
 }
 
 /**
@@ -335,10 +392,19 @@ export async function fetchProfitAndLoss(entityId: number, startDate: string, en
   if (!entity) throw new Error("QBO entity not found");
 
   // Check cache first (within 1 hour)
+  // Always re-parse rows from rawData to pick up classification improvements
   if (useCache) {
     const cached = await financialDb.getCachedReport(entityId, "ProfitAndLoss", startDate, endDate);
     if (cached && cached.fetchedAt > new Date(Date.now() - 60 * 60 * 1000)) {
-      return cached.reportData as ParsedReport;
+      const report = cached.reportData as ParsedReport;
+      // Re-parse from raw data to ensure latest classification logic is used
+      if (report.rawData?.Rows?.Row) {
+        report.rows = parseQboReportRows(
+          report.rawData?.Columns?.Column || [],
+          report.rawData.Rows.Row,
+        );
+      }
+      return report;
     }
   }
 
@@ -389,7 +455,15 @@ export async function fetchBalanceSheet(entityId: number, asOfDate: string, useC
   if (useCache) {
     const cached = await financialDb.getCachedReport(entityId, "BalanceSheet", undefined, undefined, asOfDate);
     if (cached && cached.fetchedAt > new Date(Date.now() - 60 * 60 * 1000)) {
-      return cached.reportData as ParsedReport;
+      const report = cached.reportData as ParsedReport;
+      // Re-parse from raw data to ensure latest classification logic is used
+      if (report.rawData?.Rows?.Row) {
+        report.rows = parseQboReportRows(
+          report.rawData?.Columns?.Column || [],
+          report.rawData.Rows.Row,
+        );
+      }
+      return report;
     }
   }
 
