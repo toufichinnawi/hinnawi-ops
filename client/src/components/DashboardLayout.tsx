@@ -23,7 +23,7 @@ import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import {
   LayoutDashboard, FileText, Receipt, Package, ShoppingCart,
-  Users, BarChart3, Plug, LogOut, PanelLeft, ChefHat, Upload, ClipboardList, UtensilsCrossed, TrendingUp, LineChart, Mail, DollarSign
+  Users, BarChart3, Plug, LogOut, PanelLeft, ChefHat, Upload, ClipboardList, UtensilsCrossed, TrendingUp, LineChart, Mail, DollarSign, ListChecks
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -47,6 +47,7 @@ const menuItems = [
   { icon: Mail, label: "Email Inbox", path: "/email" },
   { icon: DollarSign, label: "Cost Pipeline", path: "/cost-pipeline" },
   { icon: FileText, label: "Financial Statements", path: "/financial-statements" },
+  { icon: ListChecks, label: "Accountant Tasks", path: "/accountant-tasks" },
   { icon: Plug, label: "Integrations", path: "/integrations" },
 ];
 

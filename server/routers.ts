@@ -20,6 +20,7 @@ import * as qboReports from "./qboReports";
 import * as qboReclassify from "./qboReclassify";
 import * as qboAccountReclassify from "./qboAccountReclassify";
 import * as consolidatedReports from "./consolidatedReports";
+import * as accountantTasksEngine from "./accountantTasks";
 
 export const appRouter = router({
   system: systemRouter,
@@ -2969,6 +2970,56 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         await financialDb.updateSharedExpense(input.sharedExpenseId, { fileUrl: url, fileKey: key });
         return { success: true, url };
       }),
+    }),
+  }),
+
+  // ─── Accountant Task Center ───
+  accountantTasks: router({
+    detect: protectedProcedure.mutation(async () => {
+      const result = await accountantTasksEngine.detectAndUpsertTasks();
+      return result;
+    }),
+
+    summary: protectedProcedure.query(async () => {
+      return await accountantTasksEngine.getTaskSummary();
+    }),
+
+    list: protectedProcedure.input(z.object({
+      frequency: z.enum(["daily", "weekly", "monthly"]).optional(),
+      status: z.enum(["pending", "in_progress", "completed", "skipped", "overdue"]).optional(),
+    }).optional()).query(async ({ input }) => {
+      return await accountantTasksEngine.getTasksByFrequency(input?.frequency, input?.status);
+    }),
+
+    complete: protectedProcedure.input(z.object({
+      taskId: z.number(),
+      completedBy: z.string(),
+      notes: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      await accountantTasksEngine.completeTask(input.taskId, input.completedBy, input.notes);
+      return { success: true };
+    }),
+
+    updateStatus: protectedProcedure.input(z.object({
+      taskId: z.number(),
+      status: z.enum(["pending", "in_progress", "completed", "skipped", "overdue"]),
+      notes: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      await accountantTasksEngine.updateTaskStatus(input.taskId, input.status, input.notes);
+      return { success: true };
+    }),
+
+    snooze: protectedProcedure.input(z.object({
+      taskId: z.number(),
+      snoozeUntil: z.string(),
+    })).mutation(async ({ input }) => {
+      await accountantTasksEngine.snoozeTask(input.taskId, input.snoozeUntil);
+      return { success: true };
+    }),
+
+    notifyOverdue: protectedProcedure.mutation(async () => {
+      const sent = await accountantTasksEngine.notifyOverdueTasks();
+      return { success: sent };
     }),
   }),
 });

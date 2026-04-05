@@ -23,6 +23,7 @@ import ChartOfAccounts from "./pages/ChartOfAccounts";
 import EmailInbox from "./pages/EmailInbox";
 import CostPipeline from "./pages/CostPipeline";
 import FinancialStatements from "./pages/FinancialStatements";
+import AccountantTasks from "./pages/AccountantTasks";
 
 function Router() {
   return (
@@ -46,6 +47,7 @@ function Router() {
         <Route path="/email" component={EmailInbox} />
         <Route path="/cost-pipeline" component={CostPipeline} />
         <Route path="/financial-statements" component={FinancialStatements} />
+        <Route path="/accountant-tasks" component={AccountantTasks} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

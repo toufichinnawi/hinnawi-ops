@@ -592,3 +592,34 @@ export const revenueJournalEntries = mysqlTable("revenueJournalEntries", {
 }, (table) => ({
   uniqueDateLocation: unique("uniq_revenue_je_date_loc").on(table.locationId, table.saleDate, table.environment),
 }));
+
+// ─── Accountant Tasks (auto-detected + manual, with completion tracking) ───
+export const accountantTasks = mysqlTable("accountantTasks", {
+  id: int("id").autoincrement().primaryKey(),
+  taskKey: varchar("taskKey", { length: 256 }).notNull(),
+  frequency: mysqlEnum("taskFrequency", ["daily", "weekly", "monthly"]).notNull(),
+  category: mysqlEnum("taskCategory", [
+    "revenue_posting", "invoice_processing", "bank_reconciliation",
+    "payroll", "tax_filing", "month_end", "email_processing",
+    "expense_classification", "intercompany", "other"
+  ]).notNull(),
+  title: varchar("taskTitle", { length: 512 }).notNull(),
+  description: text("taskDescription"),
+  locationId: int("locationId"),
+  dueDate: date("dueDate").notNull(),
+  periodStart: date("periodStart"),
+  periodEnd: date("periodEnd"),
+  priority: mysqlEnum("taskPriority", ["critical", "high", "medium", "low"]).default("medium").notNull(),
+  status: mysqlEnum("taskStatus", ["pending", "in_progress", "completed", "skipped", "overdue"]).default("pending").notNull(),
+  autoDetected: boolean("autoDetected").default(true).notNull(),
+  sourceTable: varchar("sourceTable", { length: 128 }),
+  sourceRecordId: int("sourceRecordId"),
+  completedBy: varchar("completedBy", { length: 256 }),
+  completedAt: timestamp("completedAt"),
+  completionNotes: text("completionNotes"),
+  snoozedUntil: date("snoozedUntil"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  uniqueTaskKey: unique("uniq_task_key_date").on(table.taskKey, table.dueDate),
+}));
