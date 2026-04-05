@@ -4,7 +4,9 @@ import {
   InsertUser, users, locations, suppliers, invoices, invoiceLineItems,
   dailySales, payrollRecords, inventoryItems, recipes, recipeIngredients,
   purchaseOrders, poLineItems, alerts, integrations, importLogs, bankTransactions,
-  appSettings, syncLogs, menuItems, bankAccounts, productSales, quotations, processedEmails
+  appSettings, syncLogs, menuItems, bankAccounts, productSales, quotations, processedEmails,
+  locationPins, inventoryLevels, stockMovements, wasteReports, wasteReportItems,
+  leftoverReports, leftoverReportItems, vendorCatalogItems, orderRecommendations
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { findMenuItemMatch, getProductCategory } from './productNameMap';

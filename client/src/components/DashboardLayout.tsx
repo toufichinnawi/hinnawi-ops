@@ -36,6 +36,7 @@ const menuItems = [
   { icon: Receipt, label: "Quotations", path: "/quotations" },
   { icon: Package, label: "Inventory", path: "/inventory" },
   { icon: ShoppingCart, label: "Purchasing", path: "/purchasing" },
+  { icon: ClipboardList, label: "Procurement Hub", path: "/procurement" },
   { icon: Users, label: "Workforce", path: "/workforce" },
   { icon: BarChart3, label: "Reports", path: "/reports" },
   { icon: LineChart, label: "CFO Intelligence", path: "/cfo" },

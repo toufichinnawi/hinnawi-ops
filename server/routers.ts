@@ -21,6 +21,7 @@ import * as qboReclassify from "./qboReclassify";
 import * as qboAccountReclassify from "./qboAccountReclassify";
 import * as consolidatedReports from "./consolidatedReports";
 import * as accountantTasksEngine from "./accountantTasks";
+import * as procurement from "./procurement";
 
 export const appRouter = router({
   system: systemRouter,
@@ -3020,6 +3021,272 @@ If a field cannot be determined, use null. Always return valid JSON.`,
     notifyOverdue: protectedProcedure.mutation(async () => {
       const sent = await accountantTasksEngine.notifyOverdueTasks();
       return { success: sent };
+    }),
+  }),
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PROCUREMENT MODULE
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  procurement: router({
+    // ─── PIN Management ───
+    pins: router({
+      list: protectedProcedure.query(async () => {
+        const [pins, locs] = await Promise.all([procurement.listPins(), db.getAllLocations()]);
+        const locMap = new Map(locs.map(l => [l.id, l]));
+        return pins.map(p => ({ ...p, locationName: locMap.get(p.locationId)?.name || "Unknown" }));
+      }),
+      create: protectedProcedure.input(z.object({
+        locationId: z.number(),
+        pin: z.string().min(4).max(8),
+        label: z.string(),
+        role: z.enum(["manager", "ops_manager", "admin"]),
+      })).mutation(async ({ input }) => {
+        return procurement.createPin(input);
+      }),
+      verify: publicProcedure.input(z.object({
+        pin: z.string(),
+        locationId: z.number().optional(),
+      })).mutation(async ({ input }) => {
+        return procurement.verifyPin(input.pin, input.locationId);
+      }),
+      deactivate: protectedProcedure.input(z.object({ pinId: z.number() })).mutation(async ({ input }) => {
+        await procurement.deactivatePin(input.pinId);
+        return { success: true };
+      }),
+    }),
+
+    // ─── Purchase Orders ───
+    orders: router({
+      list: publicProcedure.input(z.object({ status: z.string().optional() }).optional()).query(async ({ input }) => {
+        const [orders, sups, locs] = await Promise.all([
+          procurement.getPurchaseOrdersByStatus(input?.status),
+          db.getAllSuppliers(),
+          db.getAllLocations(),
+        ]);
+        const supMap = new Map(sups.map(s => [s.id, s]));
+        const locMap = new Map(locs.map(l => [l.id, l]));
+        return orders.map(o => ({
+          ...o,
+          supplierName: supMap.get(o.supplierId)?.name || "Unknown",
+          locationName: locMap.get(o.locationId)?.name || "Unknown",
+        }));
+      }),
+      get: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+        const po = await procurement.getPurchaseOrderWithLines(input.id);
+        if (!po) return null;
+        const [sups, locs, items] = await Promise.all([
+          db.getAllSuppliers(), db.getAllLocations(), db.getAllInventoryItems(),
+        ]);
+        const sup = sups.find(s => s.id === po.supplierId);
+        const loc = locs.find(l => l.id === po.locationId);
+        const itemMap = new Map(items.map(i => [i.id, i]));
+        return {
+          ...po,
+          supplierName: sup?.name || "Unknown",
+          locationName: loc?.name || "Unknown",
+          lines: po.lines.map(l => ({
+            ...l,
+            itemName: l.inventoryItemId ? itemMap.get(l.inventoryItemId)?.name : undefined,
+          })),
+        };
+      }),
+      create: publicProcedure.input(z.object({
+        supplierId: z.number(),
+        locationId: z.number(),
+        notes: z.string().optional(),
+        createdByPin: z.number().optional(),
+        items: z.array(z.object({
+          inventoryItemId: z.number().optional(),
+          description: z.string(),
+          quantity: z.string(),
+          unitPrice: z.string(),
+        })),
+      })).mutation(async ({ input }) => {
+        return procurement.createPurchaseOrder(input);
+      }),
+      updateLines: protectedProcedure.input(z.object({
+        poId: z.number(),
+        items: z.array(z.object({
+          id: z.number().optional(),
+          inventoryItemId: z.number().optional(),
+          description: z.string(),
+          quantity: z.string(),
+          unitPrice: z.string(),
+        })),
+      })).mutation(async ({ input }) => {
+        return procurement.updatePurchaseOrderLines(input.poId, input.items);
+      }),
+      submitForApproval: publicProcedure.input(z.object({
+        poId: z.number(),
+        pinId: z.number(),
+      })).mutation(async ({ input }) => {
+        return procurement.submitForApproval(input.poId, input.pinId);
+      }),
+      approve: publicProcedure.input(z.object({
+        poId: z.number(),
+        pinId: z.number(),
+      })).mutation(async ({ input }) => {
+        return procurement.approvePurchaseOrder(input.poId, input.pinId);
+      }),
+      reject: publicProcedure.input(z.object({
+        poId: z.number(),
+        notes: z.string().optional(),
+      })).mutation(async ({ input }) => {
+        return procurement.rejectPurchaseOrder(input.poId, input.notes);
+      }),
+      markSubmitted: protectedProcedure.input(z.object({ poId: z.number() })).mutation(async ({ input }) => {
+        return procurement.markSubmitted(input.poId);
+      }),
+      receive: publicProcedure.input(z.object({
+        poId: z.number(),
+        items: z.array(z.object({
+          poLineItemId: z.number(),
+          receivedQty: z.string(),
+        })),
+      })).mutation(async ({ input }) => {
+        return procurement.receivePurchaseOrder(input.poId, input.items);
+      }),
+    }),
+
+    // ─── Inventory Levels ───
+    inventory: router({
+      levels: publicProcedure.input(z.object({ locationId: z.number() })).query(async ({ input }) => {
+        return procurement.getInventoryLevelWithItem(input.locationId);
+      }),
+      upsertLevel: protectedProcedure.input(z.object({
+        locationId: z.number(),
+        inventoryItemId: z.number(),
+        currentQty: z.string().optional(),
+        parLevel: z.string().optional(),
+        reorderPoint: z.string().optional(),
+        maxLevel: z.string().optional(),
+      })).mutation(async ({ input }) => {
+        return procurement.upsertInventoryLevel(input);
+      }),
+      movements: publicProcedure.input(z.object({
+        locationId: z.number(),
+        inventoryItemId: z.number().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        limit: z.number().optional(),
+      })).query(async ({ input }) => {
+        return procurement.getStockMovements(input.locationId, input);
+      }),
+      recordMovement: publicProcedure.input(z.object({
+        locationId: z.number(),
+        inventoryItemId: z.number(),
+        movementType: z.enum(["purchase_received", "consumption", "waste", "leftover", "transfer_in", "transfer_out", "adjustment", "count_correction", "return_to_vendor"]),
+        quantity: z.string(),
+        unitCost: z.string().optional(),
+        referenceType: z.string().optional(),
+        referenceId: z.number().optional(),
+        notes: z.string().optional(),
+        reportedByPin: z.number().optional(),
+        movementDate: z.string(),
+      })).mutation(async ({ input }) => {
+        return procurement.recordStockMovement(input);
+      }),
+      submitCount: publicProcedure.input(z.object({
+        locationId: z.number(),
+        countDate: z.string(),
+        reportedByPin: z.number().optional(),
+        items: z.array(z.object({
+          inventoryItemId: z.number(),
+          countedQty: z.string(),
+        })),
+      })).mutation(async ({ input }) => {
+        return procurement.submitInventoryCount(input);
+      }),
+    }),
+
+    // ─── Waste Reports ───
+    waste: router({
+      list: publicProcedure.input(z.object({ locationId: z.number().optional() }).optional()).query(async ({ input }) => {
+        const [reports, locs] = await Promise.all([
+          procurement.getWasteReports(input?.locationId),
+          db.getAllLocations(),
+        ]);
+        const locMap = new Map(locs.map(l => [l.id, l]));
+        return reports.map(r => ({ ...r, locationName: locMap.get(r.locationId)?.name || "Unknown" }));
+      }),
+      get: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+        return procurement.getWasteReportWithItems(input.id);
+      }),
+      create: publicProcedure.input(z.object({
+        locationId: z.number(),
+        reportDate: z.string(),
+        reportedByPin: z.number().optional(),
+        notes: z.string().optional(),
+        items: z.array(z.object({
+          inventoryItemId: z.number(),
+          quantity: z.string(),
+          unit: z.string().optional(),
+          reason: z.enum(["expired", "spoiled", "overproduction", "damaged", "quality_issue", "prep_waste", "customer_return", "other"]),
+          notes: z.string().optional(),
+        })),
+      })).mutation(async ({ input }) => {
+        return procurement.createWasteReport(input);
+      }),
+    }),
+
+    // ─── Leftover Reports ───
+    leftovers: router({
+      list: publicProcedure.input(z.object({ locationId: z.number().optional() }).optional()).query(async ({ input }) => {
+        const [reports, locs] = await Promise.all([
+          procurement.getLeftoverReports(input?.locationId),
+          db.getAllLocations(),
+        ]);
+        const locMap = new Map(locs.map(l => [l.id, l]));
+        return reports.map(r => ({ ...r, locationName: locMap.get(r.locationId)?.name || "Unknown" }));
+      }),
+      create: publicProcedure.input(z.object({
+        locationId: z.number(),
+        reportDate: z.string(),
+        reportedByPin: z.number().optional(),
+        notes: z.string().optional(),
+        items: z.array(z.object({
+          inventoryItemId: z.number(),
+          quantity: z.string(),
+          unit: z.string().optional(),
+          disposition: z.enum(["carry_forward", "discount_sale", "staff_meal", "donate", "discard"]),
+          notes: z.string().optional(),
+        })),
+      })).mutation(async ({ input }) => {
+        return procurement.createLeftoverReport(input);
+      }),
+    }),
+
+    // ─── Smart Ordering Recommendations ───
+    recommendations: router({
+      generate: publicProcedure.input(z.object({ locationId: z.number() })).mutation(async ({ input }) => {
+        return procurement.generateOrderRecommendations(input.locationId);
+      }),
+      list: publicProcedure.input(z.object({ locationId: z.number() })).query(async ({ input }) => {
+        const [recos, items, sups] = await Promise.all([
+          procurement.getOrderRecommendations(input.locationId),
+          db.getAllInventoryItems(),
+          db.getAllSuppliers(),
+        ]);
+        const itemMap = new Map(items.map(i => [i.id, i]));
+        const supMap = new Map(sups.map(s => [s.id, s]));
+        return recos.map(r => ({
+          ...r,
+          itemName: itemMap.get(r.inventoryItemId)?.name || "Unknown",
+          itemUnit: itemMap.get(r.inventoryItemId)?.unit || "",
+          supplierName: r.supplierId ? supMap.get(r.supplierId)?.name : undefined,
+        }));
+      }),
+      createPO: publicProcedure.input(z.object({
+        locationId: z.number(),
+        supplierId: z.number(),
+        recommendationIds: z.array(z.number()),
+        pinId: z.number().optional(),
+      })).mutation(async ({ input }) => {
+        return procurement.createPOFromRecommendations(
+          input.locationId, input.supplierId, input.recommendationIds, input.pinId
+        );
+      }),
     }),
   }),
 });
