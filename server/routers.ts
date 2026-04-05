@@ -2494,9 +2494,9 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         const allLocations = await db.getAllLocations();
 
         // Known mapping: location code → legal name + PRODUCTION realm ID
-        const CAFE_LEGAL_MAP: Record<string, { legalName: string; companyName: string; realmId: string }> = {
-          "PK": { legalName: "9427-0659 Quebec Inc", companyName: "PK Cafe", realmId: "9130346671806126" },
-          "MK": { legalName: "9427-0659 Quebec Inc", companyName: "MK Cafe", realmId: "9130346671806126" },
+        const CAFE_LEGAL_MAP: Record<string, { legalName: string; companyName: string; realmId: string; departmentFilter?: string }> = {
+          "PK": { legalName: "9427-0659 Quebec Inc", companyName: "PK Cafe", realmId: "9130346671806126", departmentFilter: "PK" },
+          "MK": { legalName: "9427-0659 Quebec Inc", companyName: "MK Cafe", realmId: "9130346671806126", departmentFilter: "MK" },
           "ONT": { legalName: "9287-8982 Quebec Inc", companyName: "ONT Cafe", realmId: "123146517406139" },
           "CT": { legalName: "9364-1009 Quebec Inc", companyName: "CT Cafe", realmId: "123146517409489" },
           "FAC": { legalName: "Hinnawi Bros Bagel & Cafe", companyName: "Factory & Central Kitchen", realmId: "193514694951044" },
@@ -2516,6 +2516,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
             companyName: mapping.companyName,
             legalName: mapping.legalName,
             fiscalYearStartMonth: 9,
+            departmentFilter: mapping.departmentFilter || null,
           });
           created.push({ locationId: loc.id, entityId, name: mapping.companyName });
         }

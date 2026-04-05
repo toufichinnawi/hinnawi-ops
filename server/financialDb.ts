@@ -29,6 +29,7 @@ export async function upsertQboEntity(data: {
   companyName?: string;
   legalName?: string;
   fiscalYearStartMonth?: number;
+  departmentFilter?: string | null;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -42,6 +43,7 @@ export async function upsertQboEntity(data: {
       companyName: data.companyName,
       legalName: data.legalName,
       fiscalYearStartMonth: data.fiscalYearStartMonth,
+      departmentFilter: data.departmentFilter ?? existing[0].departmentFilter,
     }).where(eq(qboEntities.id, existing[0].id));
     return existing[0].id;
   }

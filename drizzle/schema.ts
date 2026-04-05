@@ -441,6 +441,7 @@ export const qboEntities = mysqlTable("qboEntities", {
   syncStatus: mysqlEnum("qboEntitySyncStatus", ["idle", "syncing", "error"]).default("idle"),
   syncError: text("syncError"),
   isActive: boolean("isActive").default(true),
+  departmentFilter: varchar("departmentFilter", { length: 64 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
