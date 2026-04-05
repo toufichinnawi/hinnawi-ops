@@ -570,3 +570,25 @@ export const qboReportCache = mysqlTable("qboReportCache", {
   reportData: json("reportData"),
   fetchedAt: timestamp("fetchedAt").defaultNow().notNull(),
 });
+
+// ─── Revenue Journal Entries (tracking posted revenue JEs to QBO) ───
+export const revenueJournalEntries = mysqlTable("revenueJournalEntries", {
+  id: int("id").autoincrement().primaryKey(),
+  locationId: int("locationId").notNull(),
+  saleDate: date("saleDate").notNull(),
+  realmId: varchar("realmId", { length: 64 }).notNull(),
+  qboJeId: varchar("qboJeId", { length: 64 }),
+  docNumber: varchar("docNumber", { length: 128 }),
+  totalSales: decimal("totalSales", { precision: 12, scale: 2 }).default("0.00"),
+  netRevenue: decimal("netRevenue", { precision: 12, scale: 2 }).default("0.00"),
+  gst: decimal("gst", { precision: 10, scale: 2 }).default("0.00"),
+  qst: decimal("qst", { precision: 10, scale: 2 }).default("0.00"),
+  status: mysqlEnum("revenueJeStatus", ["posted", "voided", "deleted", "failed"]).default("posted").notNull(),
+  environment: mysqlEnum("revenueJeEnv", ["sandbox", "production"]).default("production").notNull(),
+  postedAt: timestamp("postedAt").defaultNow().notNull(),
+  voidedAt: timestamp("voidedAt"),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  uniqueDateLocation: unique("uniq_revenue_je_date_loc").on(table.locationId, table.saleDate, table.environment),
+}));
