@@ -2542,7 +2542,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
        * Reclassify P&L accounts in QBO for 9427-0659 Quebec Inc.
        * Updates AccountType and AccountSubType so the QBO P&L report is properly structured.
        */
-      reclassifyAccounts: protectedProcedure.input(z.object({
+      reclassifyAccounts: publicProcedure.input(z.object({
         dryRun: z.boolean().default(false),
       })).mutation(async ({ input }) => {
         const result = await qboAccountReclassify.reclassifyAccounts(input.dryRun);
