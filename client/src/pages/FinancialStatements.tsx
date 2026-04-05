@@ -80,6 +80,19 @@ export default function FinancialStatements() {
     },
   });
 
+  const reclassifyAccounts = trpc.financialStatements.entities.reclassifyAccounts.useMutation({
+    onSuccess: (result) => {
+      toast.success(`Account reclassification complete! ${result.reclassified} accounts updated, ${result.alreadyCorrect} already correct`, {
+        description: `Analyzed: ${result.analyzed} | Errors: ${result.errors} | No rule: ${result.noRuleMatch}`,
+        duration: 10000,
+      });
+      refetchEntities();
+    },
+    onError: (err) => {
+      toast.error(`Account reclassification failed: ${err.message}`);
+    },
+  });
+
   const selectedEntity = entities?.find((e: any) => e.id === selectedEntityId) || null;
   const selectedLocation = selectedEntity
     ? locations?.find((l: any) => l.id === selectedEntity.locationId)
@@ -329,6 +342,20 @@ export default function FinancialStatements() {
                   <Settings2 className="h-3 w-3" />
                 )}
                 {reclassify.isPending ? "Reclassifying..." : "Reclassify MK/PK Transactions"}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => reclassifyAccounts.mutate({ dryRun: false })}
+                disabled={reclassifyAccounts.isPending}
+                className="gap-1 text-xs text-blue-700 hover:text-blue-800 hover:bg-blue-50"
+              >
+                {reclassifyAccounts.isPending ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-3 w-3" />
+                )}
+                {reclassifyAccounts.isPending ? "Reclassifying Accounts..." : "Reclassify P&L Accounts in QBO"}
               </Button>
             </div>
           </CardContent>

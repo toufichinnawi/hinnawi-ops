@@ -18,6 +18,7 @@ import * as financialReports from "./financialReports";
 import * as financialExport from "./financialExport";
 import * as qboReports from "./qboReports";
 import * as qboReclassify from "./qboReclassify";
+import * as qboAccountReclassify from "./qboAccountReclassify";
 import * as consolidatedReports from "./consolidatedReports";
 
 export const appRouter = router({
@@ -2535,6 +2536,16 @@ If a field cannot be determined, use null. Always return valid JSON.`,
        */
       reclassifyTransactions: protectedProcedure.mutation(async () => {
         const result = await qboReclassify.reclassifyTransactions();
+        return result;
+      }),
+      /**
+       * Reclassify P&L accounts in QBO for 9427-0659 Quebec Inc.
+       * Updates AccountType and AccountSubType so the QBO P&L report is properly structured.
+       */
+      reclassifyAccounts: protectedProcedure.input(z.object({
+        dryRun: z.boolean().default(false),
+      })).mutation(async ({ input }) => {
+        const result = await qboAccountReclassify.reclassifyAccounts(input.dryRun);
         return result;
       }),
     }),
