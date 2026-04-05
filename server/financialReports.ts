@@ -95,21 +95,46 @@ interface MappedLine {
 }
 
 /**
- * Apply manual mappings to QBO report rows.
+ * Hybrid mapping: applies manual mappings where they exist, and falls back
+ * to auto-classification for accounts that don't have a manual mapping.
+ * This ensures mapped accounts are respected while unmapped accounts still
+ * get properly classified into the correct P&L or BS lines.
  */
-function applyManualMappings(
+function applyHybridMappings(
   rows: ReportRow[],
   mappings: Awaited<ReturnType<typeof financialDb.getMappingsForEntity>>,
+  statementType: "profit_loss" | "balance_sheet",
 ): Map<string, MappedLine> {
   const lineMap = new Map<string, MappedLine>();
+  // Build a quick lookup by QBO account ID
+  const mappingMap = new Map(mappings.map(m => [m.qboAccountId, m]));
+  // Auto-classify all rows to have a fallback ready
+  const autoClassified = qboReports.autoClassifyRows(rows, statementType);
+  const autoMap = new Map(autoClassified.map(r => [r.accountId || r.accountName, r]));
 
   for (const row of rows) {
-    const mapping = mappings.find(m => m.qboAccountId === row.accountId);
-    if (mapping && mapping.isHidden) continue;
+    const manual = row.accountId ? mappingMap.get(row.accountId) : undefined;
 
-    const category = mapping?.category || "Uncategorized";
-    const subcategory = mapping?.subcategory || null;
-    const label = mapping?.customLabel || mapping?.category || row.accountName;
+    // If manually hidden, skip entirely
+    if (manual && manual.isHidden) continue;
+
+    let category: string;
+    let subcategory: string | null;
+    let label: string;
+
+    if (manual && manual.category) {
+      // Use manual mapping
+      category = manual.category;
+      subcategory = manual.subcategory || null;
+      label = manual.customLabel || manual.category;
+    } else {
+      // Fall back to auto-classification
+      const auto = autoMap.get(row.accountId || row.accountName);
+      category = auto?.autoCategory || "Uncategorized";
+      subcategory = auto?.autoSubcategory || null;
+      label = subcategory || category;
+    }
+
     const key = `${category}::${subcategory || ""}`;
 
     if (!lineMap.has(key)) {
@@ -157,7 +182,8 @@ function applyAutoClassification(
 }
 
 /**
- * Smart mapping: uses manual mappings if available, falls back to auto-classification.
+ * Smart mapping: uses hybrid approach (manual + auto fallback) if any manual mappings exist,
+ * otherwise pure auto-classification.
  */
 async function smartMap(
   rows: ReportRow[],
@@ -166,7 +192,7 @@ async function smartMap(
 ): Promise<{ mapped: Map<string, MappedLine>; mode: "manual" | "auto" }> {
   const mappings = await financialDb.getMappingsForEntity(entityId);
   if (mappings.length > 0) {
-    return { mapped: applyManualMappings(rows, mappings), mode: "manual" };
+    return { mapped: applyHybridMappings(rows, mappings, statementType), mode: "manual" };
   }
   return { mapped: applyAutoClassification(rows, statementType), mode: "auto" };
 }
