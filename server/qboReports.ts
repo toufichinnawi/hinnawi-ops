@@ -73,6 +73,44 @@ async function getValidToken(realmId: string): Promise<string> {
   return tokenRow.accessToken;
 }
 
+// ─── QBO Department Lookup ───
+
+const departmentIdCache = new Map<string, string>(); // "realmId:name" -> departmentId
+
+async function resolveDepartmentId(realmId: string, departmentName: string): Promise<string | null> {
+  const cacheKey = `${realmId}:${departmentName}`;
+  if (departmentIdCache.has(cacheKey)) return departmentIdCache.get(cacheKey)!;
+
+  try {
+    const accessToken = await getValidToken(realmId);
+    const query = encodeURIComponent(`SELECT Id, Name FROM Department WHERE Name = '${departmentName}'`);
+    const url = `${QBO_BASE_URL}/v3/company/${realmId}/query?query=${query}`;
+    const res = await fetch(url, {
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Accept": "application/json",
+      },
+    });
+    if (!res.ok) {
+      console.warn(`[QBO] Failed to query department "${departmentName}": ${res.status}`);
+      return null;
+    }
+    const data = await res.json();
+    const departments = data?.QueryResponse?.Department;
+    if (departments && departments.length > 0) {
+      const id = departments[0].Id;
+      departmentIdCache.set(cacheKey, id);
+      console.log(`[QBO] Resolved department "${departmentName}" -> ID ${id}`);
+      return id;
+    }
+    console.warn(`[QBO] Department "${departmentName}" not found in realm ${realmId}`);
+    return null;
+  } catch (err) {
+    console.warn(`[QBO] Error resolving department "${departmentName}":`, err);
+    return null;
+  }
+}
+
 // ─── QBO Report API ───
 
 async function fetchQboReport(realmId: string, reportName: string, params: Record<string, string>): Promise<any> {
@@ -635,8 +673,14 @@ export async function fetchProfitAndLoss(entityId: number, startDate: string, en
       accounting_method: "Accrual",
     };
     // Filter by department if entity has a department filter (e.g., PK or MK)
+    // QBO API requires the numeric Department.Id, not the name
     if (entity.departmentFilter) {
-      reportParams.department = entity.departmentFilter;
+      const deptId = await resolveDepartmentId(entity.realmId, entity.departmentFilter);
+      if (deptId) {
+        reportParams.department = deptId;
+      } else {
+        console.warn(`[QBO] Could not resolve department "${entity.departmentFilter}" for entity ${entityId}, fetching unfiltered report`);
+      }
     }
     const raw = await fetchQboReport(entity.realmId, "ProfitAndLoss", reportParams);
 
@@ -699,8 +743,14 @@ export async function fetchBalanceSheet(entityId: number, asOfDate: string, useC
       accounting_method: "Accrual",
     };
     // Filter by department if entity has a department filter (e.g., PK or MK)
+    // QBO API requires the numeric Department.Id, not the name
     if (entity.departmentFilter) {
-      reportParams.department = entity.departmentFilter;
+      const deptId = await resolveDepartmentId(entity.realmId, entity.departmentFilter);
+      if (deptId) {
+        reportParams.department = deptId;
+      } else {
+        console.warn(`[QBO] Could not resolve department "${entity.departmentFilter}" for entity ${entityId}, fetching unfiltered report`);
+      }
     }
     const raw = await fetchQboReport(entity.realmId, "BalanceSheet", reportParams);
 
