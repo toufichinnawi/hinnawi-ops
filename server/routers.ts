@@ -2688,12 +2688,14 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         includeYoY: z.boolean().optional(),
         includeSharedExpenses: z.boolean().optional(),
         locationId: z.number().optional(),
+        forceRefresh: z.boolean().optional(),
       })).query(async ({ input }) => {
         return financialReports.buildProfitAndLoss({
           ...input,
           includeComparison: input.includeComparison ?? false,
           includeYoY: input.includeYoY ?? false,
           includeSharedExpenses: input.includeSharedExpenses ?? false,
+          forceRefresh: input.forceRefresh ?? false,
         });
       }),
       balanceSheet: publicProcedure.input(z.object({
@@ -2701,10 +2703,12 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         asOfDate: z.string(),
         compareDate: z.string().optional(),
         includeSharedExpenses: z.boolean().optional(),
+        forceRefresh: z.boolean().optional(),
       })).query(async ({ input }) => {
         return financialReports.buildBalanceSheet({
           ...input,
           includeSharedExpenses: input.includeSharedExpenses ?? false,
+          forceRefresh: input.forceRefresh ?? false,
         });
       }),
       exportCsv: publicProcedure.input(z.object({
@@ -2817,6 +2821,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         eliminateIntercompany: z.boolean().optional(),
         customIntercompanyPatterns: z.array(z.string()).optional(),
         excludeEntityIds: z.array(z.number()).optional(),
+        forceRefresh: z.boolean().optional(),
       })).query(async ({ input }) => {
         return consolidatedReports.buildConsolidatedProfitAndLoss({
           startDate: input.startDate,
@@ -2825,6 +2830,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
           eliminateIntercompany: input.eliminateIntercompany ?? true,
           customIntercompanyPatterns: input.customIntercompanyPatterns,
           excludeEntityIds: input.excludeEntityIds,
+          forceRefresh: input.forceRefresh ?? false,
         });
       }),
       balanceSheet: publicProcedure.input(z.object({
@@ -2833,6 +2839,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         eliminateIntercompany: z.boolean().optional(),
         customIntercompanyPatterns: z.array(z.string()).optional(),
         excludeEntityIds: z.array(z.number()).optional(),
+        forceRefresh: z.boolean().optional(),
       })).query(async ({ input }) => {
         return consolidatedReports.buildConsolidatedBalanceSheet({
           asOfDate: input.asOfDate,
@@ -2840,6 +2847,7 @@ If a field cannot be determined, use null. Always return valid JSON.`,
           eliminateIntercompany: input.eliminateIntercompany ?? true,
           customIntercompanyPatterns: input.customIntercompanyPatterns,
           excludeEntityIds: input.excludeEntityIds,
+          forceRefresh: input.forceRefresh ?? false,
         });
       }),
     }),

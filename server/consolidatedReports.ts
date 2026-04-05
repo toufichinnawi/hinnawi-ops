@@ -166,6 +166,7 @@ export async function buildConsolidatedProfitAndLoss(params: {
   eliminateIntercompany: boolean;
   customIntercompanyPatterns?: string[];
   excludeEntityIds?: number[];
+  forceRefresh?: boolean;
 }): Promise<ConsolidatedStatement> {
   const entities = await financialDb.getQboEntities();
   const activeEntities = entities.filter(e =>
@@ -188,6 +189,7 @@ export async function buildConsolidatedProfitAndLoss(params: {
         includeComparison: params.includeComparison,
         includeYoY: false,
         includeSharedExpenses: false,
+        forceRefresh: params.forceRefresh,
       });
       entityReports.push({ entity, report });
     } catch (err) {
@@ -214,6 +216,7 @@ export async function buildConsolidatedBalanceSheet(params: {
   eliminateIntercompany: boolean;
   customIntercompanyPatterns?: string[];
   excludeEntityIds?: number[];
+  forceRefresh?: boolean;
 }): Promise<ConsolidatedStatement> {
   const entities = await financialDb.getQboEntities();
   const activeEntities = entities.filter(e =>
@@ -233,6 +236,7 @@ export async function buildConsolidatedBalanceSheet(params: {
         asOfDate: params.asOfDate,
         compareDate: params.compareDate,
         includeSharedExpenses: false,
+        forceRefresh: params.forceRefresh,
       });
       entityReports.push({ entity, report });
     } catch (err) {

@@ -473,12 +473,15 @@ export async function buildProfitAndLoss(params: {
   includeYoY: boolean;
   includeSharedExpenses: boolean;
   locationId?: number;
+  forceRefresh?: boolean;
 }): Promise<FinancialStatement> {
   const entity = await financialDb.getQboEntityById(params.entityId);
   if (!entity) throw new Error("Entity not found");
 
+  const useCache = !params.forceRefresh;
+
   // Fetch current period
-  const current = await qboReports.fetchProfitAndLoss(params.entityId, params.startDate, params.endDate);
+  const current = await qboReports.fetchProfitAndLoss(params.entityId, params.startDate, params.endDate, useCache);
   const lineDefinitions = await financialDb.getFsLineDefinitions("profit_loss");
 
   // Fetch comparison periods
@@ -488,14 +491,14 @@ export async function buildProfitAndLoss(params: {
   if (params.includeComparison) {
     const prior = getPriorPeriodDates(params.startDate, params.endDate);
     try {
-      priorReport = await qboReports.fetchProfitAndLoss(params.entityId, prior.start, prior.end);
+      priorReport = await qboReports.fetchProfitAndLoss(params.entityId, prior.start, prior.end, useCache);
     } catch { /* comparison data unavailable */ }
   }
 
   if (params.includeYoY) {
     const priorYear = getPriorYearDates(params.startDate, params.endDate);
     try {
-      priorYearReport = await qboReports.fetchProfitAndLoss(params.entityId, priorYear.start, priorYear.end);
+      priorYearReport = await qboReports.fetchProfitAndLoss(params.entityId, priorYear.start, priorYear.end, useCache);
     } catch { /* YoY data unavailable */ }
   }
 
@@ -541,17 +544,19 @@ export async function buildBalanceSheet(params: {
   asOfDate: string;
   compareDate?: string;
   includeSharedExpenses: boolean;
+  forceRefresh?: boolean;
 }): Promise<FinancialStatement> {
   const entity = await financialDb.getQboEntityById(params.entityId);
   if (!entity) throw new Error("Entity not found");
 
-  const current = await qboReports.fetchBalanceSheet(params.entityId, params.asOfDate);
+  const useCache = !params.forceRefresh;
+  const current = await qboReports.fetchBalanceSheet(params.entityId, params.asOfDate, useCache);
   const lineDefinitions = await financialDb.getFsLineDefinitions("balance_sheet");
 
   let priorReport: qboReports.ParsedReport | null = null;
   if (params.compareDate) {
     try {
-      priorReport = await qboReports.fetchBalanceSheet(params.entityId, params.compareDate);
+      priorReport = await qboReports.fetchBalanceSheet(params.entityId, params.compareDate, useCache);
     } catch { /* comparison unavailable */ }
   }
 

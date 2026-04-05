@@ -104,6 +104,8 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
     return { startDate: format(subMonths(new Date(), 1), "yyyy-MM-01"), endDate: format(new Date(), "yyyy-MM-dd") };
   }, [periodMode, selectedMonth, selectedFY, customStart, customEnd]);
 
+  const [forceRefresh, setForceRefresh] = useState(false);
+
   // Fetch P&L — ALWAYS request comparison and YoY data
   const { data: report, isLoading, error, refetch } = trpc.financialStatements.reports.profitAndLoss.useQuery({
     entityId,
@@ -113,9 +115,17 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
     includeYoY: true,
     includeSharedExpenses: includeShared,
     locationId: includeShared ? locationId : undefined,
+    forceRefresh,
   }, { enabled: !!entityId });
 
   const utils = trpc.useUtils();
+
+  const handleRefresh = () => {
+    setForceRefresh(true);
+    setTimeout(() => {
+      refetch().then(() => setForceRefresh(false));
+    }, 100);
+  };
 
   // Generate month options (last 24 months)
   const monthOptions = useMemo(() => {
@@ -290,7 +300,7 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
             </div>
 
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isLoading}>
+              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
                 <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? "animate-spin" : ""}`} />
                 Refresh
               </Button>
