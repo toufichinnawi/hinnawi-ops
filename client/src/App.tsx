@@ -25,6 +25,9 @@ import CostPipeline from "./pages/CostPipeline";
 import FinancialStatements from "./pages/FinancialStatements";
 import AccountantTasks from "./pages/AccountantTasks";
 import ProcurementHub from "./pages/ProcurementHub";
+import ReconciliationDashboard from "./pages/ReconciliationDashboard";
+import VendorCatalogPage from "./pages/VendorCatalog";
+import CoACleanupPage from "./pages/CoACleanup";
 
 function Router() {
   return (
@@ -50,6 +53,9 @@ function Router() {
         <Route path="/financial-statements" component={FinancialStatements} />
         <Route path="/accountant-tasks" component={AccountantTasks} />
         <Route path="/procurement" component={ProcurementHub} />
+        <Route path="/reconciliation" component={ReconciliationDashboard} />
+        <Route path="/vendor-catalog" component={VendorCatalogPage} />
+        <Route path="/coa-cleanup" component={CoACleanupPage} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

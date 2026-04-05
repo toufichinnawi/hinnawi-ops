@@ -22,6 +22,10 @@ import * as qboAccountReclassify from "./qboAccountReclassify";
 import * as consolidatedReports from "./consolidatedReports";
 import * as accountantTasksEngine from "./accountantTasks";
 import * as procurement from "./procurement";
+import * as reconciliation from "./reconciliation";
+import * as vendorCatalog from "./vendorCatalog";
+import * as autoOrder from "./autoOrder";
+import * as coaCleanup from "./coaCleanup";
 
 export const appRouter = router({
   system: systemRouter,
@@ -3287,6 +3291,255 @@ If a field cannot be determined, use null. Always return valid JSON.`,
           input.locationId, input.supplierId, input.recommendationIds, input.pinId
         );
       }),
+    }),
+  }),
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RECONCILIATION MODULE
+  // ═══════════════════════════════════════════════════════════════════════════
+  reconciliation: router({
+    // Get filtered bank/credit card transactions
+    transactions: publicProcedure.input(z.object({
+      bankAccountId: z.number().optional(),
+      locationId: z.number().optional(),
+      matchedType: z.string().optional(),
+      startDate: z.string().optional(),
+      endDate: z.string().optional(),
+      limit: z.number().optional(),
+    }).optional()).query(async ({ input }) => {
+      return reconciliation.getFilteredBankTransactions(input || {});
+    }),
+
+    // Get reconciliation summary
+    summary: publicProcedure.input(z.object({
+      bankAccountId: z.number().optional(),
+    }).optional()).query(async ({ input }) => {
+      return reconciliation.getReconciliationSummary(input?.bankAccountId);
+    }),
+
+    // Run auto-matching on unmatched transactions
+    autoMatch: protectedProcedure.input(z.object({
+      bankAccountId: z.number().optional(),
+      locationId: z.number().optional(),
+    }).optional()).mutation(async ({ input }) => {
+      const result = await reconciliation.runAutoMatch(input?.bankAccountId, input?.locationId);
+      return result;
+    }),
+
+    // Apply match results above confidence threshold
+    applyMatches: protectedProcedure.input(z.object({
+      matches: z.array(z.object({
+        bankTxnId: z.number(),
+        matchedType: z.string(),
+        matchedRecordId: z.number().optional(),
+        confidence: z.number(),
+        matchReason: z.string(),
+        suggestedCategory: z.string().optional(),
+        suggestedLocationId: z.number().optional(),
+      })),
+      minConfidence: z.number().optional(),
+    })).mutation(async ({ input }) => {
+      const applied = await reconciliation.applyMatches(input.matches as any, input.minConfidence);
+      return { applied };
+    }),
+
+    // Manually classify a single transaction
+    classify: protectedProcedure.input(z.object({
+      txnId: z.number(),
+      matchedType: z.string(),
+      category: z.string().optional(),
+      locationId: z.number().optional(),
+      notes: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      await reconciliation.classifyTransaction(input.txnId, input);
+      return { success: true };
+    }),
+
+    // Bulk classify multiple transactions
+    bulkClassify: protectedProcedure.input(z.object({
+      txnIds: z.array(z.number()),
+      matchedType: z.string(),
+      category: z.string().optional(),
+      locationId: z.number().optional(),
+    })).mutation(async ({ input }) => {
+      const count = await reconciliation.bulkClassifyTransactions(input.txnIds, input);
+      return { classified: count };
+    }),
+
+    // Push a classified expense to QBO
+    pushToQBO: protectedProcedure.input(z.object({
+      txnId: z.number(),
+      locationId: z.number(),
+      category: z.string(),
+      vendorName: z.string().optional(),
+      memo: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      return reconciliation.pushExpenseToQBO(input.txnId, input);
+    }),
+
+    // Bulk push expenses to QBO
+    bulkPushToQBO: protectedProcedure.input(z.object({
+      txnIds: z.array(z.number()),
+      locationId: z.number(),
+      category: z.string(),
+    })).mutation(async ({ input }) => {
+      return reconciliation.bulkPushExpensesToQBO(input.txnIds, input.locationId, input.category);
+    }),
+
+    // Get credit card spending by location (inter-company)
+    creditCardByLocation: publicProcedure.input(z.object({
+      bankAccountId: z.number(),
+    })).query(async ({ input }) => {
+      return reconciliation.getCreditCardByLocation(input.bankAccountId);
+    }),
+
+    // Get expense categories list
+    expenseCategories: publicProcedure.query(() => {
+      return reconciliation.EXPENSE_CATEGORIES;
+    }),
+  }),
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // VENDOR CATALOG
+  // ═══════════════════════════════════════════════════════════════════════════
+  vendorCatalog: router({
+    // Get catalog items for a supplier
+    bySupplier: publicProcedure.input(z.object({
+      supplierId: z.number(),
+    })).query(async ({ input }) => {
+      return vendorCatalog.getVendorCatalog(input.supplierId);
+    }),
+
+    // Get catalog items for an inventory item (across all vendors)
+    byItem: publicProcedure.input(z.object({
+      inventoryItemId: z.number(),
+    })).query(async ({ input }) => {
+      return vendorCatalog.getCatalogForItem(input.inventoryItemId);
+    }),
+
+    // Import vendor catalog from CSV
+    importCSV: protectedProcedure.input(z.object({
+      supplierId: z.number(),
+      csvContent: z.string(),
+      columnMapping: z.object({
+        sku: z.string().optional(),
+        productName: z.string(),
+        unit: z.string().optional(),
+        packSize: z.string().optional(),
+        price: z.string(),
+        minQty: z.string().optional(),
+      }),
+    })).mutation(async ({ input }) => {
+      const rows = vendorCatalog.parseVendorCSV(input.csvContent, input.supplierId, input.columnMapping);
+      return vendorCatalog.importVendorCatalog(rows);
+    }),
+
+    // Link a catalog item to an inventory item
+    link: protectedProcedure.input(z.object({
+      catalogItemId: z.number(),
+      inventoryItemId: z.number(),
+    })).mutation(async ({ input }) => {
+      await vendorCatalog.linkCatalogToInventory(input.catalogItemId, input.inventoryItemId);
+      return { success: true };
+    }),
+
+    // Auto-link catalog items to inventory by name matching
+    autoLink: protectedProcedure.input(z.object({
+      supplierId: z.number(),
+    })).mutation(async ({ input }) => {
+      return vendorCatalog.autoLinkCatalogItems(input.supplierId);
+    }),
+
+    // Get price comparisons across vendors
+    priceComparisons: publicProcedure.query(async () => {
+      return vendorCatalog.getPriceComparisons();
+    }),
+  }),
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AUTO-ORDER
+  // ═══════════════════════════════════════════════════════════════════════════
+  autoOrder: router({
+    // Generate POs from recommendations
+    generatePOs: protectedProcedure.input(z.object({
+      locationId: z.number(),
+      recommendationIds: z.array(z.number()),
+      createdByPin: z.number().optional(),
+    })).mutation(async ({ input }) => {
+      return autoOrder.generatePOsFromRecommendations(
+        input.locationId, input.recommendationIds, input.createdByPin
+      );
+    }),
+
+    // Format PO as email
+    previewEmail: publicProcedure.input(z.object({
+      purchaseOrderId: z.number(),
+    })).query(async ({ input }) => {
+      return autoOrder.formatPOEmail(input.purchaseOrderId);
+    }),
+
+    // Send PO to vendor via email
+    sendPO: protectedProcedure.input(z.object({
+      purchaseOrderId: z.number(),
+      overrideEmail: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      return autoOrder.sendPOEmail(input.purchaseOrderId, input.overrideEmail);
+    }),
+
+    // Get pending orders needing follow-up
+    pendingOrders: publicProcedure.query(async () => {
+      return autoOrder.getPendingOrders();
+    }),
+
+    // Get order history
+    history: publicProcedure.input(z.object({
+      supplierId: z.number().optional(),
+      locationId: z.number().optional(),
+      limit: z.number().optional(),
+    }).optional()).query(async ({ input }) => {
+      return autoOrder.getOrderHistory(input?.supplierId, input?.locationId, input?.limit);
+    }),
+  }),
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHART OF ACCOUNTS CLEANUP
+  // ═══════════════════════════════════════════════════════════════════════════
+  coaCleanup: router({
+    // Run full audit across all companies
+    audit: protectedProcedure.mutation(async () => {
+      const report = await coaCleanup.auditAllCompanies();
+      return {
+        ...report,
+        standardizedNames: undefined, // Map not serializable
+        reportMarkdown: coaCleanup.formatAuditReport(report),
+      };
+    }),
+
+    // Dry-run standardization
+    standardizeDryRun: protectedProcedure.mutation(async () => {
+      return coaCleanup.standardizeAccountNames(true);
+    }),
+
+    // Apply standardization (live)
+    standardizeApply: protectedProcedure.mutation(async () => {
+      return coaCleanup.standardizeAccountNames(false);
+    }),
+
+    // Rename a single account
+    renameAccount: protectedProcedure.input(z.object({
+      realmId: z.string(),
+      accountId: z.string(),
+      newName: z.string(),
+    })).mutation(async ({ input }) => {
+      return coaCleanup.renameAccount(input.realmId, input.accountId, input.newName);
+    }),
+
+    // Deactivate a single account
+    deactivateAccount: protectedProcedure.input(z.object({
+      realmId: z.string(),
+      accountId: z.string(),
+    })).mutation(async ({ input }) => {
+      return coaCleanup.deactivateAccount(input.realmId, input.accountId);
     }),
   }),
 });
