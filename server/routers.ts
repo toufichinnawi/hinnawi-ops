@@ -2852,6 +2852,20 @@ If a field cannot be determined, use null. Always return valid JSON.`,
       }),
     }),
 
+    // ─── Cache Management ───
+    cache: router({
+      /**
+       * Clear all cached QBO reports (or for a specific entity).
+       * This forces the next query to fetch fresh data from QBO.
+       */
+      clear: publicProcedure.input(z.object({
+        entityId: z.number().optional(),
+      }).optional()).mutation(async ({ input }) => {
+        const result = await financialDb.clearReportCache(input?.entityId);
+        return { success: true, ...result };
+      }),
+    }),
+
     // ─── Shared Expenses ───
     sharedExpenses: router({
       list: publicProcedure.input(z.object({

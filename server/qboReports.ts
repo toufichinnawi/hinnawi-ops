@@ -647,11 +647,11 @@ export async function fetchProfitAndLoss(entityId: number, startDate: string, en
   const entity = await financialDb.getQboEntityById(entityId);
   if (!entity) throw new Error("QBO entity not found");
 
-  // Check cache first (within 1 hour)
+  // Check cache first (within 5 minutes)
   // Always re-parse rows from rawData to pick up classification improvements
   if (useCache) {
     const cached = await financialDb.getCachedReport(entityId, "ProfitAndLoss", startDate, endDate);
-    if (cached && cached.fetchedAt > new Date(Date.now() - 60 * 60 * 1000)) {
+    if (cached && cached.fetchedAt > new Date(Date.now() - 5 * 60 * 1000)) {
       const report = cached.reportData as ParsedReport;
       // Re-parse from raw data to ensure latest classification logic is used
       if (report.rawData?.Rows?.Row) {
@@ -674,12 +674,32 @@ export async function fetchProfitAndLoss(entityId: number, startDate: string, en
     };
     // Filter by department if entity has a department filter (e.g., PK or MK)
     // QBO API requires the numeric Department.Id, not the name
+    // CRITICAL: If department filter is set but cannot be resolved, return EMPTY
+    // report to prevent duplication in consolidated views. Never fall back to
+    // unfiltered data when a filter is expected.
     if (entity.departmentFilter) {
       const deptId = await resolveDepartmentId(entity.realmId, entity.departmentFilter);
       if (deptId) {
         reportParams.department = deptId;
       } else {
-        console.warn(`[QBO] Could not resolve department "${entity.departmentFilter}" for entity ${entityId}, fetching unfiltered report`);
+        console.warn(`[QBO] Could not resolve department "${entity.departmentFilter}" for entity ${entityId} — returning empty report to prevent duplication`);
+        const emptyParsed: ParsedReport = {
+          reportName: "Profit and Loss",
+          startDate,
+          endDate,
+          currency: "CAD",
+          rows: [],
+          rawData: null,
+        };
+        await financialDb.cacheReport({
+          qboEntityId: entityId,
+          reportType: "ProfitAndLoss",
+          startDate,
+          endDate,
+          reportData: emptyParsed,
+        });
+        await financialDb.updateQboEntitySync(entityId, "idle");
+        return emptyParsed;
       }
     }
     const raw = await fetchQboReport(entity.realmId, "ProfitAndLoss", reportParams);
@@ -719,9 +739,10 @@ export async function fetchBalanceSheet(entityId: number, asOfDate: string, useC
   const entity = await financialDb.getQboEntityById(entityId);
   if (!entity) throw new Error("QBO entity not found");
 
+  // Check cache first (within 5 minutes)
   if (useCache) {
     const cached = await financialDb.getCachedReport(entityId, "BalanceSheet", undefined, undefined, asOfDate);
-    if (cached && cached.fetchedAt > new Date(Date.now() - 60 * 60 * 1000)) {
+    if (cached && cached.fetchedAt > new Date(Date.now() - 5 * 60 * 1000)) {
       const report = cached.reportData as ParsedReport;
       // Re-parse from raw data to ensure latest classification logic is used
       if (report.rawData?.Rows?.Row) {
@@ -744,12 +765,29 @@ export async function fetchBalanceSheet(entityId: number, asOfDate: string, useC
     };
     // Filter by department if entity has a department filter (e.g., PK or MK)
     // QBO API requires the numeric Department.Id, not the name
+    // CRITICAL: If department filter is set but cannot be resolved, return EMPTY
+    // report to prevent duplication in consolidated views.
     if (entity.departmentFilter) {
       const deptId = await resolveDepartmentId(entity.realmId, entity.departmentFilter);
       if (deptId) {
         reportParams.department = deptId;
       } else {
-        console.warn(`[QBO] Could not resolve department "${entity.departmentFilter}" for entity ${entityId}, fetching unfiltered report`);
+        console.warn(`[QBO] Could not resolve department "${entity.departmentFilter}" for entity ${entityId} — returning empty report to prevent duplication`);
+        const emptyParsed: ParsedReport = {
+          reportName: "Balance Sheet",
+          asOfDate,
+          currency: "CAD",
+          rows: [],
+          rawData: null,
+        };
+        await financialDb.cacheReport({
+          qboEntityId: entityId,
+          reportType: "BalanceSheet",
+          asOfDate,
+          reportData: emptyParsed,
+        });
+        await financialDb.updateQboEntitySync(entityId, "idle");
+        return emptyParsed;
       }
     }
     const raw = await fetchQboReport(entity.realmId, "BalanceSheet", reportParams);

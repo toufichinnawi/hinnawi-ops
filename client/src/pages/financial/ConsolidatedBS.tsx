@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import {
   Download, RefreshCw, ChevronDown, ChevronRight, Loader2, AlertTriangle,
   Building2, Eye, EyeOff, FileSpreadsheet,
 } from "lucide-react";
+import { toast } from "sonner";
 import { format, subMonths } from "date-fns";
 
 function fmt(val: number | null | undefined) {
@@ -61,18 +62,41 @@ export default function ConsolidatedBS() {
     return opts;
   }, []);
 
-  const [refreshCounter, setRefreshCounter] = useState(0);
-  const forceRefresh = refreshCounter > 0;
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data: report, isLoading, error, refetch } = trpc.financialStatements.consolidated.balanceSheet.useQuery({
     asOfDate,
     eliminateIntercompany: eliminateIC,
-    forceRefresh,
+    forceRefresh: isRefreshing,
   });
 
-  const handleRefresh = () => {
-    setRefreshCounter(c => c + 1);
-  };
+  const utils = trpc.useUtils();
+  const clearCacheMutation = trpc.financialStatements.cache.clear.useMutation();
+
+  const handleRefresh = useCallback(async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      await clearCacheMutation.mutateAsync({});
+      await utils.financialStatements.consolidated.invalidate();
+      await utils.financialStatements.reports.invalidate();
+      await refetch();
+      toast.success("Consolidated Balance Sheet refreshed successfully from QuickBooks");
+    } catch (err) {
+      console.error("Refresh failed:", err);
+      toast.error("Failed to refresh data. Please try again.");
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [isRefreshing, clearCacheMutation, utils, refetch]);
+
+  // Auto-refresh every 5 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      utils.financialStatements.consolidated.invalidate();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [utils]);
 
   const toggleRow = (key: string) => {
     const next = new Set(expandedRows);
@@ -176,8 +200,8 @@ export default function ConsolidatedBS() {
 
             <div className="flex-1" />
 
-            <Button variant="outline" size="sm" onClick={handleRefresh} className="gap-1 h-8">
-              <RefreshCw className="h-3 w-3" /> Refresh
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing || isLoading} className="gap-1 h-8">
+              <RefreshCw className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`} /> {isRefreshing ? "Refreshing..." : "Refresh"}
             </Button>
             <Button variant="outline" size="sm" onClick={exportCsv} className="gap-1 h-8">
               <FileSpreadsheet className="h-3 w-3" /> Export CSV

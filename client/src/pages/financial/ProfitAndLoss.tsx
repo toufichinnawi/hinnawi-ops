@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
   ChevronDown, ChevronRight, Eye, EyeOff, FileSpreadsheet, FileText as FileTextIcon,
   Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { format, subMonths, subYears } from "date-fns";
 
 interface Props {
@@ -104,8 +105,7 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
     return { startDate: format(subMonths(new Date(), 1), "yyyy-MM-01"), endDate: format(new Date(), "yyyy-MM-dd") };
   }, [periodMode, selectedMonth, selectedFY, customStart, customEnd]);
 
-  const [refreshCounter, setRefreshCounter] = useState(0);
-  const forceRefresh = refreshCounter > 0;
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch P&L — ALWAYS request comparison and YoY data
   const { data: report, isLoading, error, refetch } = trpc.financialStatements.reports.profitAndLoss.useQuery({
@@ -116,14 +116,40 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
     includeYoY: true,
     includeSharedExpenses: includeShared,
     locationId: includeShared ? locationId : undefined,
-    forceRefresh,
+    forceRefresh: isRefreshing,
   }, { enabled: !!entityId });
 
   const utils = trpc.useUtils();
+  const clearCacheMutation = trpc.financialStatements.cache.clear.useMutation();
 
-  const handleRefresh = () => {
-    setRefreshCounter(c => c + 1);
-  };
+  const handleRefresh = useCallback(async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      // Step 1: Clear server-side cache for this entity
+      await clearCacheMutation.mutateAsync({ entityId });
+      // Step 2: Invalidate all React Query caches for financial statements
+      await utils.financialStatements.reports.invalidate();
+      await utils.financialStatements.consolidated.invalidate();
+      // Step 3: Refetch the current query
+      await refetch();
+      toast.success("P&L data refreshed successfully from QuickBooks");
+    } catch (err) {
+      console.error("Refresh failed:", err);
+      toast.error("Failed to refresh data. Please try again.");
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [entityId, isRefreshing, clearCacheMutation, utils, refetch]);
+
+  // Auto-refresh every 5 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Silent auto-refresh: invalidate queries so they refetch with cache (5-min TTL)
+      utils.financialStatements.reports.invalidate();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [utils]);
 
   // Generate month options (last 24 months)
   const monthOptions = useMemo(() => {
@@ -298,9 +324,9 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
             </div>
 
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
-                <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? "animate-spin" : ""}`} />
-                Refresh
+              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing || isLoading}>
+                <RefreshCw className={`h-4 w-4 mr-1 ${isRefreshing ? "animate-spin" : ""}`} />
+                {isRefreshing ? "Refreshing..." : "Refresh"}
               </Button>
               <Popover>
                 <PopoverTrigger asChild>

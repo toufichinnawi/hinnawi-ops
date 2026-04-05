@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import {
   ChevronDown, ChevronRight, FileSpreadsheet, FileText as FileTextIcon,
   Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { format, subYears } from "date-fns";
 
 interface Props {
@@ -61,22 +62,43 @@ export default function BalanceSheet({ entityId, locationId, entityName }: Props
   const asOfStr = format(asOfDate, "yyyy-MM-dd");
   const priorYearStr = format(subYears(asOfDate, 1), "yyyy-MM-dd");
 
-  const [refreshCounter, setRefreshCounter] = useState(0);
-  const forceRefresh = refreshCounter > 0;
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch Balance Sheet — always request comparison data
   const { data: report, isLoading, error, refetch } = trpc.financialStatements.reports.balanceSheet.useQuery({
     entityId,
     asOfDate: asOfStr,
     compareDate: priorYearStr,
-    forceRefresh,
+    forceRefresh: isRefreshing,
   }, { enabled: !!entityId });
 
-  const handleRefresh = () => {
-    setRefreshCounter(c => c + 1);
-  };
-
   const utils = trpc.useUtils();
+  const clearCacheMutation = trpc.financialStatements.cache.clear.useMutation();
+
+  const handleRefresh = useCallback(async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      await clearCacheMutation.mutateAsync({ entityId });
+      await utils.financialStatements.reports.invalidate();
+      await utils.financialStatements.consolidated.invalidate();
+      await refetch();
+      toast.success("Balance Sheet refreshed successfully from QuickBooks");
+    } catch (err) {
+      console.error("Refresh failed:", err);
+      toast.error("Failed to refresh data. Please try again.");
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [entityId, isRefreshing, clearCacheMutation, utils, refetch]);
+
+  // Auto-refresh every 5 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      utils.financialStatements.reports.invalidate();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [utils]);
 
   const toggleRow = (key: string) => {
     const next = new Set(expandedRows);
@@ -170,9 +192,9 @@ export default function BalanceSheet({ entityId, locationId, entityName }: Props
             </div>
 
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
-                <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? "animate-spin" : ""}`} />
-                Refresh
+              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing || isLoading}>
+                <RefreshCw className={`h-4 w-4 mr-1 ${isRefreshing ? "animate-spin" : ""}`} />
+                {isRefreshing ? "Refreshing..." : "Refresh"}
               </Button>
               <Popover>
                 <PopoverTrigger asChild>

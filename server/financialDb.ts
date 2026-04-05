@@ -667,6 +667,18 @@ export async function getCachedReport(entityId: number, reportType: "ProfitAndLo
   return rows[0] || null;
 }
 
+export async function clearReportCache(entityId?: number) {
+  const db = await getDb();
+  if (!db) return { deleted: 0 };
+  if (entityId) {
+    const result = await db.delete(qboReportCache).where(eq(qboReportCache.qboEntityId, entityId));
+    return { deleted: (result as any)[0]?.affectedRows ?? 0 };
+  } else {
+    const result = await db.delete(qboReportCache);
+    return { deleted: (result as any)[0]?.affectedRows ?? 0 };
+  }
+}
+
 export async function cacheReport(data: {
   qboEntityId: number;
   reportType: "ProfitAndLoss" | "BalanceSheet";
