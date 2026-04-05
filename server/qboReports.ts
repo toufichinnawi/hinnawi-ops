@@ -272,9 +272,36 @@ function classifyPLAccount(accountName: string, section?: string, subSection?: s
     const name = accountName.toLowerCase();
     if (name.includes("sales") || name.includes("revenue") || name.includes("income") || name.includes("discount")) {
       baseCategory = "Revenue";
-    } else if (name.includes("cost of goods") || name.includes("cogs") || name.includes("cost of sales") || name.includes("purchase") || name.includes("food cost") || name.includes("bakery") || name.includes("ingredient") || name.includes("packaging") || name.includes("raw material")) {
+    } else if (
+      name.includes("cost of goods") || name.includes("cogs") || name.includes("cost of sales") ||
+      name.includes("purchase") || name.includes("food cost") || name.includes("bakery") ||
+      name.includes("ingredient") || name.includes("packaging") || name.includes("raw material") ||
+      name.includes("beverage") || name.includes("disposable") || name.includes("laundry") ||
+      name.includes("linen") || name.includes("kitchen equipment") || name.includes("coffee") ||
+      name.includes("programme alimentation") || name.includes("purchase return") ||
+      name.includes("early payment") || name.includes("small kitchen")
+    ) {
       baseCategory = "COGS";
-    } else if (name.includes("expense") || name.includes("payroll") || name.includes("rent") || name.includes("utilit") || name.includes("merchant") || name.includes("cleaning") || name.includes("insurance") || name.includes("wage") || name.includes("salary") || name.includes("freight") || name.includes("delivery") || name.includes("repair") || name.includes("maintenance") || name.includes("office") || name.includes("supplies") || name.includes("professional") || name.includes("marketing") || name.includes("advertising") || name.includes("depreciation") || name.includes("amortization") || name.includes("interest") || name.includes("bank charge") || name.includes("miscellaneous") || name.includes("sundry") || name.includes("general") || name.includes("telephone") || name.includes("travel") || name.includes("training") || name.includes("license") || name.includes("permit") || name.includes("dues") || name.includes("subscription")) {
+    } else if (
+      name.includes("expense") || name.includes("payroll") || name.includes("rent") ||
+      name.includes("utilit") || name.includes("merchant") || name.includes("cleaning") ||
+      name.includes("insurance") || name.includes("wage") || name.includes("salary") ||
+      name.includes("freight") || name.includes("delivery") || name.includes("repair") ||
+      name.includes("maintenance") || name.includes("office") || name.includes("supplies") ||
+      name.includes("professional") || name.includes("marketing") || name.includes("advertising") ||
+      name.includes("depreciation") || name.includes("amortization") || name.includes("interest") ||
+      name.includes("bank charge") || name.includes("miscellaneous") || name.includes("sundry") ||
+      name.includes("general") || name.includes("telephone") || name.includes("travel") ||
+      name.includes("training") || name.includes("license") || name.includes("permit") ||
+      name.includes("dues") || name.includes("subscription") || name.includes("royalt") ||
+      name.includes("management fee") || name.includes("commission") || name.includes("tips") ||
+      name.includes("electricity") || name.includes("heating") || name.includes("computer") ||
+      name.includes("security") || name.includes("car expense") || name.includes("renovation") ||
+      name.includes("csst") || name.includes("qpp") || name.includes("qpip") ||
+      name.includes("stat holiday") || name.includes("vacation") || name.includes("ei expense") ||
+      name.includes("service charge") || name.includes("accounting") || name.includes("legal") ||
+      name.includes("advertisement")
+    ) {
       baseCategory = "Operating Expenses";
     }
   }
@@ -286,43 +313,92 @@ function classifyPLAccount(accountName: string, section?: string, subSection?: s
   // For Operating Expenses, auto-detect subcategory from account name
   if (baseCategory === "Operating Expenses") {
     const name = accountName.toLowerCase();
-    if (name.includes("payroll") || name.includes("salary") || name.includes("wage") || name.includes("benefit") || name.includes("employee")) {
+
+    // ─── Payroll (must be before general keyword matches) ───
+    if (name.includes("payroll") || name.includes("salary") || name.includes("salaries") ||
+        name.includes("wage") || name.includes("benefit") || name.includes("employee") ||
+        name.includes("tips") || name.includes("usalaries") || name.includes("ei expense") ||
+        name.includes("cpp") || name.includes("qpp") || name.includes("qpip") ||
+        name.includes("csst") || name.includes("cnesst") || name.includes("vacation expense") ||
+        name.includes("vacation accrual") || name.includes("stat holiday") ||
+        name.includes("service charges payroll") || name.includes("service charge") ||
+        name.includes("payroll gov") || name.includes("gov deduction") ||
+        name.includes("workers comp") || name.includes("eht") || name.includes("health tax")) {
       return { category: "Operating Expenses", subcategory: "Payroll" };
     }
+
+    // ─── Rent / Occupancy ───
     if (name.includes("rent") || name.includes("occupancy") || name.includes("lease")) {
       return { category: "Operating Expenses", subcategory: "Rent / Occupancy" };
     }
-    if (name.includes("utilit") || name.includes("hydro") || name.includes("electric") || name.includes("gas") || name.includes("water") || name.includes("internet") || name.includes("phone") || name.includes("telecom")) {
+
+    // ─── Utilities (electricity, heating, telephone, internet) ───
+    if (name.includes("utilit") || name.includes("hydro") || name.includes("electric") ||
+        name.includes("heating") || name.includes("gas ") || name.includes("water") ||
+        name.includes("internet") || name.includes("phone") || name.includes("telecom") ||
+        name.includes("telephone")) {
       return { category: "Operating Expenses", subcategory: "Utilities" };
     }
-    if (name.includes("repair") || name.includes("maintenance")) {
+
+    // ─── Repairs & Maintenance (including renovation) ───
+    if (name.includes("repair") || name.includes("maintenance") || name.includes("renovation")) {
       return { category: "Operating Expenses", subcategory: "Repairs & Maintenance" };
     }
-    if (name.includes("professional") || name.includes("legal") || name.includes("accounting") || name.includes("consulting") || name.includes("bookkeeping")) {
+
+    // ─── Professional Fees (accounting, legal, consulting) ───
+    if (name.includes("professional") || name.includes("legal") || name.includes("accounting") ||
+        name.includes("consulting") || name.includes("bookkeeping") || name.includes("legal fee")) {
       return { category: "Operating Expenses", subcategory: "Professional Fees" };
     }
-    if (name.includes("marketing") || name.includes("advertising") || name.includes("promotion")) {
+
+    // ─── Marketing (advertising, commission, promotion) ───
+    if (name.includes("marketing") || name.includes("advertising") || name.includes("advertisement") ||
+        name.includes("promotion") || name.includes("commission")) {
       return { category: "Operating Expenses", subcategory: "Marketing" };
     }
-    if (name.includes("delivery") || name.includes("vehicle") || name.includes("fuel") || name.includes("auto") || name.includes("transport") || name.includes("shipping") || name.includes("freight")) {
+
+    // ─── Royalties ───
+    if (name.includes("royalt")) {
+      return { category: "Operating Expenses", subcategory: "Royalties" };
+    }
+
+    // ─── Management Fees ───
+    if (name.includes("management fee") || name.includes("management fees")) {
+      return { category: "Operating Expenses", subcategory: "Management Fees" };
+    }
+
+    // ─── Delivery / Vehicle ───
+    if (name.includes("delivery") || name.includes("vehicle") || name.includes("fuel") ||
+        name.includes("auto ") || name.includes("transport") || name.includes("shipping") ||
+        name.includes("car expense") || name.includes("car ")) {
       return { category: "Operating Expenses", subcategory: "Delivery / Vehicle" };
     }
-    if (name.includes("office") || name.includes("admin") || name.includes("supplies") || name.includes("postage") || name.includes("cleaning") || name.includes("janitorial")) {
+
+    // ─── Office / Admin (office supplies, computer, security, cleaning, insurance, misc) ───
+    if (name.includes("office") || name.includes("admin") || name.includes("supplies") ||
+        name.includes("postage") || name.includes("cleaning") || name.includes("janitorial") ||
+        name.includes("computer") || name.includes("security") || name.includes("insurance") ||
+        name.includes("miscellaneous")) {
       return { category: "Operating Expenses", subcategory: "Office / Admin" };
     }
-    if (name.includes("merchant") || name.includes("processing") || name.includes("stripe") || name.includes("square") || name.includes("bank charge") || name.includes("transaction fee")) {
+
+    // ─── Merchant Fees / Bank Charges ───
+    if (name.includes("merchant") || name.includes("processing") || name.includes("stripe") ||
+        name.includes("square") || name.includes("bank charge") || name.includes("transaction fee")) {
       return { category: "Operating Expenses", subcategory: "Merchant Fees" };
     }
+
+    // ─── Interest & Bank Charges ───
     if (name.includes("interest")) {
       return { category: "Operating Expenses", subcategory: "Interest" };
     }
+
+    // ─── Depreciation / Amortization ───
     if (name.includes("depreciation") || name.includes("amortization")) {
       return { category: "Operating Expenses", subcategory: "Depreciation" };
     }
-    if (name.includes("insurance")) {
-      return { category: "Operating Expenses", subcategory: "Office / Admin" };
-    }
-    // Default: general operating expense
+
+    // Default: general operating expense (will be caught by "Other Operating Expenses" line)
     return { category: "Operating Expenses", subcategory: null };
   }
   

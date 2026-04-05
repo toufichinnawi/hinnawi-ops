@@ -483,7 +483,8 @@ function getStandardLineOrder(statementType: "profit_loss" | "balance_sheet"): s
       "Operating Expenses::Professional Fees", "Operating Expenses::Marketing",
       "Operating Expenses::Delivery / Vehicle", "Operating Expenses::Office / Admin",
       "Operating Expenses::Merchant Fees", "Operating Expenses::Interest",
-      "Operating Expenses::Depreciation", "Operating Expenses::",
+      "Operating Expenses::Depreciation", "Operating Expenses::Royalties",
+      "Operating Expenses::Management Fees", "Operating Expenses::",
       "Other Income::", "Other Expenses::",
       "Net Income::",
     ];

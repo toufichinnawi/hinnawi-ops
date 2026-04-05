@@ -327,13 +327,64 @@ export async function ensureBSCatchAllLines() {
   }
 }
 
+/**
+ * Ensure the new P&L subcategory lines (Royalties, Management Fees, Other Operating Expenses) exist.
+ * This is needed for existing deployments that were seeded before these lines were added.
+ */
+export async function ensurePLNewSubcategories() {
+  const db = await getDb();
+  if (!db) return;
+  const plLines = await db.select().from(fsLineDefinitions)
+    .where(eq(fsLineDefinitions.statementType, "profit_loss"))
+    .orderBy(asc(fsLineDefinitions.sortOrder));
+  if (plLines.length === 0) return; // Not yet seeded
+
+  const hasRoyalties = plLines.some(l => l.category === "Operating Expenses" && l.subcategory === "Royalties");
+  if (!hasRoyalties) {
+    await db.insert(fsLineDefinitions).values({
+      statementType: "profit_loss",
+      category: "Operating Expenses",
+      subcategory: "Royalties",
+      displayLabel: "Royalties",
+      lineType: "detail",
+      sortOrder: 510,
+    });
+  }
+
+  const hasMgmtFees = plLines.some(l => l.category === "Operating Expenses" && l.subcategory === "Management Fees");
+  if (!hasMgmtFees) {
+    await db.insert(fsLineDefinitions).values({
+      statementType: "profit_loss",
+      category: "Operating Expenses",
+      subcategory: "Management Fees",
+      displayLabel: "Management Fees",
+      lineType: "detail",
+      sortOrder: 520,
+    });
+  }
+
+  // Add "Other Operating Expenses" catch-all detail line
+  const hasOtherOpex = plLines.some(l => l.category === "Operating Expenses" && !l.subcategory && l.lineType === "detail");
+  if (!hasOtherOpex) {
+    await db.insert(fsLineDefinitions).values({
+      statementType: "profit_loss",
+      category: "Operating Expenses",
+      subcategory: null,
+      displayLabel: "Other Operating Expenses",
+      lineType: "detail",
+      sortOrder: 530,
+    });
+  }
+}
+
 export async function seedDefaultLineDefinitions() {
   const db = await getDb();
   if (!db) return;
   const existing = await db.select().from(fsLineDefinitions).limit(1);
   if (existing.length > 0) {
-    // Even if already seeded, ensure the new catch-all lines exist
+    // Even if already seeded, ensure the new lines exist
     await ensureBSCatchAllLines();
+    await ensurePLNewSubcategories();
     return;
   }
 
@@ -354,6 +405,9 @@ export async function seedDefaultLineDefinitions() {
     { category: "Operating Expenses", subcategory: "Merchant Fees", displayLabel: "Merchant Fees", lineType: "detail" as const, sortOrder: 480 },
     { category: "Operating Expenses", subcategory: "Interest", displayLabel: "Interest", lineType: "detail" as const, sortOrder: 490 },
     { category: "Operating Expenses", subcategory: "Depreciation", displayLabel: "Depreciation", lineType: "detail" as const, sortOrder: 500 },
+    { category: "Operating Expenses", subcategory: "Royalties", displayLabel: "Royalties", lineType: "detail" as const, sortOrder: 510 },
+    { category: "Operating Expenses", subcategory: "Management Fees", displayLabel: "Management Fees", lineType: "detail" as const, sortOrder: 520 },
+    { category: "Operating Expenses", subcategory: null, displayLabel: "Other Operating Expenses", lineType: "detail" as const, sortOrder: 530 },
     { category: "Operating Expenses", subcategory: null, displayLabel: "Total Operating Expenses", lineType: "subtotal" as const, sortOrder: 599 },
     { category: "Other Income", subcategory: null, displayLabel: "Other Income", lineType: "detail" as const, sortOrder: 600 },
     { category: "Other Expenses", subcategory: null, displayLabel: "Other Expenses", lineType: "detail" as const, sortOrder: 700 },

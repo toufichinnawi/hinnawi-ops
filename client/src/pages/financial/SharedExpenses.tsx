@@ -27,7 +27,8 @@ const EXPENSE_CATEGORIES = [
 const STATEMENT_CATEGORIES = [
   "Payroll", "Rent / Occupancy", "Utilities", "Repairs & Maintenance",
   "Professional Fees", "Marketing", "Delivery / Vehicle", "Office / Admin",
-  "Merchant Fees", "Interest", "Depreciation", "Other Expenses",
+  "Merchant Fees", "Interest", "Depreciation", "Royalties", "Management Fees",
+  "Other Expenses",
 ];
 
 const SOURCE_TYPES = [

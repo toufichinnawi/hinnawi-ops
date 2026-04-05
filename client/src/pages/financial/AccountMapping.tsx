@@ -30,7 +30,7 @@ const PL_SUBCATEGORIES: Record<string, string[]> = {
   "Operating Expenses": [
     "", "Payroll", "Rent / Occupancy", "Utilities", "Repairs & Maintenance",
     "Professional Fees", "Marketing", "Delivery / Vehicle", "Office / Admin",
-    "Merchant Fees", "Interest", "Depreciation",
+    "Merchant Fees", "Interest", "Depreciation", "Royalties", "Management Fees",
   ],
   "Other Income": [""],
   "Other Expenses": [""],
