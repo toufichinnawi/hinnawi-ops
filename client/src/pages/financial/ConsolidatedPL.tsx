@@ -70,7 +70,8 @@ export default function ConsolidatedPL() {
     return { startDate: format(subMonths(new Date(), 1), "yyyy-MM-01"), endDate: format(new Date(), "yyyy-MM-dd") };
   }, [periodMode, selectedMonth, selectedFY]);
 
-  const [forceRefresh, setForceRefresh] = useState(false);
+  const [refreshCounter, setRefreshCounter] = useState(0);
+  const forceRefresh = refreshCounter > 0;
 
   const { data: report, isLoading, error, refetch } = trpc.financialStatements.consolidated.profitAndLoss.useQuery({
     startDate: dateRange.startDate,
@@ -81,10 +82,7 @@ export default function ConsolidatedPL() {
   });
 
   const handleRefresh = () => {
-    setForceRefresh(true);
-    setTimeout(() => {
-      refetch().then(() => setForceRefresh(false));
-    }, 100);
+    setRefreshCounter(c => c + 1);
   };
 
   const monthOptions = useMemo(() => {

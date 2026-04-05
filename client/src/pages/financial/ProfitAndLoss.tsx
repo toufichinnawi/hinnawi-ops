@@ -104,7 +104,8 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
     return { startDate: format(subMonths(new Date(), 1), "yyyy-MM-01"), endDate: format(new Date(), "yyyy-MM-dd") };
   }, [periodMode, selectedMonth, selectedFY, customStart, customEnd]);
 
-  const [forceRefresh, setForceRefresh] = useState(false);
+  const [refreshCounter, setRefreshCounter] = useState(0);
+  const forceRefresh = refreshCounter > 0;
 
   // Fetch P&L — ALWAYS request comparison and YoY data
   const { data: report, isLoading, error, refetch } = trpc.financialStatements.reports.profitAndLoss.useQuery({
@@ -121,10 +122,7 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
   const utils = trpc.useUtils();
 
   const handleRefresh = () => {
-    setForceRefresh(true);
-    setTimeout(() => {
-      refetch().then(() => setForceRefresh(false));
-    }, 100);
+    setRefreshCounter(c => c + 1);
   };
 
   // Generate month options (last 24 months)

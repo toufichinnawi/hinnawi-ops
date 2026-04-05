@@ -61,10 +61,18 @@ export default function ConsolidatedBS() {
     return opts;
   }, []);
 
+  const [refreshCounter, setRefreshCounter] = useState(0);
+  const forceRefresh = refreshCounter > 0;
+
   const { data: report, isLoading, error, refetch } = trpc.financialStatements.consolidated.balanceSheet.useQuery({
     asOfDate,
     eliminateIntercompany: eliminateIC,
+    forceRefresh,
   });
+
+  const handleRefresh = () => {
+    setRefreshCounter(c => c + 1);
+  };
 
   const toggleRow = (key: string) => {
     const next = new Set(expandedRows);
@@ -168,7 +176,7 @@ export default function ConsolidatedBS() {
 
             <div className="flex-1" />
 
-            <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-1 h-8">
+            <Button variant="outline" size="sm" onClick={handleRefresh} className="gap-1 h-8">
               <RefreshCw className="h-3 w-3" /> Refresh
             </Button>
             <Button variant="outline" size="sm" onClick={exportCsv} className="gap-1 h-8">

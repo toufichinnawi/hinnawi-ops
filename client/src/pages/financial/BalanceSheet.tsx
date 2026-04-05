@@ -61,12 +61,20 @@ export default function BalanceSheet({ entityId, locationId, entityName }: Props
   const asOfStr = format(asOfDate, "yyyy-MM-dd");
   const priorYearStr = format(subYears(asOfDate, 1), "yyyy-MM-dd");
 
+  const [refreshCounter, setRefreshCounter] = useState(0);
+  const forceRefresh = refreshCounter > 0;
+
   // Fetch Balance Sheet — always request comparison data
   const { data: report, isLoading, error, refetch } = trpc.financialStatements.reports.balanceSheet.useQuery({
     entityId,
     asOfDate: asOfStr,
     compareDate: priorYearStr,
+    forceRefresh,
   }, { enabled: !!entityId });
+
+  const handleRefresh = () => {
+    setRefreshCounter(c => c + 1);
+  };
 
   const utils = trpc.useUtils();
 
@@ -162,7 +170,7 @@ export default function BalanceSheet({ entityId, locationId, entityName }: Props
             </div>
 
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isLoading}>
+              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading}>
                 <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? "animate-spin" : ""}`} />
                 Refresh
               </Button>
