@@ -199,31 +199,64 @@ const PL_SECTION_MAP: Record<string, { category: string; subcategory: string | n
 
 /** Map QBO Balance Sheet section names to our standard categories */
 const BS_SECTION_MAP: Record<string, { category: string; subcategory: string | null }> = {
+  // ─── Top-level sections ───
   "ASSETS": { category: "Assets", subcategory: null },
   "Assets": { category: "Assets", subcategory: null },
+  "Total Assets": { category: "Assets", subcategory: null },
+  "LIABILITIES AND EQUITY": { category: "Liabilities", subcategory: null },
+  "Liabilities and Equity": { category: "Liabilities", subcategory: null },
+  "LIABILITIES": { category: "Liabilities", subcategory: null },
+  "Liabilities": { category: "Liabilities", subcategory: null },
+  "EQUITY": { category: "Equity", subcategory: "Equity" },
+  "Equity": { category: "Equity", subcategory: "Equity" },
+
+  // ─── Asset sub-sections ───
   "Current Assets": { category: "Assets", subcategory: null },
   "Bank": { category: "Assets", subcategory: "Cash" },
   "Bank Accounts": { category: "Assets", subcategory: "Cash" },
   "Cash and cash equivalents": { category: "Assets", subcategory: "Cash" },
+  "Cash and Cash Equivalents": { category: "Assets", subcategory: "Cash" },
+  "Chequing": { category: "Assets", subcategory: "Cash" },
+  "Checking": { category: "Assets", subcategory: "Cash" },
+  "Savings": { category: "Assets", subcategory: "Cash" },
   "Accounts Receivable": { category: "Assets", subcategory: "Accounts Receivable" },
   "Accounts receivable (A/R)": { category: "Assets", subcategory: "Accounts Receivable" },
+  "Accounts Receivable (A/R)": { category: "Assets", subcategory: "Accounts Receivable" },
   "Other Current Assets": { category: "Assets", subcategory: "Prepaids" },
+  "Other current assets": { category: "Assets", subcategory: "Prepaids" },
+  "Inventory": { category: "Assets", subcategory: "Inventory" },
+  "Inventory Asset": { category: "Assets", subcategory: "Inventory" },
   "Fixed Assets": { category: "Assets", subcategory: "Fixed Assets" },
+  "Fixed assets": { category: "Assets", subcategory: "Fixed Assets" },
   "Property, plant and equipment": { category: "Assets", subcategory: "Fixed Assets" },
+  "Property, Plant and Equipment": { category: "Assets", subcategory: "Fixed Assets" },
   "Other Assets": { category: "Assets", subcategory: null },
-  "LIABILITIES AND EQUITY": { category: "Liabilities", subcategory: null },
-  "Liabilities": { category: "Liabilities", subcategory: null },
+  "Other assets": { category: "Assets", subcategory: null },
+  "Non-current Assets": { category: "Assets", subcategory: "Fixed Assets" },
+
+  // ─── Liability sub-sections ───
   "Current Liabilities": { category: "Liabilities", subcategory: null },
+  "Current liabilities": { category: "Liabilities", subcategory: null },
   "Accounts Payable": { category: "Liabilities", subcategory: "Accounts Payable" },
   "Accounts payable (A/P)": { category: "Liabilities", subcategory: "Accounts Payable" },
+  "Accounts Payable (A/P)": { category: "Liabilities", subcategory: "Accounts Payable" },
   "Credit Cards": { category: "Liabilities", subcategory: "Credit Cards" },
   "Credit Card": { category: "Liabilities", subcategory: "Credit Cards" },
+  "Credit cards": { category: "Liabilities", subcategory: "Credit Cards" },
   "Other Current Liabilities": { category: "Liabilities", subcategory: null },
+  "Other current liabilities": { category: "Liabilities", subcategory: null },
   "Long-Term Liabilities": { category: "Liabilities", subcategory: "Debt" },
+  "Long-term Liabilities": { category: "Liabilities", subcategory: "Debt" },
+  "Long Term Liabilities": { category: "Liabilities", subcategory: "Debt" },
   "Non-Current Liabilities": { category: "Liabilities", subcategory: "Debt" },
-  "Equity": { category: "Equity", subcategory: "Equity" },
+  "Non-current Liabilities": { category: "Liabilities", subcategory: "Debt" },
+
+  // ─── Equity sub-sections ───
   "Stockholders' Equity": { category: "Equity", subcategory: "Equity" },
   "Owner's Equity": { category: "Equity", subcategory: "Equity" },
+  "Shareholders' Equity": { category: "Equity", subcategory: "Equity" },
+  "Share Capital": { category: "Equity", subcategory: "Equity" },
+  "Retained Earnings": { category: "Equity", subcategory: "Retained Earnings" },
 };
 
 /** Classify P&L accounts using section context + account name keyword matching */
@@ -310,12 +343,19 @@ function classifyPLAccount(accountName: string, section?: string, subSection?: s
   return sectionMapping || { category: baseCategory, subcategory: null };
 }
 
+/**
+ * Enhanced Balance Sheet account classifier.
+ * Uses a three-tier approach:
+ *   1. Sub-section mapping (most specific)
+ *   2. Section mapping (fallback)
+ *   3. Account name keyword matching (final fallback)
+ * Then refines the subcategory based on account name keywords.
+ */
 function classifyBSAccount(accountName: string, section?: string, subSection?: string): { category: string; subcategory: string | null } {
   // Try sub-section first for more specific classification
   if (subSection) {
     const subMapping = BS_SECTION_MAP[subSection];
     if (subMapping) {
-      // Even with sub-section mapping, try to refine subcategory from account name
       return refineBSSubcategory(accountName, subMapping);
     }
   }
@@ -325,55 +365,148 @@ function classifyBSAccount(accountName: string, section?: string, subSection?: s
     if (sectionMapping) {
       return refineBSSubcategory(accountName, sectionMapping);
     }
+    // Case-insensitive fallback: try matching section name case-insensitively
+    const sectionLower = section.toLowerCase();
+    for (const [key, val] of Object.entries(BS_SECTION_MAP)) {
+      if (key.toLowerCase() === sectionLower) {
+        return refineBSSubcategory(accountName, val);
+      }
+    }
   }
   // Final fallback: classify from account name alone
+  return classifyBSAccountByName(accountName);
+}
+
+/**
+ * Classify a BS account purely from its name when no section context is available.
+ */
+function classifyBSAccountByName(accountName: string): { category: string; subcategory: string | null } {
   const name = accountName.toLowerCase();
-  if (name.includes("cash") || name.includes("bank") || name.includes("chequing")) return { category: "Assets", subcategory: "Cash" };
-  if (name.includes("receivable")) return { category: "Assets", subcategory: "Accounts Receivable" };
-  if (name.includes("inventory")) return { category: "Assets", subcategory: "Inventory" };
-  if (name.includes("payable")) return { category: "Liabilities", subcategory: "Accounts Payable" };
-  if (name.includes("equity") || name.includes("retained")) return { category: "Equity", subcategory: "Equity" };
+
+  // ─── Assets ───
+  if (name.includes("cash") || name.includes("bank") || name.includes("chequing") || name.includes("checking") || name.includes("savings") || name.includes("petty cash") || name.includes("caisse")) {
+    return { category: "Assets", subcategory: "Cash" };
+  }
+  if (name.includes("receivable") || name.includes("a/r") || name.includes("accounts rec")) {
+    return { category: "Assets", subcategory: "Accounts Receivable" };
+  }
+  if (name.includes("inventory") || name.includes("stock") || name.includes("merchandise")) {
+    return { category: "Assets", subcategory: "Inventory" };
+  }
+  if (name.includes("prepaid") || name.includes("deposit") || name.includes("advance") || name.includes("security deposit")) {
+    return { category: "Assets", subcategory: "Prepaids" };
+  }
+  if (name.includes("accumulated depreciation") || name.includes("accum. depreciation") || name.includes("accum depreciation") || name.includes("amortissement cumul")) {
+    return { category: "Assets", subcategory: "Accumulated Depreciation" };
+  }
+  if (name.includes("equipment") || name.includes("furniture") || name.includes("leasehold") || name.includes("vehicle") || name.includes("computer") || name.includes("machinery") || name.includes("building") || name.includes("land") || name.includes("fixed asset") || name.includes("capital asset") || name.includes("immobilisation") || name.includes("right-of-use") || name.includes("tenant improvement")) {
+    return { category: "Assets", subcategory: "Fixed Assets" };
+  }
+
+  // ─── Liabilities ───
+  if (name.includes("accounts payable") || name.includes("a/p") || name.includes("trade payable")) {
+    return { category: "Liabilities", subcategory: "Accounts Payable" };
+  }
+  if (name.includes("credit card") || name.includes("visa") || name.includes("mastercard") || name.includes("amex") || name.includes("american express")) {
+    return { category: "Liabilities", subcategory: "Credit Cards" };
+  }
+  if (name.includes("sales tax") || name.includes("gst") || name.includes("qst") || name.includes("hst") || name.includes("tps") || name.includes("tvq") || name.includes("pst") || name.includes("vat") || name.includes("tax payable") || name.includes("tax collected") || name.includes("input tax") || name.includes("output tax")) {
+    return { category: "Liabilities", subcategory: "Sales Taxes" };
+  }
+  if (name.includes("payroll liabilit") || name.includes("ei ") || name.includes("cpp") || name.includes("qpip") || name.includes("source deduction") || name.includes("employee deduction") || name.includes("vacation payable") || name.includes("rqap") || name.includes("rrq") || name.includes("fss") || name.includes("cnt") || name.includes("csst") || name.includes("cnesst") || name.includes("workers comp") || name.includes("health tax") || name.includes("eht")) {
+    return { category: "Liabilities", subcategory: "Payroll Liabilities" };
+  }
+  if (name.includes("shareholder") || name.includes("director") || name.includes("due to") || name.includes("due from") || name.includes("related party") || name.includes("owner") || name.includes("actionnaire")) {
+    return { category: "Liabilities", subcategory: "Shareholder Loans" };
+  }
+  if (name.includes("loan") || name.includes("mortgage") || name.includes("note payable") || name.includes("line of credit") || name.includes("loc ") || name.includes("long-term") || name.includes("long term") || name.includes("financing") || name.includes("ceba") || name.includes("bdc") || name.includes("debenture")) {
+    return { category: "Liabilities", subcategory: "Debt" };
+  }
+  if (name.includes("payable") || name.includes("accrued") || name.includes("deferred revenue") || name.includes("unearned") || name.includes("gift card") || name.includes("customer deposit")) {
+    return { category: "Liabilities", subcategory: null };
+  }
+
+  // ─── Equity ───
+  if (name.includes("retained earnings") || name.includes("net income") || name.includes("bénéfices non répartis") || name.includes("profit") || name.includes("accumulated")) {
+    return { category: "Equity", subcategory: "Retained Earnings" };
+  }
+  if (name.includes("equity") || name.includes("capital") || name.includes("common share") || name.includes("preferred share") || name.includes("contributed surplus") || name.includes("opening balance") || name.includes("owner") || name.includes("draw") || name.includes("distribution") || name.includes("dividend")) {
+    return { category: "Equity", subcategory: "Equity" };
+  }
+
   return { category: "Uncategorized", subcategory: null };
 }
 
+/**
+ * Refine the subcategory of a BS account based on its name,
+ * given a base mapping from the section context.
+ * This is the most comprehensive keyword matcher for BS accounts.
+ */
 function refineBSSubcategory(accountName: string, baseMapping: { category: string; subcategory: string | null }): { category: string; subcategory: string | null } {
   const name = accountName.toLowerCase();
+
+  // ─── Assets refinement ───
   if (baseMapping.category === "Assets") {
-    if (name.includes("cash") || name.includes("chequing") || name.includes("checking") || name.includes("savings") || name.includes("bank")) {
+    if (name.includes("cash") || name.includes("chequing") || name.includes("checking") || name.includes("savings") || name.includes("bank") || name.includes("petty cash") || name.includes("caisse")) {
       return { category: "Assets", subcategory: "Cash" };
     }
-    if (name.includes("receivable")) return { category: "Assets", subcategory: "Accounts Receivable" };
-    if (name.includes("inventory")) return { category: "Assets", subcategory: "Inventory" };
-    if (name.includes("prepaid")) return { category: "Assets", subcategory: "Prepaids" };
-    if (name.includes("accumulated depreciation") || name.includes("accum. depreciation")) {
+    if (name.includes("receivable") || name.includes("a/r")) {
+      return { category: "Assets", subcategory: "Accounts Receivable" };
+    }
+    if (name.includes("inventory") || name.includes("stock") || name.includes("merchandise")) {
+      return { category: "Assets", subcategory: "Inventory" };
+    }
+    if (name.includes("prepaid") || name.includes("deposit") || name.includes("advance") || name.includes("security deposit")) {
+      return { category: "Assets", subcategory: "Prepaids" };
+    }
+    if (name.includes("accumulated depreciation") || name.includes("accum. depreciation") || name.includes("accum depreciation") || name.includes("amortissement cumul")) {
       return { category: "Assets", subcategory: "Accumulated Depreciation" };
     }
-    if (name.includes("equipment") || name.includes("furniture") || name.includes("leasehold") || name.includes("vehicle") || name.includes("computer")) {
+    if (name.includes("equipment") || name.includes("furniture") || name.includes("leasehold") || name.includes("vehicle") || name.includes("computer") || name.includes("machinery") || name.includes("building") || name.includes("land") || name.includes("capital asset") || name.includes("immobilisation") || name.includes("right-of-use") || name.includes("tenant improvement")) {
       return { category: "Assets", subcategory: "Fixed Assets" };
     }
+    // If we have a subcategory from the section, use it; otherwise return base
+    return baseMapping.subcategory ? baseMapping : { category: "Assets", subcategory: baseMapping.subcategory };
   }
+
+  // ─── Liabilities refinement ───
   if (baseMapping.category === "Liabilities") {
-    if (name.includes("payable") && !name.includes("note payable")) return { category: "Liabilities", subcategory: "Accounts Payable" };
-    if (name.includes("credit card")) return { category: "Liabilities", subcategory: "Credit Cards" };
-    if (name.includes("sales tax") || name.includes("gst") || name.includes("qst") || name.includes("hst") || name.includes("tps") || name.includes("tvq")) {
+    if ((name.includes("payable") || name.includes("a/p") || name.includes("trade payable")) && !name.includes("note payable") && !name.includes("tax payable") && !name.includes("payroll")) {
+      return { category: "Liabilities", subcategory: "Accounts Payable" };
+    }
+    if (name.includes("credit card") || name.includes("visa") || name.includes("mastercard") || name.includes("amex")) {
+      return { category: "Liabilities", subcategory: "Credit Cards" };
+    }
+    if (name.includes("sales tax") || name.includes("gst") || name.includes("qst") || name.includes("hst") || name.includes("tps") || name.includes("tvq") || name.includes("pst") || name.includes("vat") || name.includes("tax payable") || name.includes("tax collected") || name.includes("input tax") || name.includes("output tax")) {
       return { category: "Liabilities", subcategory: "Sales Taxes" };
     }
-    if (name.includes("payroll") || name.includes("ei ") || name.includes("cpp") || name.includes("qpip") || name.includes("source deduction")) {
+    if (name.includes("payroll") || name.includes("ei ") || name.includes("cpp") || name.includes("qpip") || name.includes("source deduction") || name.includes("employee deduction") || name.includes("vacation payable") || name.includes("rqap") || name.includes("rrq") || name.includes("fss") || name.includes("cnt") || name.includes("csst") || name.includes("cnesst") || name.includes("workers comp") || name.includes("health tax") || name.includes("eht")) {
       return { category: "Liabilities", subcategory: "Payroll Liabilities" };
     }
-    if (name.includes("shareholder") || name.includes("director") || name.includes("due to")) {
+    if (name.includes("shareholder") || name.includes("director") || name.includes("due to") || name.includes("due from") || name.includes("related party") || name.includes("actionnaire")) {
       return { category: "Liabilities", subcategory: "Shareholder Loans" };
     }
-    if (name.includes("loan") || name.includes("mortgage") || name.includes("note payable") || name.includes("line of credit")) {
+    if (name.includes("loan") || name.includes("mortgage") || name.includes("note payable") || name.includes("line of credit") || name.includes("loc ") || name.includes("long-term") || name.includes("long term") || name.includes("financing") || name.includes("ceba") || name.includes("bdc") || name.includes("debenture")) {
       return { category: "Liabilities", subcategory: "Debt" };
     }
+    // Return base mapping if we have a subcategory, otherwise null
+    return baseMapping;
   }
+
+  // ─── Equity refinement ───
   if (baseMapping.category === "Equity") {
-    if (name.includes("retained earnings") || name.includes("net income")) {
+    if (name.includes("retained earnings") || name.includes("net income") || name.includes("bénéfices non répartis") || name.includes("accumulated")) {
       return { category: "Equity", subcategory: "Retained Earnings" };
+    }
+    if (name.includes("opening balance equity") || name.includes("opening bal equity")) {
+      return { category: "Equity", subcategory: "Equity" };
+    }
+    if (name.includes("draw") || name.includes("distribution") || name.includes("dividend")) {
+      return { category: "Equity", subcategory: "Equity" };
     }
     return { category: "Equity", subcategory: "Equity" };
   }
+
   return baseMapping;
 }
 

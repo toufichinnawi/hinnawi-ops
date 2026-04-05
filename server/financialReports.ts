@@ -188,15 +188,15 @@ function aggregateCategoryRemainder(
   const allAccounts: Array<{ accountId?: string; accountName: string; amount: number }> = [];
   let found = false;
 
-  for (const [key, data] of mapped.entries()) {
-    if (!key.startsWith(category + "::")) continue;
+  Array.from(mapped.entries()).forEach(([key, data]) => {
+    if (!key.startsWith(category + "::")) return;
     const subcat = key.substring(category.length + 2) || null;
     // Skip entries that have their own dedicated line definition
-    if (subcat && specificSubcats.has(subcat)) continue;
+    if (subcat && specificSubcats.has(subcat)) return;
     total += data.amount;
     allAccounts.push(...data.accounts);
     found = true;
-  }
+  });
 
   if (!found) return undefined;
   return {
@@ -245,7 +245,7 @@ function buildLines(
     const key = `${def.category}::${def.subcategory || ""}`;
     
     // For detail rows with subcategory=null, aggregate ALL subcategories for that category
-    // This ensures Revenue::, COGS::, etc. collect all their sub-entries
+    // This ensures Revenue::, COGS::, Assets::, Liabilities::, etc. collect all their sub-entries
     let currentData: MappedLine | undefined;
     let priorData: MappedLine | undefined;
     let priorYearData: MappedLine | undefined;
@@ -371,11 +371,25 @@ function buildLines(
   }
 
   // Add unmapped categories that aren't in line definitions
+  // Track which category::subcategory keys are already covered by line definitions
+  const definedKeys = new Set(lineDefinitions.map(d => `${d.category}::${d.subcategory || ""}`));
+  
+  // Also track categories that have a null-subcategory detail line (catch-all)
+  const categoriesWithCatchAll = new Set(
+    lineDefinitions
+      .filter(d => d.lineType === "detail" && !d.subcategory)
+      .map(d => d.category)
+  );
+
   Array.from(currentMapped.entries()).forEach(([key, data]) => {
     if (usedKeys.has(key)) return;
-    // Check if this key matches any definition
-    const matchesDef = lineDefinitions.some(d => `${d.category}::${d.subcategory || ""}` === key);
-    if (matchesDef) return;
+    // Check if this key matches any definition directly
+    if (definedKeys.has(key)) return;
+    
+    // Check if this key's category has a catch-all detail line (subcategory=null)
+    // If so, the data is already aggregated into that catch-all line
+    const category = data.category;
+    if (categoriesWithCatchAll.has(category)) return;
 
     const priorData = priorMapped?.get(key);
     const priorYearData = priorYearMapped?.get(key);

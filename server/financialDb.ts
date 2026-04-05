@@ -287,11 +287,55 @@ export async function getFsLineDefinitions(statementType: "profit_loss" | "balan
     .orderBy(asc(fsLineDefinitions.sortOrder));
 }
 
+/**
+ * Ensure the BS catch-all "Other" lines exist.
+ * This is needed for existing deployments that were seeded before these lines were added.
+ * Safe to call multiple times — it only inserts if the specific lines are missing.
+ */
+export async function ensureBSCatchAllLines() {
+  const db = await getDb();
+  if (!db) return;
+  const bsLines = await db.select().from(fsLineDefinitions)
+    .where(eq(fsLineDefinitions.statementType, "balance_sheet"))
+    .orderBy(asc(fsLineDefinitions.sortOrder));
+  if (bsLines.length === 0) return; // Not yet seeded, seedDefaultLineDefinitions will handle it
+
+  // Check if "Other Assets" catch-all detail line exists
+  const hasOtherAssets = bsLines.some(l => l.category === "Assets" && !l.subcategory && l.lineType === "detail");
+  if (!hasOtherAssets) {
+    await db.insert(fsLineDefinitions).values({
+      statementType: "balance_sheet",
+      category: "Assets",
+      subcategory: null,
+      displayLabel: "Other Assets",
+      lineType: "detail",
+      sortOrder: 160,
+    });
+  }
+
+  // Check if "Other Liabilities" catch-all detail line exists
+  const hasOtherLiabilities = bsLines.some(l => l.category === "Liabilities" && !l.subcategory && l.lineType === "detail");
+  if (!hasOtherLiabilities) {
+    await db.insert(fsLineDefinitions).values({
+      statementType: "balance_sheet",
+      category: "Liabilities",
+      subcategory: null,
+      displayLabel: "Other Liabilities",
+      lineType: "detail",
+      sortOrder: 260,
+    });
+  }
+}
+
 export async function seedDefaultLineDefinitions() {
   const db = await getDb();
   if (!db) return;
   const existing = await db.select().from(fsLineDefinitions).limit(1);
-  if (existing.length > 0) return;
+  if (existing.length > 0) {
+    // Even if already seeded, ensure the new catch-all lines exist
+    await ensureBSCatchAllLines();
+    return;
+  }
 
   const plLines = [
     { category: "Revenue", subcategory: null, displayLabel: "Sales", lineType: "detail" as const, sortOrder: 100 },
@@ -323,6 +367,7 @@ export async function seedDefaultLineDefinitions() {
     { category: "Assets", subcategory: "Prepaids", displayLabel: "Prepaids", lineType: "detail" as const, sortOrder: 130 },
     { category: "Assets", subcategory: "Fixed Assets", displayLabel: "Fixed Assets", lineType: "detail" as const, sortOrder: 140 },
     { category: "Assets", subcategory: "Accumulated Depreciation", displayLabel: "Accumulated Depreciation", lineType: "detail" as const, sortOrder: 150 },
+    { category: "Assets", subcategory: null, displayLabel: "Other Assets", lineType: "detail" as const, sortOrder: 160 },
     { category: "Assets", subcategory: null, displayLabel: "Total Assets", lineType: "subtotal" as const, sortOrder: 199 },
     { category: "Liabilities", subcategory: "Accounts Payable", displayLabel: "Accounts Payable", lineType: "detail" as const, sortOrder: 200 },
     { category: "Liabilities", subcategory: "Credit Cards", displayLabel: "Credit Cards", lineType: "detail" as const, sortOrder: 210 },
@@ -330,6 +375,7 @@ export async function seedDefaultLineDefinitions() {
     { category: "Liabilities", subcategory: "Payroll Liabilities", displayLabel: "Payroll Liabilities", lineType: "detail" as const, sortOrder: 230 },
     { category: "Liabilities", subcategory: "Shareholder Loans", displayLabel: "Shareholder Loans", lineType: "detail" as const, sortOrder: 240 },
     { category: "Liabilities", subcategory: "Debt", displayLabel: "Debt", lineType: "detail" as const, sortOrder: 250 },
+    { category: "Liabilities", subcategory: null, displayLabel: "Other Liabilities", lineType: "detail" as const, sortOrder: 260 },
     { category: "Liabilities", subcategory: null, displayLabel: "Total Liabilities", lineType: "subtotal" as const, sortOrder: 299 },
     { category: "Equity", subcategory: "Equity", displayLabel: "Equity", lineType: "detail" as const, sortOrder: 300 },
     { category: "Equity", subcategory: "Retained Earnings", displayLabel: "Retained Earnings", lineType: "detail" as const, sortOrder: 310 },
