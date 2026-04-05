@@ -30,6 +30,24 @@ function getFiscalYearDates(year: number) {
   };
 }
 
+/** Fiscal quarters based on Sep 1 fiscal year start */
+function getFiscalQuarterDates(fiscalYear: number, quarter: 1 | 2 | 3 | 4) {
+  switch (quarter) {
+    case 1: return { start: `${fiscalYear}-09-01`, end: `${fiscalYear}-11-30` };
+    case 2: return { start: `${fiscalYear}-12-01`, end: `${fiscalYear + 1}-02-${new Date(fiscalYear + 1, 2, 0).getDate()}` };
+    case 3: return { start: `${fiscalYear + 1}-03-01`, end: `${fiscalYear + 1}-05-31` };
+    case 4: return { start: `${fiscalYear + 1}-06-01`, end: `${fiscalYear + 1}-08-31` };
+  }
+}
+
+function getCurrentFiscalQuarter(): 1 | 2 | 3 | 4 {
+  const month = new Date().getMonth() + 1;
+  if (month >= 9 && month <= 11) return 1;
+  if (month >= 12 || month <= 2) return 2;
+  if (month >= 3 && month <= 5) return 3;
+  return 4;
+}
+
 function getCurrentFiscalYear() {
   const now = new Date();
   return now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
@@ -69,7 +87,7 @@ function downloadBlob(content: string, filename: string, mimeType: string) {
   URL.revokeObjectURL(url);
 }
 
-type PeriodMode = "monthly" | "yearly" | "custom";
+type PeriodMode = "monthly" | "quarterly" | "yearly" | "custom";
 
 export default function ProfitAndLoss({ entityId, locationId, entityName }: Props) {
   const currentFY = getCurrentFiscalYear();
@@ -79,6 +97,8 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
     return format(subMonths(now, 1), "yyyy-MM");
   });
   const [selectedFY, setSelectedFY] = useState(currentFY);
+  const [selectedQuarter, setSelectedQuarter] = useState<1 | 2 | 3 | 4>(getCurrentFiscalQuarter());
+  const [selectedQuarterFY, setSelectedQuarterFY] = useState(currentFY);
   const [customStart, setCustomStart] = useState<Date | undefined>(undefined);
   const [customEnd, setCustomEnd] = useState<Date | undefined>(undefined);
   const [includeShared, setIncludeShared] = useState(false);
@@ -93,6 +113,9 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
       const lastDay = new Date(y, m, 0).getDate();
       const end = `${y}-${String(m).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
       return { startDate: start, endDate: end };
+    } else if (periodMode === "quarterly") {
+      const q = getFiscalQuarterDates(selectedQuarterFY, selectedQuarter);
+      return { startDate: q.start, endDate: q.end };
     } else if (periodMode === "yearly") {
       const fy = getFiscalYearDates(selectedFY);
       return { startDate: fy.start, endDate: fy.end };
@@ -103,7 +126,7 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
       };
     }
     return { startDate: format(subMonths(new Date(), 1), "yyyy-MM-01"), endDate: format(new Date(), "yyyy-MM-dd") };
-  }, [periodMode, selectedMonth, selectedFY, customStart, customEnd]);
+  }, [periodMode, selectedMonth, selectedFY, selectedQuarter, selectedQuarterFY, customStart, customEnd]);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -252,6 +275,7 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="quarterly">Quarterly</SelectItem>
                   <SelectItem value="yearly">Yearly</SelectItem>
                   <SelectItem value="custom">Custom Range</SelectItem>
                 </SelectContent>
@@ -270,6 +294,33 @@ export default function ProfitAndLoss({ entityId, locationId, entityName }: Prop
                   ))}
                 </SelectContent>
               </Select>
+            )}
+
+            {/* Quarter Selector */}
+            {periodMode === "quarterly" && (
+              <div className="flex items-center gap-2">
+                <Select value={selectedQuarterFY.toString()} onValueChange={(v) => setSelectedQuarterFY(Number(v))}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {fyOptions.map(fy => (
+                      <SelectItem key={fy.value} value={fy.value.toString()}>FY {fy.value}/{fy.value + 1}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={selectedQuarter.toString()} onValueChange={(v) => setSelectedQuarter(Number(v) as 1 | 2 | 3 | 4)}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Q1 (Sep – Nov)</SelectItem>
+                    <SelectItem value="2">Q2 (Dec – Feb)</SelectItem>
+                    <SelectItem value="3">Q3 (Mar – May)</SelectItem>
+                    <SelectItem value="4">Q4 (Jun – Aug)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             )}
 
             {/* FY Selector */}

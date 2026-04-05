@@ -173,7 +173,7 @@ export default function BalanceSheet({ entityId, locationId, entityName }: Props
               </Popover>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button variant="ghost" size="sm" onClick={() => setAsOfDate(new Date())}>Today</Button>
               <Button variant="ghost" size="sm" onClick={() => {
                 const now = new Date();
@@ -183,6 +183,22 @@ export default function BalanceSheet({ entityId, locationId, entityName }: Props
                 setAsOfDate(fyEnd);
               }}>Last FY End</Button>
               <Button variant="ghost" size="sm" onClick={() => setAsOfDate(subYears(new Date(), 1))}>1 Year Ago</Button>
+              <Separator orientation="vertical" className="h-6" />
+              <span className="text-xs text-muted-foreground">Quarter Ends:</span>
+              {(() => {
+                const now = new Date();
+                const fy = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+                return [
+                  { label: "Q1", date: new Date(fy, 10, 30) },
+                  { label: "Q2", date: new Date(fy + 1, 1, new Date(fy + 1, 2, 0).getDate()) },
+                  { label: "Q3", date: new Date(fy + 1, 4, 31) },
+                  { label: "Q4", date: new Date(fy + 1, 7, 31) },
+                ].filter(q => q.date <= now).map(q => (
+                  <Button key={q.label} variant="ghost" size="sm" className="text-xs h-7 px-2" onClick={() => setAsOfDate(q.date)}>
+                    {q.label} ({format(q.date, "MMM d")})
+                  </Button>
+                ));
+              })()}
             </div>
 
             <Separator orientation="vertical" className="h-8" />

@@ -43,22 +43,49 @@ export default function ConsolidatedBS() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const dateOptions = useMemo(() => {
-    const opts = [];
+    const opts: Array<{ value: string; label: string; group?: string }> = [];
     const now = new Date();
-    opts.push({ value: format(now, "yyyy-MM-dd"), label: `Today (${format(now, "MMM d, yyyy")})` });
+    const curFY = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+
+    // Today
+    opts.push({ value: format(now, "yyyy-MM-dd"), label: `Today (${format(now, "MMM d, yyyy")})`, group: "Quick" });
+
+    // Fiscal year ends (last 3 FYs)
+    for (let fy = curFY; fy >= curFY - 2; fy--) {
+      opts.push({ value: `${fy + 1}-08-31`, label: `FY ${fy}/${fy + 1} End (Aug 31, ${fy + 1})`, group: "Fiscal Year End" });
+    }
+
+    // Quarter ends for current and prior FY
+    for (let fy = curFY; fy >= curFY - 1; fy--) {
+      const q1End = `${fy}-11-30`;
+      const febDays = new Date(fy + 1, 2, 0).getDate();
+      const q2End = `${fy + 1}-02-${String(febDays).padStart(2, "0")}`;
+      const q3End = `${fy + 1}-05-31`;
+      const q4End = `${fy + 1}-08-31`;
+      const quarters = [
+        { value: q1End, label: `FY ${fy}/${fy + 1} Q1 End (Nov 30, ${fy})` },
+        { value: q2End, label: `FY ${fy}/${fy + 1} Q2 End (Feb ${febDays}, ${fy + 1})` },
+        { value: q3End, label: `FY ${fy}/${fy + 1} Q3 End (May 31, ${fy + 1})` },
+        { value: q4End, label: `FY ${fy}/${fy + 1} Q4 End (Aug 31, ${fy + 1})` },
+      ];
+      for (const q of quarters) {
+        // Only add if date is in the past and not already in the list
+        if (new Date(q.value) <= now && !opts.find(o => o.value === q.value)) {
+          opts.push({ ...q, group: "Quarter End" });
+        }
+      }
+    }
+
+    // Monthly end-of-month (last 12 months)
     for (let i = 1; i <= 12; i++) {
       const d = subMonths(now, i);
       const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-      opts.push({
-        value: format(lastDay, "yyyy-MM-dd"),
-        label: `End of ${format(lastDay, "MMMM yyyy")}`,
-      });
+      const val = format(lastDay, "yyyy-MM-dd");
+      if (!opts.find(o => o.value === val)) {
+        opts.push({ value: val, label: `End of ${format(lastDay, "MMMM yyyy")}`, group: "Month End" });
+      }
     }
-    // Add fiscal year ends
-    const curYear = now.getFullYear();
-    for (let y = curYear; y >= curYear - 2; y--) {
-      opts.push({ value: `${y}-08-31`, label: `FY End Aug 31, ${y}` });
-    }
+
     return opts;
   }, []);
 

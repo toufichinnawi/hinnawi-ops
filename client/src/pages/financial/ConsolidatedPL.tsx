@@ -9,15 +9,35 @@ import { Separator } from "@/components/ui/separator";
 import {
   Download, RefreshCw, TrendingUp, TrendingDown,
   ChevronDown, ChevronRight, Loader2, AlertTriangle,
-  Building2, Eye, EyeOff, FileSpreadsheet,
+  Building2, Eye, EyeOff, FileSpreadsheet, Calendar as CalendarIcon,
 } from "lucide-react";
 import { format, subMonths } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
 
-type PeriodMode = "monthly" | "yearly" | "custom";
+type PeriodMode = "monthly" | "quarterly" | "yearly" | "custom";
 
 function getFiscalYearDates(year: number) {
   return { start: `${year}-09-01`, end: `${year + 1}-08-31` };
+}
+
+/** Fiscal quarters based on Sep 1 fiscal year start */
+function getFiscalQuarterDates(fiscalYear: number, quarter: 1 | 2 | 3 | 4) {
+  switch (quarter) {
+    case 1: return { start: `${fiscalYear}-09-01`, end: `${fiscalYear}-11-30` };
+    case 2: return { start: `${fiscalYear}-12-01`, end: `${fiscalYear + 1}-02-${new Date(fiscalYear + 1, 2, 0).getDate()}` };
+    case 3: return { start: `${fiscalYear + 1}-03-01`, end: `${fiscalYear + 1}-05-31` };
+    case 4: return { start: `${fiscalYear + 1}-06-01`, end: `${fiscalYear + 1}-08-31` };
+  }
+}
+
+function getCurrentFiscalQuarter(): 1 | 2 | 3 | 4 {
+  const month = new Date().getMonth() + 1; // 1-12
+  if (month >= 9 && month <= 11) return 1;
+  if (month >= 12 || month <= 2) return 2;
+  if (month >= 3 && month <= 5) return 3;
+  return 4;
 }
 
 function getCurrentFiscalYear() {
@@ -52,6 +72,10 @@ export default function ConsolidatedPL() {
   const [periodMode, setPeriodMode] = useState<PeriodMode>("monthly");
   const [selectedMonth, setSelectedMonth] = useState(() => format(subMonths(new Date(), 1), "yyyy-MM"));
   const [selectedFY, setSelectedFY] = useState(currentFY);
+  const [selectedQuarter, setSelectedQuarter] = useState<1 | 2 | 3 | 4>(getCurrentFiscalQuarter());
+  const [selectedQuarterFY, setSelectedQuarterFY] = useState(currentFY);
+  const [customStart, setCustomStart] = useState<Date | undefined>(undefined);
+  const [customEnd, setCustomEnd] = useState<Date | undefined>(undefined);
   const [eliminateIC, setEliminateIC] = useState(true);
   const [showEntityBreakdown, setShowEntityBreakdown] = useState(false);
   const [showEliminations, setShowEliminations] = useState(false);
@@ -64,12 +88,17 @@ export default function ConsolidatedPL() {
       const lastDay = new Date(y, m, 0).getDate();
       const end = `${y}-${String(m).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
       return { startDate: start, endDate: end };
+    } else if (periodMode === "quarterly") {
+      const q = getFiscalQuarterDates(selectedQuarterFY, selectedQuarter);
+      return { startDate: q.start, endDate: q.end };
     } else if (periodMode === "yearly") {
       const fy = getFiscalYearDates(selectedFY);
       return { startDate: fy.start, endDate: fy.end };
+    } else if (periodMode === "custom" && customStart && customEnd) {
+      return { startDate: format(customStart, "yyyy-MM-dd"), endDate: format(customEnd, "yyyy-MM-dd") };
     }
     return { startDate: format(subMonths(new Date(), 1), "yyyy-MM-01"), endDate: format(new Date(), "yyyy-MM-dd") };
-  }, [periodMode, selectedMonth, selectedFY]);
+  }, [periodMode, selectedMonth, selectedFY, selectedQuarter, selectedQuarterFY, customStart, customEnd]);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -197,10 +226,10 @@ export default function ConsolidatedPL() {
         <CardContent className="py-4">
           <div className="flex flex-wrap items-center gap-4">
             {/* Period selector */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-medium">Period:</span>
               <div className="flex border rounded-md overflow-hidden">
-                {(["monthly", "yearly"] as PeriodMode[]).map((mode) => (
+                {(["monthly", "quarterly", "yearly", "custom"] as PeriodMode[]).map((mode) => (
                   <button
                     key={mode}
                     onClick={() => setPeriodMode(mode)}
@@ -208,7 +237,7 @@ export default function ConsolidatedPL() {
                       periodMode === mode ? "bg-primary text-primary-foreground" : "bg-background hover:bg-muted"
                     }`}
                   >
-                    {mode === "monthly" ? "Monthly" : "Yearly"}
+                    {mode === "monthly" ? "Monthly" : mode === "quarterly" ? "Quarterly" : mode === "yearly" ? "Yearly" : "Custom"}
                   </button>
                 ))}
               </div>
@@ -224,17 +253,69 @@ export default function ConsolidatedPL() {
                   </SelectContent>
                 </Select>
               )}
+              {periodMode === "quarterly" && (
+                <>
+                  <Select value={selectedQuarterFY.toString()} onValueChange={(v) => setSelectedQuarterFY(Number(v))}>
+                    <SelectTrigger className="w-[140px] h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[currentFY, currentFY - 1, currentFY - 2].map((y) => (
+                        <SelectItem key={y} value={y.toString()}>FY {y}/{y + 1}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={selectedQuarter.toString()} onValueChange={(v) => setSelectedQuarter(Number(v) as 1 | 2 | 3 | 4)}>
+                    <SelectTrigger className="w-[200px] h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Q1 (Sep – Nov)</SelectItem>
+                      <SelectItem value="2">Q2 (Dec – Feb)</SelectItem>
+                      <SelectItem value="3">Q3 (Mar – May)</SelectItem>
+                      <SelectItem value="4">Q4 (Jun – Aug)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </>
+              )}
               {periodMode === "yearly" && (
                 <Select value={selectedFY.toString()} onValueChange={(v) => setSelectedFY(Number(v))}>
-                  <SelectTrigger className="w-[140px] h-8 text-xs">
+                  <SelectTrigger className="w-[200px] h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {[currentFY, currentFY - 1, currentFY - 2].map((y) => (
-                      <SelectItem key={y} value={y.toString()}>FY {y}/{y + 1}</SelectItem>
+                      <SelectItem key={y} value={y.toString()}>FY {y}/{y + 1} (Sep {y} – Aug {y + 1})</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+              )}
+              {periodMode === "custom" && (
+                <div className="flex items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="h-8 text-xs w-[150px] justify-start">
+                        <CalendarIcon className="mr-2 h-3 w-3" />
+                        {customStart ? format(customStart, "MMM d, yyyy") : "Start date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={customStart} onSelect={setCustomStart} />
+                    </PopoverContent>
+                  </Popover>
+                  <span className="text-xs text-muted-foreground">to</span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="h-8 text-xs w-[150px] justify-start">
+                        <CalendarIcon className="mr-2 h-3 w-3" />
+                        {customEnd ? format(customEnd, "MMM d, yyyy") : "End date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={customEnd} onSelect={setCustomEnd} />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               )}
             </div>
 
