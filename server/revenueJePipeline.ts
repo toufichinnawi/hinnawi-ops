@@ -163,7 +163,9 @@ export interface ExistingRevenueJE {
 
 /**
  * Query all existing revenue JEs in production QBO for a date range.
- * Searches for JEs with DocNumber starting with "REV-".
+ * Option C: Finds ALL journal entries that touch a Sales account (name contains "Sales")
+ * within the date range, regardless of DocNumber. This catches both manual JEs
+ * (e.g., "01March RevenueMK") and automated ones (e.g., "REVPK260405").
  */
 export async function queryExistingRevenueJEs(
   startDate: string,
@@ -174,23 +176,40 @@ export async function queryExistingRevenueJEs(
 
   for (const realmId of uniqueRealms) {
     try {
+      // First, resolve the Sales account name for this realm
+      const accounts = await prodQbo.getProductionAccounts(realmId);
+      const salesAccounts = accounts.filter((a: { Name: string; AccountType: string }) =>
+        a.Name.toLowerCase().includes("sales") && a.AccountType === "Income"
+      );
+      const salesAccountIds = new Set(salesAccounts.map((a: { Id: string }) => a.Id));
+      const salesAccountNames = salesAccounts.map((a: { Name: string }) => a.Name);
+      console.log(`  Realm ${realmId}: Sales accounts found: ${salesAccountNames.join(", ")}`);
+
       const entries = await prodQbo.getJournalEntriesByDateRange(realmId, startDate, endDate);
 
       for (const entry of entries) {
-        const docNumber = entry.DocNumber || "";
-        if (docNumber.startsWith("REV-")) {
+        // Check if ANY line in this JE touches a Sales account
+        const lines = entry.Line || [];
+        const touchesSales = lines.some((line: any) => {
+          const detail = line.JournalEntryLineDetail;
+          if (!detail || !detail.AccountRef) return false;
+          return salesAccountIds.has(detail.AccountRef.value);
+        });
+
+        if (touchesSales) {
           allJEs.push({
             realmId,
             jeId: entry.Id,
             syncToken: entry.SyncToken,
-            docNumber,
+            docNumber: entry.DocNumber || "(no doc#)",
             txnDate: entry.TxnDate,
             totalAmt: entry.TotalAmt,
           });
         }
       }
 
-      console.log(`  Realm ${realmId}: found ${allJEs.filter(j => j.realmId === realmId).length} revenue JEs`);
+      const realmCount = allJEs.filter(j => j.realmId === realmId).length;
+      console.log(`  Realm ${realmId}: found ${realmCount} JEs touching Sales accounts`);
     } catch (err: any) {
       console.error(`  Realm ${realmId}: ERROR querying JEs — ${err.message}`);
     }
