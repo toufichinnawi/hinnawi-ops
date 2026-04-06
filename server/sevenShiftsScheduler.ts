@@ -52,12 +52,16 @@ export async function runSevenShiftsSync(): Promise<SevenShiftsSyncResult> {
     let updated = 0;
 
     for (const day of dailyData) {
+      // IMPORTANT: Ontario sales data comes from Lightspeed (single source of truth).
+      // 7shifts only provides labour data for Ontario — do NOT overwrite sales fields
+      // (totalSales, taxableSales, taxExemptSales, gstCollected, qstCollected).
       const result = await db.upsertDailySale({
         locationId,
         saleDate: day.date,
-        totalSales: String(day.totalSales),
-        taxableSales: String(day.totalSales),
-        tipsCollected: String(day.tips),
+        // Sales fields intentionally omitted — Lightspeed is the source of truth
+        // totalSales: DO NOT SET — comes from Lightspeed CSV import
+        // taxableSales: DO NOT SET — comes from Lightspeed CSV import
+        // tipsCollected: DO NOT SET — comes from Lightspeed CSV import
         orderCount: day.orderCount,
         labourCost: String(day.labourCost),
       });
