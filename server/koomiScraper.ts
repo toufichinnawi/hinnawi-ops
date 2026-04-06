@@ -417,6 +417,7 @@ export interface DailySalesRecord {
   totalDeposit: string;
   tipsCollected: string;
   labourCost: string;
+  pettyCash: string;
   orderCount: number;
 }
 
@@ -495,6 +496,7 @@ function buildDailySalesFromBlocks(blocks: ParsedStoreBlock[]): DailySalesRecord
       const orders = Math.round(parseNumber(ordersRow?.values[d] || "0"));
       const tips = parseNumber(tipsRow?.values[d] || "0");
       const salaries = parseNumber(salariesRow?.values[d] || "0");
+      const cashPayments = parseNumber(cashRow?.values[d] || "0");
 
       // Estimate GST/QST from taxable sales (5% GST, 9.975% QST for Quebec)
       const gst = taxable * 0.05;
@@ -515,6 +517,7 @@ function buildDailySalesFromBlocks(blocks: ParsedStoreBlock[]): DailySalesRecord
         totalDeposit: totalDeposit.toFixed(2),
         tipsCollected: tips.toFixed(2),
         labourCost: salaries.toFixed(2),
+        pettyCash: cashPayments.toFixed(2),
         orderCount: orders,
       });
     }

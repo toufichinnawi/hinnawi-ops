@@ -8,15 +8,19 @@
  *   4. Tracking all posted JEs in the revenueJournalEntries table
  * 
  * Production QBO Realms:
- *   PK + MK → 9130346671806126 (shared company, department-filtered)
+ *   PK + MK → 9130346671806126 (shared company, class-filtered)
  *   ONT     → 123146517406139
  *   CT      → 123146517409489
  * 
  * Revenue JE Template (per day per location):
- *   DEBIT  Undeposited Funds  = totalSales (gross receipts incl. taxes)
- *   CREDIT Sales Revenue      = net revenue (totalSales - GST - QST)
- *   CREDIT GST Payable        = GST collected
- *   CREDIT QST Payable        = QST collected
+ *   Line 1: DEBIT  Accounts Receivable  = AR amount          (Name: MEV XX.)
+ *   Line 2: CREDIT Sales                = taxExemptSales      (Tax: Zero-rated)
+ *   Line 3: CREDIT Sales                = taxableSales        (Tax: GST/QST QC - 9.975)
+ *   Line 4: DEBIT  Petty Cash           = pettyCash           (cash taken out)
+ *   Line 5: CREDIT Tips Payable         = tipsCollected       (Tax: Zero-rated)
+ * 
+ *   GST/QST are calculated automatically by QBO from the tax code on line 3.
+ *   AR = taxExemptSales + taxableSales + GST + QST + tips - pettyCash
  */
 import * as prodQbo from "./qboProduction";
 import { getDb } from "./db";
@@ -31,30 +35,31 @@ interface LocationQboConfig {
   name: string;
   realmId: string;
   departmentFilter?: string; // PK or MK for the shared company
+  mevName?: string; // Name column in QBO (e.g., "MEV MK.", "MEV PK.")
 }
 
 const LOCATION_QBO_MAP: LocationQboConfig[] = [
-  { locationId: 1, code: "PK", name: "President Kennedy", realmId: "9130346671806126", departmentFilter: "PK" },
-  { locationId: 2, code: "MK", name: "Mackay", realmId: "9130346671806126", departmentFilter: "MK" },
-  { locationId: 3, code: "ONT", name: "Ontario", realmId: "123146517406139" },
-  { locationId: 4, code: "CT", name: "Cathcart Tunnel", realmId: "123146517409489" },
+  { locationId: 1, code: "PK", name: "President Kennedy", realmId: "9130346671806126", departmentFilter: "PK", mevName: "MEV PK." },
+  { locationId: 2, code: "MK", name: "Mackay", realmId: "9130346671806126", departmentFilter: "MK", mevName: "MEV MK." },
+  { locationId: 3, code: "ONT", name: "Ontario", realmId: "123146517406139", mevName: "MEV ONT." },
+  { locationId: 4, code: "CT", name: "Cathcart Tunnel", realmId: "123146517409489", mevName: "MEV CT." },
 ];
 
 // ─── Account ID Cache (per realm) ───
-// Production account IDs differ from sandbox — we query them dynamically
 
 interface RealmAccountIds {
-  undepositedFunds: { id: string; name: string };
+  accountsReceivable: { id: string; name: string };
   salesRevenue: { id: string; name: string };
-  gstPayable: { id: string; name: string };
-  qstPayable: { id: string; name: string };
+  pettyCash: { id: string; name: string };
+  tipsPayable: { id: string; name: string };
+  taxCodeZeroRated: { id: string; name: string } | null;
+  taxCodeGstQst: { id: string; name: string } | null;
 }
 
 const accountIdCache = new Map<string, RealmAccountIds>();
 
 /**
- * Discover the correct QBO account IDs for revenue JEs in a given realm.
- * Searches by common account name patterns.
+ * Discover the correct QBO account IDs and tax codes for revenue JEs in a given realm.
  */
 async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
   if (accountIdCache.has(realmId)) return accountIdCache.get(realmId)!;
@@ -79,14 +84,39 @@ async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
     throw new Error(`Could not find account matching any of: ${patterns.join(", ")} in realm ${realmId}`);
   }
 
+  // Resolve tax codes
+  const taxCodeZeroRated = await prodQbo.resolveTaxCodeId(realmId, "Zero-rated");
+  const taxCodeGstQst = await prodQbo.resolveTaxCodeId(realmId, "GST/QST QC");
+
   const result: RealmAccountIds = {
-    undepositedFunds: findAccount(["Undeposited Funds"]),
-    salesRevenue: findAccount(["Sales", "Sales Revenue", "Revenue", "Sales of Product Income"]),
-    gstPayable: findAccount(["GST Payable", "GST/HST Payable", "GST", "TPS à payer", "TPS Payable"]),
-    qstPayable: findAccount(["QST Payable", "QST", "TVQ à payer", "TVQ Payable"]),
+    accountsReceivable: findAccount([
+      "Accounts Receivable", "1200 Accounts Receivable", "Accounts Receivable (A/R)",
+      "Comptes clients", "A/R",
+    ]),
+    salesRevenue: findAccount([
+      "Sales", "Sales Revenue", "4200 Sales", "Sales MK", "Sales PK",
+      "Revenue", "Sales of Product Income", "Ventes",
+    ]),
+    pettyCash: findAccount([
+      "Petty Cash", "1051 Petty Cash", "Petty Cash - PK", "Petty Cash - MK",
+      "Petite caisse", "Cash on Hand",
+    ]),
+    tipsPayable: findAccount([
+      "Tips", "Tips Payable", "Tips Payable - PK", "Tips Payable - MK",
+      "Pourboires", "Pourboires à payer",
+    ]),
+    taxCodeZeroRated,
+    taxCodeGstQst,
   };
 
   accountIdCache.set(realmId, result);
+  console.log(`  Realm ${realmId} accounts resolved:`);
+  console.log(`    AR:           ${result.accountsReceivable.name} (#${result.accountsReceivable.id})`);
+  console.log(`    Sales:        ${result.salesRevenue.name} (#${result.salesRevenue.id})`);
+  console.log(`    Petty Cash:   ${result.pettyCash.name} (#${result.pettyCash.id})`);
+  console.log(`    Tips:         ${result.tipsPayable.name} (#${result.tipsPayable.id})`);
+  console.log(`    Tax Zero:     ${result.taxCodeZeroRated?.name || "NOT FOUND"} (#${result.taxCodeZeroRated?.id || "?"})`);
+  console.log(`    Tax GST/QST:  ${result.taxCodeGstQst?.name || "NOT FOUND"} (#${result.taxCodeGstQst?.id || "?"})`);
   return result;
 }
 
@@ -114,13 +144,10 @@ export async function queryExistingRevenueJEs(
 
   for (const realmId of uniqueRealms) {
     try {
-      // Query all JEs in date range — we'll filter by DocNumber prefix client-side
-      // because QBO LIKE queries on DocNumber can be unreliable
       const entries = await prodQbo.getJournalEntriesByDateRange(realmId, startDate, endDate);
 
       for (const entry of entries) {
         const docNumber = entry.DocNumber || "";
-        // Only include revenue JEs (DocNumber starts with REV-)
         if (docNumber.startsWith("REV-")) {
           allJEs.push({
             realmId,
@@ -152,9 +179,6 @@ export interface DeleteResult {
   error?: string;
 }
 
-/**
- * Delete all provided revenue JEs from production QBO.
- */
 export async function deleteRevenueJEs(
   existingJEs: ExistingRevenueJE[],
 ): Promise<DeleteResult[]> {
@@ -165,7 +189,6 @@ export async function deleteRevenueJEs(
       await prodQbo.deleteJournalEntry(je.realmId, je.jeId, je.syncToken);
       results.push({ realmId: je.realmId, jeId: je.jeId, docNumber: je.docNumber, status: "deleted" });
       console.log(`  ✅ Deleted ${je.docNumber} (JE #${je.jeId}) from realm ${je.realmId}`);
-      // Small delay to avoid rate limiting
       await new Promise(r => setTimeout(r, 200));
     } catch (err: any) {
       results.push({ realmId: je.realmId, jeId: je.jeId, docNumber: je.docNumber, status: "error", error: err.message });
@@ -187,7 +210,11 @@ export interface PostResult {
   qboJeId?: string;
   docNumber?: string;
   totalSales?: number;
-  netRevenue?: number;
+  taxExemptSales?: number;
+  taxableSales?: number;
+  pettyCash?: number;
+  tips?: number;
+  arAmount?: number;
   gst?: number;
   qst?: number;
   error?: string;
@@ -196,6 +223,13 @@ export interface PostResult {
 /**
  * Post revenue JEs from POS dailySales data for a date range.
  * Creates one JE per day per location in the correct production realm.
+ * 
+ * JE Template:
+ *   Line 1: DEBIT  Accounts Receivable  = AR amount          (Name: MEV XX.)
+ *   Line 2: CREDIT Sales                = taxExemptSales      (Tax: Zero-rated)
+ *   Line 3: CREDIT Sales                = taxableSales        (Tax: GST/QST QC - 9.975)
+ *   Line 4: DEBIT  Petty Cash           = pettyCash           (if > 0)
+ *   Line 5: CREDIT Tips Payable         = tipsCollected       (Tax: Zero-rated, if > 0)
  */
 export async function postRevenueJEsFromPOS(
   startDate: string,
@@ -206,7 +240,6 @@ export async function postRevenueJEsFromPOS(
 
   const results: PostResult[] = [];
 
-  // Get all daily sales in the date range
   const sales = await db.select().from(dailySales)
     .where(and(
       gte(dailySales.saleDate, startDate),
@@ -245,12 +278,17 @@ export async function postRevenueJEsFromPOS(
     }
 
     try {
-      // Get the correct account IDs for this realm
       const accts = await getRealmAccountIds(locConfig.realmId);
 
+      const taxExemptSales = Math.round(Number(sale.taxExemptSales || 0) * 100) / 100;
+      const taxableSales = Math.round(Number(sale.taxableSales || 0) * 100) / 100;
       const gst = Math.round(Number(sale.gstCollected || 0) * 100) / 100;
       const qst = Math.round(Number(sale.qstCollected || 0) * 100) / 100;
-      const netRevenue = Math.round((totalSales - gst - qst) * 100) / 100;
+      const pettyCash = Math.round(Number((sale as any).pettyCash || 0) * 100) / 100;
+      const tips = Math.round(Number(sale.tipsCollected || 0) * 100) / 100;
+
+      // AR = taxExemptSales + taxableSales + GST + QST + tips - pettyCash
+      const arAmount = Math.round((taxExemptSales + taxableSales + gst + qst + tips - pettyCash) * 100) / 100;
 
       // Resolve department/class ID for PK/MK
       let classId: string | undefined;
@@ -263,6 +301,20 @@ export async function postRevenueJEsFromPOS(
         }
       }
 
+      // Resolve MEV customer for the Name column
+      let entityId: string | undefined;
+      let entityName: string | undefined;
+      if (locConfig.mevName) {
+        const customer = await prodQbo.resolveCustomerId(locConfig.realmId, locConfig.mevName);
+        if (customer) {
+          entityId = customer.id;
+          entityName = customer.name;
+        }
+      }
+
+      const description = `${String(sale.saleDate).replace(/-/g, "").slice(4)}${locConfig.code} Revenue`;
+      const docNumber = `REV-${locConfig.code}-${sale.saleDate}`;
+
       const lines: Array<{
         postingType: "Debit" | "Credit";
         amount: number;
@@ -271,57 +323,83 @@ export async function postRevenueJEsFromPOS(
         description: string;
         className?: string;
         classId?: string;
+        taxCodeId?: string;
+        taxCodeName?: string;
+        entityId?: string;
+        entityName?: string;
       }> = [];
 
-      // DEBIT: Undeposited Funds = totalSales (gross)
+      // Line 1: DEBIT Accounts Receivable = AR amount (with MEV Name)
       lines.push({
         postingType: "Debit",
-        amount: totalSales,
-        accountId: accts.undepositedFunds.id,
-        accountName: accts.undepositedFunds.name,
-        description: `Daily sales - ${locConfig.name} - ${sale.saleDate}`,
+        amount: arAmount,
+        accountId: accts.accountsReceivable.id,
+        accountName: accts.accountsReceivable.name,
+        description: "",
         className,
         classId,
+        entityId,
+        entityName,
       });
 
-      // CREDIT: Sales Revenue = net revenue
-      lines.push({
-        postingType: "Credit",
-        amount: netRevenue,
-        accountId: accts.salesRevenue.id,
-        accountName: accts.salesRevenue.name,
-        description: `Daily revenue - ${locConfig.name} - ${sale.saleDate}`,
-        className,
-        classId,
-      });
-
-      // CREDIT: GST Payable
-      if (gst > 0) {
+      // Line 2: CREDIT Sales = taxExemptSales (Tax: Zero-rated)
+      if (taxExemptSales > 0) {
         lines.push({
           postingType: "Credit",
-          amount: gst,
-          accountId: accts.gstPayable.id,
-          accountName: accts.gstPayable.name,
-          description: `GST collected - ${locConfig.name} - ${sale.saleDate}`,
+          amount: taxExemptSales,
+          accountId: accts.salesRevenue.id,
+          accountName: accts.salesRevenue.name,
+          description: `${description}`,
+          className,
+          classId,
+          taxCodeId: accts.taxCodeZeroRated?.id,
+          taxCodeName: accts.taxCodeZeroRated?.name,
+        });
+      }
+
+      // Line 3: CREDIT Sales = taxableSales (Tax: GST/QST QC - 9.975)
+      if (taxableSales > 0) {
+        lines.push({
+          postingType: "Credit",
+          amount: taxableSales,
+          accountId: accts.salesRevenue.id,
+          accountName: accts.salesRevenue.name,
+          description: `${description}`,
+          className,
+          classId,
+          taxCodeId: accts.taxCodeGstQst?.id,
+          taxCodeName: accts.taxCodeGstQst?.name,
+        });
+      }
+
+      // Line 4: DEBIT Petty Cash (if > 0)
+      if (pettyCash > 0) {
+        lines.push({
+          postingType: "Debit",
+          amount: pettyCash,
+          accountId: accts.pettyCash.id,
+          accountName: accts.pettyCash.name,
+          description: `${description}`,
           className,
           classId,
         });
       }
 
-      // CREDIT: QST Payable
-      if (qst > 0) {
+      // Line 5: CREDIT Tips Payable (Tax: Zero-rated, if > 0)
+      if (tips > 0) {
         lines.push({
           postingType: "Credit",
-          amount: qst,
-          accountId: accts.qstPayable.id,
-          accountName: accts.qstPayable.name,
-          description: `QST collected - ${locConfig.name} - ${sale.saleDate}`,
+          amount: tips,
+          accountId: accts.tipsPayable.id,
+          accountName: accts.tipsPayable.name,
+          description: `${description}`,
           className,
           classId,
+          taxCodeId: accts.taxCodeZeroRated?.id,
+          taxCodeName: accts.taxCodeZeroRated?.name,
         });
       }
 
-      const docNumber = `REV-${locConfig.code}-${sale.saleDate}`;
       const result = await prodQbo.createProductionJournalEntry(locConfig.realmId, {
         txnDate: String(sale.saleDate),
         docNumber,
@@ -340,14 +418,13 @@ export async function postRevenueJEsFromPOS(
           qboJeId: jeId || null,
           docNumber,
           totalSales: String(totalSales),
-          netRevenue: String(netRevenue),
+          netRevenue: String(taxExemptSales + taxableSales),
           gst: String(gst),
           qst: String(qst),
           status: "posted",
           environment: "production",
         });
       } catch (trackErr: any) {
-        // Duplicate tracking entry is OK — means it was already tracked
         console.log(`  ⚠️  Tracking entry already exists for ${docNumber}`);
       }
 
@@ -360,12 +437,16 @@ export async function postRevenueJEsFromPOS(
         qboJeId: jeId,
         docNumber,
         totalSales,
-        netRevenue,
+        taxExemptSales,
+        taxableSales,
+        pettyCash,
+        tips,
+        arAmount,
         gst,
         qst,
       });
 
-      console.log(`  ✅ ${docNumber} — JE #${jeId} — Gross: $${totalSales.toFixed(2)}, Net: $${netRevenue.toFixed(2)}, GST: $${gst.toFixed(2)}, QST: $${qst.toFixed(2)}`);
+      console.log(`  ✅ ${docNumber} — JE #${jeId} — AR: $${arAmount.toFixed(2)}, Exempt: $${taxExemptSales.toFixed(2)}, Taxable: $${taxableSales.toFixed(2)}, Tips: $${tips.toFixed(2)}, PettyCash: $${pettyCash.toFixed(2)}`);
 
       // Rate limit: 200ms between API calls
       await new Promise(r => setTimeout(r, 200));
@@ -394,9 +475,13 @@ export interface PipelineResult {
   phase3_post: { posted: number; skipped: number; errors: number; details: PostResult[] };
   summary: {
     totalGrossSales: number;
-    totalNetRevenue: number;
+    totalTaxExempt: number;
+    totalTaxable: number;
     totalGst: number;
     totalQst: number;
+    totalTips: number;
+    totalPettyCash: number;
+    totalAR: number;
     jeCount: number;
   };
 }
@@ -406,10 +491,6 @@ export interface PipelineResult {
  *   1. Query existing revenue JEs in production QBO
  *   2. Delete them all
  *   3. Re-post from POS dailySales data
- * 
- * @param startDate - Start of date range (YYYY-MM-DD), e.g. "2025-09-01"
- * @param endDate - End of date range (YYYY-MM-DD), e.g. "2026-04-05"
- * @param dryRun - If true, only queries and reports without deleting/posting
  */
 export async function runRevenueJePipeline(
   startDate: string,
@@ -451,7 +532,6 @@ export async function runRevenueJePipeline(
     postResults = await postRevenueJEsFromPOS(startDate, endDate);
   } else {
     console.log(`\n📝 Phase 3: SKIPPED (dry run) — would post JEs for all daily sales in range`);
-    // Still count what would be posted
     const db = await getDb();
     if (db) {
       const sales = await db.select().from(dailySales)
@@ -466,9 +546,13 @@ export async function runRevenueJePipeline(
   const posted = postResults.filter(r => r.status === "posted");
   const summary = {
     totalGrossSales: posted.reduce((sum, r) => sum + (r.totalSales || 0), 0),
-    totalNetRevenue: posted.reduce((sum, r) => sum + (r.netRevenue || 0), 0),
+    totalTaxExempt: posted.reduce((sum, r) => sum + (r.taxExemptSales || 0), 0),
+    totalTaxable: posted.reduce((sum, r) => sum + (r.taxableSales || 0), 0),
     totalGst: posted.reduce((sum, r) => sum + (r.gst || 0), 0),
     totalQst: posted.reduce((sum, r) => sum + (r.qst || 0), 0),
+    totalTips: posted.reduce((sum, r) => sum + (r.tips || 0), 0),
+    totalPettyCash: posted.reduce((sum, r) => sum + (r.pettyCash || 0), 0),
+    totalAR: posted.reduce((sum, r) => sum + (r.arAmount || 0), 0),
     jeCount: posted.length,
   };
 
@@ -483,9 +567,13 @@ export async function runRevenueJePipeline(
   console.log(`Post errors:         ${postResults.filter(r => r.status === "error").length}`);
   if (posted.length > 0) {
     console.log(`Total Gross Sales:   $${summary.totalGrossSales.toFixed(2)}`);
-    console.log(`Total Net Revenue:   $${summary.totalNetRevenue.toFixed(2)}`);
-    console.log(`Total GST:           $${summary.totalGst.toFixed(2)}`);
-    console.log(`Total QST:           $${summary.totalQst.toFixed(2)}`);
+    console.log(`  Tax Exempt:        $${summary.totalTaxExempt.toFixed(2)}`);
+    console.log(`  Taxable:           $${summary.totalTaxable.toFixed(2)}`);
+    console.log(`Total GST (auto):    $${summary.totalGst.toFixed(2)}`);
+    console.log(`Total QST (auto):    $${summary.totalQst.toFixed(2)}`);
+    console.log(`Total Tips:          $${summary.totalTips.toFixed(2)}`);
+    console.log(`Total Petty Cash:    $${summary.totalPettyCash.toFixed(2)}`);
+    console.log(`Total AR:            $${summary.totalAR.toFixed(2)}`);
   }
 
   return {

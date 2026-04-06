@@ -123,6 +123,7 @@ export const dailySales = mysqlTable("dailySales", {
   totalDeposit: decimal("totalDeposit", { precision: 12, scale: 2 }).default("0.00"),
   tipsCollected: decimal("tipsCollected", { precision: 10, scale: 2 }).default("0.00"),
   merchantFees: decimal("merchantFees", { precision: 10, scale: 2 }).default("0.00"),
+  pettyCash: decimal("pettyCash", { precision: 10, scale: 2 }).default("0.00"),
   labourCost: decimal("labourCost", { precision: 12, scale: 2 }).default("0.00"),
   orderCount: int("orderCount").default(0),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

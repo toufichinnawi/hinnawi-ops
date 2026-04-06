@@ -168,20 +168,32 @@ export async function createProductionJournalEntry(
       description?: string;
       className?: string;
       classId?: string;
+      taxCodeId?: string;
+      taxCodeName?: string;
+      entityId?: string;
+      entityName?: string;
+      locationId?: string;
+      locationName?: string;
     }>;
   },
 ) {
-  const Line = entry.lines.map((line, idx) => ({
-    Id: String(idx + 1),
-    DetailType: "JournalEntryLineDetail",
-    Amount: line.amount,
-    Description: line.description || "",
-    JournalEntryLineDetail: {
+  const Line = entry.lines.map((line, idx) => {
+    const detail: Record<string, unknown> = {
       PostingType: line.postingType,
       AccountRef: { value: line.accountId, name: line.accountName || "" },
-      ...(line.classId ? { ClassRef: { value: line.classId, name: line.className || "" } } : {}),
-    },
-  }));
+    };
+    if (line.classId) detail.ClassRef = { value: line.classId, name: line.className || "" };
+    if (line.taxCodeId) detail.TaxCodeRef = { value: line.taxCodeId, name: line.taxCodeName || "" };
+    if (line.entityId) detail.Entity = { EntityRef: { value: line.entityId, name: line.entityName || "" }, Type: "Customer" };
+
+    return {
+      Id: String(idx + 1),
+      DetailType: "JournalEntryLineDetail",
+      Amount: line.amount,
+      Description: line.description || "",
+      JournalEntryLineDetail: detail,
+    };
+  });
 
   const jePayload: Record<string, unknown> = {
     Line,
@@ -228,5 +240,74 @@ export async function resolveClassId(realmId: string, className: string): Promis
     classIdCache.set(cacheKey, id);
     return id;
   }
+  return null;
+}
+
+// ─── Tax Code Query ───
+
+const taxCodeCache = new Map<string, { id: string; name: string }>();
+
+/**
+ * Resolve a QBO Tax Code by name (e.g., "Zero-rated (Sales)", "GST/QST QC - 9.975 (Sales)")
+ * Returns the TaxCode Id and Name.
+ */
+export async function resolveTaxCodeId(realmId: string, taxCodeName: string): Promise<{ id: string; name: string } | null> {
+  const cacheKey = `${realmId}:${taxCodeName}`;
+  if (taxCodeCache.has(cacheKey)) return taxCodeCache.get(cacheKey)!;
+
+  const query = `SELECT * FROM TaxCode MAXRESULTS 100`;
+  const result = await prodQboRequest(realmId, "GET", `query?query=${encodeURIComponent(query)}`);
+  const taxCodes = result?.QueryResponse?.TaxCode || [];
+
+  // Exact match first
+  let found = taxCodes.find((tc: { Name: string }) => tc.Name === taxCodeName);
+  // Partial match
+  if (!found) {
+    found = taxCodes.find((tc: { Name: string }) =>
+      tc.Name.toLowerCase().includes(taxCodeName.toLowerCase())
+    );
+  }
+
+  if (found) {
+    const entry = { id: found.Id, name: found.Name };
+    taxCodeCache.set(cacheKey, entry);
+    return entry;
+  }
+  return null;
+}
+
+// ─── Customer/Name Query ───
+
+const customerCache = new Map<string, { id: string; name: string }>();
+
+/**
+ * Resolve a QBO Customer by display name (e.g., "MEV MK.", "MEV PK.")
+ * Used for the "Name" column in journal entries.
+ */
+export async function resolveCustomerId(realmId: string, displayName: string): Promise<{ id: string; name: string } | null> {
+  const cacheKey = `${realmId}:${displayName}`;
+  if (customerCache.has(cacheKey)) return customerCache.get(cacheKey)!;
+
+  const query = `SELECT * FROM Customer WHERE DisplayName = '${displayName}'`;
+  const result = await prodQboRequest(realmId, "GET", `query?query=${encodeURIComponent(query)}`);
+  const customers = result?.QueryResponse?.Customer || [];
+
+  if (customers.length > 0) {
+    const entry = { id: customers[0].Id, name: customers[0].DisplayName };
+    customerCache.set(cacheKey, entry);
+    return entry;
+  }
+
+  // Try partial match
+  const queryAll = `SELECT * FROM Customer WHERE DisplayName LIKE '%${displayName}%'`;
+  const resultAll = await prodQboRequest(realmId, "GET", `query?query=${encodeURIComponent(queryAll)}`);
+  const customersAll = resultAll?.QueryResponse?.Customer || [];
+
+  if (customersAll.length > 0) {
+    const entry = { id: customersAll[0].Id, name: customersAll[0].DisplayName };
+    customerCache.set(cacheKey, entry);
+    return entry;
+  }
+
   return null;
 }
