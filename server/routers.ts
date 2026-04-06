@@ -968,10 +968,22 @@ export const appRouter = router({
           return Math.round(parseFloat(String(v).replace(/[^0-9.-]/g, '')) || 0);
         };
 
+        // Read tax fields directly from raw data (sent by frontend for Lightspeed imports)
+        const taxExemptSales = raw.taxExemptSales ? String(parseFloat(String(raw.taxExemptSales).replace(/[^0-9.-]/g, '')) || 0) : undefined;
+        const taxableSales = raw.taxableSales ? String(parseFloat(String(raw.taxableSales).replace(/[^0-9.-]/g, '')) || 0) : undefined;
+        const gstCollected = raw.gstCollected ? String(parseFloat(String(raw.gstCollected).replace(/[^0-9.-]/g, '')) || 0) : undefined;
+        const qstCollected = raw.qstCollected ? String(parseFloat(String(raw.qstCollected).replace(/[^0-9.-]/g, '')) || 0) : undefined;
+        const totalDeposit = raw.totalDeposit ? String(parseFloat(String(raw.totalDeposit).replace(/[^0-9.-]/g, '')) || 0) : undefined;
+
         rows.push({
           locationId: input.locationId,
           saleDate,
           totalSales: parseNum(input.columnMapping.totalSales),
+          taxExemptSales,
+          taxableSales,
+          gstCollected,
+          qstCollected,
+          totalDeposit,
           orderCount: parseIntNum(input.columnMapping.receipts),
           tipsCollected: parseNum(input.columnMapping.tips),
         });
@@ -985,6 +997,11 @@ export const appRouter = router({
             locationId: row.locationId,
             saleDate: row.saleDate,
             totalSales: row.totalSales,
+            taxExemptSales: row.taxExemptSales,
+            taxableSales: row.taxableSales,
+            gstCollected: row.gstCollected,
+            qstCollected: row.qstCollected,
+            totalDeposit: row.totalDeposit,
             orderCount: row.orderCount,
             tipsCollected: row.tipsCollected,
           });

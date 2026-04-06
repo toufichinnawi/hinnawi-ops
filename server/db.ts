@@ -982,7 +982,11 @@ export async function upsertDailySale(data: {
   locationId: number;
   saleDate: string;
   totalSales?: string;
+  taxExemptSales?: string;
   taxableSales?: string;
+  gstCollected?: string;
+  qstCollected?: string;
+  totalDeposit?: string;
   tipsCollected?: string;
   orderCount?: number;
   labourCost?: string;
@@ -999,7 +1003,11 @@ export async function upsertDailySale(data: {
     // Update existing - merge non-zero values
     const updates: Record<string, unknown> = {};
     if (data.totalSales && parseFloat(data.totalSales) > 0) updates.totalSales = data.totalSales;
+    if (data.taxExemptSales && parseFloat(data.taxExemptSales) > 0) updates.taxExemptSales = data.taxExemptSales;
     if (data.taxableSales && parseFloat(data.taxableSales) > 0) updates.taxableSales = data.taxableSales;
+    if (data.gstCollected && parseFloat(data.gstCollected) > 0) updates.gstCollected = data.gstCollected;
+    if (data.qstCollected && parseFloat(data.qstCollected) > 0) updates.qstCollected = data.qstCollected;
+    if (data.totalDeposit && parseFloat(data.totalDeposit) > 0) updates.totalDeposit = data.totalDeposit;
     if (data.tipsCollected && parseFloat(data.tipsCollected) > 0) updates.tipsCollected = data.tipsCollected;
     if (data.orderCount && data.orderCount > 0) updates.orderCount = data.orderCount;
     if (data.labourCost && parseFloat(data.labourCost) > 0) updates.labourCost = data.labourCost;
@@ -1016,11 +1024,11 @@ export async function upsertDailySale(data: {
       locationId: data.locationId,
       saleDate: data.saleDate,
       totalSales: data.totalSales || "0.00",
-      taxExemptSales: "0.00",
+      taxExemptSales: data.taxExemptSales || "0.00",
       taxableSales: data.taxableSales || "0.00",
-      gstCollected: "0.00",
-      qstCollected: "0.00",
-      totalDeposit: "0.00",
+      gstCollected: data.gstCollected || "0.00",
+      qstCollected: data.qstCollected || "0.00",
+      totalDeposit: data.totalDeposit || "0.00",
       tipsCollected: data.tipsCollected || "0.00",
       merchantFees: "0.00",
       orderCount: data.orderCount || 0,
