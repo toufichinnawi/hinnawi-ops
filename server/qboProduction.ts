@@ -183,7 +183,10 @@ export async function createProductionJournalEntry(
       AccountRef: { value: line.accountId, name: line.accountName || "" },
     };
     if (line.classId) detail.ClassRef = { value: line.classId, name: line.className || "" };
-    if (line.taxCodeId) detail.TaxCodeRef = { value: line.taxCodeId, name: line.taxCodeName || "" };
+    if (line.taxCodeId) {
+      detail.TaxCodeRef = { value: line.taxCodeId, name: line.taxCodeName || "" };
+      detail.TaxApplicableOn = "Sales";
+    }
     if (line.entityId) detail.Entity = { EntityRef: { value: line.entityId, name: line.entityName || "" }, Type: "Customer" };
 
     return {
@@ -310,4 +313,33 @@ export async function resolveCustomerId(realmId: string, displayName: string): P
   }
 
   return null;
+}
+
+// ─── Account Creation ───
+
+/**
+ * Create a new account in a production QBO company.
+ * Used to auto-create missing accounts like "Tips Payable".
+ */
+export async function createProductionAccount(
+  realmId: string,
+  account: {
+    name: string;
+    accountType: string;       // e.g., "Other Current Liability"
+    accountSubType?: string;   // e.g., "OtherCurrentLiabilities"
+    description?: string;
+  },
+): Promise<{ Id: string; Name: string }> {
+  const payload: Record<string, unknown> = {
+    Name: account.name,
+    AccountType: account.accountType,
+  };
+  if (account.accountSubType) payload.AccountSubType = account.accountSubType;
+  if (account.description) payload.Description = account.description;
+
+  const result = await prodQboRequest(realmId, "POST", "account", payload);
+  const created = result?.Account;
+  if (!created) throw new Error(`Failed to create account "${account.name}" in realm ${realmId}`);
+  console.log(`  ✅ Created account "${created.Name}" (#${created.Id}) in realm ${realmId}`);
+  return { Id: created.Id, Name: created.Name };
 }

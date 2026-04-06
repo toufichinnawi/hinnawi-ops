@@ -84,6 +84,28 @@ async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
     throw new Error(`Could not find account matching any of: ${patterns.join(", ")} in realm ${realmId}`);
   }
 
+  async function findAccountOrCreate(
+    patterns: string[],
+    createAs: { name: string; accountType: string; accountSubType?: string; description?: string },
+  ): Promise<{ id: string; name: string }> {
+    for (const pattern of patterns) {
+      const found = accounts.find((a: { Name: string; Id: string }) =>
+        a.Name.toLowerCase() === pattern.toLowerCase()
+      );
+      if (found) return { id: found.Id, name: found.Name };
+    }
+    for (const pattern of patterns) {
+      const found = accounts.find((a: { Name: string; Id: string }) =>
+        a.Name.toLowerCase().includes(pattern.toLowerCase())
+      );
+      if (found) return { id: found.Id, name: found.Name };
+    }
+    // Auto-create the missing account
+    console.log(`  ⚠️  Account not found in realm ${realmId}. Creating "${createAs.name}"...`);
+    const created = await prodQbo.createProductionAccount(realmId, createAs);
+    return { id: created.Id, name: created.Name };
+  }
+
   // Resolve tax codes
   const taxCodeZeroRated = await prodQbo.resolveTaxCodeId(realmId, "Zero-rated");
   const taxCodeGstQst = await prodQbo.resolveTaxCodeId(realmId, "GST/QST QC");
@@ -101,10 +123,18 @@ async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
       "Petty Cash", "1051 Petty Cash", "Petty Cash - PK", "Petty Cash - MK",
       "Petite caisse", "Cash on Hand",
     ]),
-    tipsPayable: findAccount([
-      "Tips", "Tips Payable", "Tips Payable - PK", "Tips Payable - MK",
-      "Pourboires", "Pourboires à payer",
-    ]),
+    tipsPayable: await findAccountOrCreate(
+      [
+        "Tips", "Tips Payable", "Tips Payable - PK", "Tips Payable - MK",
+        "Pourboires", "Pourboires à payer", "Tips payable",
+      ],
+      {
+        name: "Tips Payable",
+        accountType: "Other Current Liability",
+        accountSubType: "OtherCurrentLiabilities",
+        description: "Tips collected from POS to be paid to staff",
+      },
+    ),
     taxCodeZeroRated,
     taxCodeGstQst,
   };
@@ -114,7 +144,7 @@ async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
   console.log(`    AR:           ${result.accountsReceivable.name} (#${result.accountsReceivable.id})`);
   console.log(`    Sales:        ${result.salesRevenue.name} (#${result.salesRevenue.id})`);
   console.log(`    Petty Cash:   ${result.pettyCash.name} (#${result.pettyCash.id})`);
-  console.log(`    Tips:         ${result.tipsPayable.name} (#${result.tipsPayable.id})`);
+    console.log(`    Tips:         ${result.tipsPayable.name} (#${result.tipsPayable.id})`);
   console.log(`    Tax Zero:     ${result.taxCodeZeroRated?.name || "NOT FOUND"} (#${result.taxCodeZeroRated?.id || "?"})`);
   console.log(`    Tax GST/QST:  ${result.taxCodeGstQst?.name || "NOT FOUND"} (#${result.taxCodeGstQst?.id || "?"})`);
   return result;
@@ -312,8 +342,11 @@ export async function postRevenueJEsFromPOS(
         }
       }
 
-      const description = `${String(sale.saleDate).replace(/-/g, "").slice(4)}${locConfig.code} Revenue`;
-      const docNumber = `REV-${locConfig.code}-${sale.saleDate}`;
+      // DocNumber max 21 chars in QBO. Format: REVPK250405
+      const dateStr = String(sale.saleDate);
+      const shortDate = dateStr.replace(/-/g, "").slice(2); // 250405 from 2025-04-05
+      const docNumber = `REV${locConfig.code}${shortDate}`;
+      const description = `${shortDate.slice(2)}${locConfig.code} Revenue`;
 
       const lines: Array<{
         postingType: "Debit" | "Credit";
