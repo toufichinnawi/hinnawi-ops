@@ -299,6 +299,13 @@ export interface PostResult {
  *   Line 3: CREDIT Sales                = taxableSales        (Tax: GST/QST QC - 9.975)
  *   Line 4: DEBIT  Petty Cash           = pettyCash           (if > 0)
  *   Line 5: CREDIT Tips Payable         = tipsCollected       (Tax: Zero-rated, if > 0)
+ * 
+ * IMPORTANT: AR uses QBO-matching tax calculation (ROUND(taxable * rate, 2))
+ * instead of POS-recorded GST/QST to avoid rounding mismatches.
+ * 
+ * For entries with no tax split (e.g., Ontario/7shifts where taxExempt=0 AND
+ * taxable=0 but totalSales>0), totalSales is posted as a single tax-exempt
+ * credit line.
  */
 export async function postRevenueJEsFromPOS(
   startDate: string,
@@ -341,7 +348,7 @@ export async function postRevenueJEsFromPOS(
         saleDate: String(sale.saleDate),
         realmId: locConfig.realmId,
         status: "skipped",
-        error: "Zero sales",
+        error: "Zero sales (store closed)",
       });
       continue;
     }
@@ -349,15 +356,67 @@ export async function postRevenueJEsFromPOS(
     try {
       const accts = await getRealmAccountIds(locConfig.realmId);
 
-      const taxExemptSales = Math.round(Number(sale.taxExemptSales || 0) * 100) / 100;
-      const taxableSales = Math.round(Number(sale.taxableSales || 0) * 100) / 100;
-      const gst = Math.round(Number(sale.gstCollected || 0) * 100) / 100;
-      const qst = Math.round(Number(sale.qstCollected || 0) * 100) / 100;
+      let taxExemptSales = Math.round(Number(sale.taxExemptSales || 0) * 100) / 100;
+      let taxableSales = Math.round(Number(sale.taxableSales || 0) * 100) / 100;
       const pettyCash = Math.round(Number((sale as any).pettyCash || 0) * 100) / 100;
       const tips = Math.round(Number(sale.tipsCollected || 0) * 100) / 100;
 
-      // AR = taxExemptSales + taxableSales + GST + QST + tips - pettyCash
+      // ── Handle no-tax-split entries (e.g., Ontario/7shifts) ──
+      // If totalSales > 0 but both taxExempt and taxable are 0,
+      // treat the entire totalSales as tax-exempt revenue.
+      if (taxExemptSales === 0 && taxableSales === 0 && totalSales > 0) {
+        taxExemptSales = totalSales;
+        console.log(`  ℹ️  ${locConfig.code} ${sale.saleDate}: No tax split — treating $${totalSales.toFixed(2)} as tax-exempt`);
+      }
+
+      // ── Calculate GST/QST using QBO-matching formula ──
+      // CRITICAL: Use ROUND(taxable * rate, 2) to match QBO's auto-calculation.
+      // Do NOT use POS-recorded gstCollected/qstCollected — they may round differently.
+      const gst = Math.round(taxableSales * 5) / 100;       // ROUND(taxable * 0.05, 2)
+      const qst = Math.round(taxableSales * 9.975) / 100;   // ROUND(taxable * 0.09975, 2)
+
+      // ── AR = sum of all credits (including QBO auto-tax) minus petty cash ──
+      // Credits: taxExemptSales + taxableSales + gst(auto) + qst(auto) + tips
+      // Debits: AR + pettyCash
+      // So: AR = taxExemptSales + taxableSales + gst + qst + tips - pettyCash
       const arAmount = Math.round((taxExemptSales + taxableSales + gst + qst + tips - pettyCash) * 100) / 100;
+
+      // ── Pre-flight validation: ensure at least 2 lines ──
+      let lineCount = 1; // AR always present
+      if (taxExemptSales > 0) lineCount++;
+      if (taxableSales > 0) lineCount++;
+      if (pettyCash > 0) lineCount++;
+      if (tips > 0) lineCount++;
+
+      if (lineCount < 2) {
+        results.push({
+          locationId: sale.locationId,
+          locationCode: locConfig.code,
+          saleDate: String(sale.saleDate),
+          realmId: locConfig.realmId,
+          status: "skipped",
+          error: `Only ${lineCount} line(s) — need at least 2 for QBO`,
+        });
+        console.log(`  ⏭️  ${locConfig.code} ${sale.saleDate}: Skipped — only ${lineCount} JE line(s)`);
+        continue;
+      }
+
+      // ── Pre-flight validation: debits must equal credits ──
+      const totalDebits = arAmount + pettyCash;
+      const totalCredits = taxExemptSales + taxableSales + gst + qst + tips;
+      const balance = Math.round((totalDebits - totalCredits) * 100) / 100;
+      if (balance !== 0) {
+        results.push({
+          locationId: sale.locationId,
+          locationCode: locConfig.code,
+          saleDate: String(sale.saleDate),
+          realmId: locConfig.realmId,
+          status: "error",
+          error: `Pre-flight: Debits ($${totalDebits.toFixed(2)}) ≠ Credits ($${totalCredits.toFixed(2)}), diff=$${balance.toFixed(2)}`,
+        });
+        console.error(`  ❌ ${locConfig.code} ${sale.saleDate}: Pre-flight balance check failed: diff=$${balance.toFixed(2)}`);
+        continue;
+      }
 
       // Resolve department/class ID for PK/MK
       let classId: string | undefined;
