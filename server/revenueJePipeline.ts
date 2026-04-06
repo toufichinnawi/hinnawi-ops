@@ -41,7 +41,7 @@ interface LocationQboConfig {
 const LOCATION_QBO_MAP: LocationQboConfig[] = [
   { locationId: 1, code: "PK", name: "President Kennedy", realmId: "9130346671806126", departmentFilter: "PK", mevName: "MEV PK." },
   { locationId: 2, code: "MK", name: "Mackay", realmId: "9130346671806126", departmentFilter: "MK", mevName: "MEV MK." },
-  { locationId: 3, code: "ONT", name: "Ontario", realmId: "123146517406139", mevName: "MEV ONT." },
+  { locationId: 3, code: "ONT", name: "Ontario", realmId: "123146517406139", mevName: "Ontario SALES-12732303" },
   { locationId: 4, code: "CT", name: "Cathcart Tunnel", realmId: "123146517409489", mevName: "MEV CT." },
 ];
 
@@ -52,6 +52,8 @@ interface RealmAccountIds {
   salesRevenue: { id: string; name: string };
   pettyCash: { id: string; name: string };
   tipsPayable: { id: string; name: string };
+  gstPayable: { id: string; name: string };
+  qstPayable: { id: string; name: string };
   taxCodeZeroRated: { id: string; name: string } | null;
   taxCodeGstQst: { id: string; name: string } | null;
 }
@@ -135,6 +137,30 @@ async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
         description: "Tips collected from POS to be paid to staff",
       },
     ),
+    gstPayable: await findAccountOrCreate(
+      [
+        "GST Payable", "GST/HST Payable", "GST", "TPS à payer",
+        "GST/HST Suspense", "GST Collected",
+      ],
+      {
+        name: "GST Payable",
+        accountType: "Other Current Liability",
+        accountSubType: "OtherCurrentLiabilities",
+        description: "GST (TPS) collected on taxable sales",
+      },
+    ),
+    qstPayable: await findAccountOrCreate(
+      [
+        "QST Payable", "TVQ à payer", "QST", "TVQ",
+        "QST Collected", "Provincial Tax Payable",
+      ],
+      {
+        name: "QST Payable",
+        accountType: "Other Current Liability",
+        accountSubType: "OtherCurrentLiabilities",
+        description: "QST (TVQ) collected on taxable sales",
+      },
+    ),
     taxCodeZeroRated,
     taxCodeGstQst,
   };
@@ -145,6 +171,8 @@ async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
   console.log(`    Sales:        ${result.salesRevenue.name} (#${result.salesRevenue.id})`);
   console.log(`    Petty Cash:   ${result.pettyCash.name} (#${result.pettyCash.id})`);
     console.log(`    Tips:         ${result.tipsPayable.name} (#${result.tipsPayable.id})`);
+  console.log(`    GST Payable:  ${result.gstPayable.name} (#${result.gstPayable.id})`);
+  console.log(`    QST Payable:  ${result.qstPayable.name} (#${result.qstPayable.id})`);
   console.log(`    Tax Zero:     ${result.taxCodeZeroRated?.name || "NOT FOUND"} (#${result.taxCodeZeroRated?.id || "?"})`);
   console.log(`    Tax GST/QST:  ${result.taxCodeGstQst?.name || "NOT FOUND"} (#${result.taxCodeGstQst?.id || "?"})`);
   return result;
@@ -412,6 +440,8 @@ export async function postRevenueJEsFromPOS(
       let lineCount = 1; // AR always present
       if (taxExemptSales > 0) lineCount++;
       if (taxableSales > 0) lineCount++;
+      if (gst > 0) lineCount++;
+      if (qst > 0) lineCount++;
       if (pettyCash > 0) lineCount++;
       if (tips > 0) lineCount++;
 
@@ -515,7 +545,7 @@ export async function postRevenueJEsFromPOS(
         });
       }
 
-      // Line 3: CREDIT Sales = taxableSales (Tax: GST/QST QC - 9.975)
+      // Line 3: CREDIT Sales = taxableSales (no auto-tax — we post GST/QST as explicit lines)
       if (taxableSales > 0) {
         lines.push({
           postingType: "Credit",
@@ -530,7 +560,33 @@ export async function postRevenueJEsFromPOS(
         });
       }
 
-      // Line 4: DEBIT Petty Cash (if > 0)
+      // Line 4: CREDIT GST Payable (explicit — QBO JE tax codes are tags only, they don't auto-add amounts)
+      if (gst > 0) {
+        lines.push({
+          postingType: "Credit",
+          amount: gst,
+          accountId: accts.gstPayable.id,
+          accountName: accts.gstPayable.name,
+          description: `${description} GST`,
+          className,
+          classId,
+        });
+      }
+
+      // Line 5: CREDIT QST Payable (explicit)
+      if (qst > 0) {
+        lines.push({
+          postingType: "Credit",
+          amount: qst,
+          accountId: accts.qstPayable.id,
+          accountName: accts.qstPayable.name,
+          description: `${description} QST`,
+          className,
+          classId,
+        });
+      }
+
+      // Line 6: DEBIT Petty Cash (if > 0)
       if (pettyCash > 0) {
         lines.push({
           postingType: "Debit",
@@ -543,7 +599,7 @@ export async function postRevenueJEsFromPOS(
         });
       }
 
-      // Line 5: CREDIT Tips Payable (Tax: Zero-rated, if > 0)
+      // Line 7: CREDIT Tips Payable (if > 0)
       if (tips > 0) {
         lines.push({
           postingType: "Credit",
