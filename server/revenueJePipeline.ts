@@ -218,16 +218,21 @@ export async function queryExistingRevenueJEs(
   return allJEs;
 }
 
-// ─── Step 2: Delete Existing Revenue JEs ───
+// ─── Step 2: Delete (or Void) Existing Revenue JEs ───
 
 export interface DeleteResult {
   realmId: string;
   jeId: string;
   docNumber: string;
-  status: "deleted" | "error";
+  status: "deleted" | "voided" | "error";
   error?: string;
 }
 
+/**
+ * Delete existing revenue JEs. If a JE is matched to a bank transaction
+ * (QBO error 6480), automatically falls back to voiding it instead.
+ * Voided JEs have all amounts zeroed out so they don't affect financials.
+ */
 export async function deleteRevenueJEs(
   existingJEs: ExistingRevenueJE[],
 ): Promise<DeleteResult[]> {
@@ -235,14 +240,29 @@ export async function deleteRevenueJEs(
 
   for (const je of existingJEs) {
     try {
+      // Try delete first
       await prodQbo.deleteJournalEntry(je.realmId, je.jeId, je.syncToken);
       results.push({ realmId: je.realmId, jeId: je.jeId, docNumber: je.docNumber, status: "deleted" });
       console.log(`  ✅ Deleted ${je.docNumber} (JE #${je.jeId}) from realm ${je.realmId}`);
-      await new Promise(r => setTimeout(r, 200));
     } catch (err: any) {
-      results.push({ realmId: je.realmId, jeId: je.jeId, docNumber: je.docNumber, status: "error", error: err.message });
-      console.error(`  ❌ Failed to delete ${je.docNumber}: ${err.message}`);
+      const errMsg = err.message || "";
+      // Error 6480 = matched to bank transaction, can't delete → void instead
+      if (errMsg.includes("6480") || errMsg.includes("matched") || errMsg.includes("reconcil")) {
+        try {
+          await prodQbo.voidJournalEntry(je.realmId, je.jeId, je.syncToken);
+          results.push({ realmId: je.realmId, jeId: je.jeId, docNumber: je.docNumber, status: "voided" });
+          console.log(`  🔄 Voided ${je.docNumber} (JE #${je.jeId}) — was matched to bank txn`);
+        } catch (voidErr: any) {
+          results.push({ realmId: je.realmId, jeId: je.jeId, docNumber: je.docNumber, status: "error", error: `Delete failed (6480), void also failed: ${voidErr.message}` });
+          console.error(`  ❌ Failed to delete AND void ${je.docNumber}: ${voidErr.message}`);
+        }
+      } else {
+        results.push({ realmId: je.realmId, jeId: je.jeId, docNumber: je.docNumber, status: "error", error: errMsg });
+        console.error(`  ❌ Failed to delete ${je.docNumber}: ${errMsg}`);
+      }
     }
+    // Rate limit: 200ms between API calls
+    await new Promise(r => setTimeout(r, 200));
   }
 
   return results;
@@ -523,7 +543,7 @@ export async function postRevenueJEsFromPOS(
 
 export interface PipelineResult {
   phase1_query: { totalFound: number; byRealm: Record<string, number> };
-  phase2_delete: { deleted: number; errors: number; details: DeleteResult[] };
+  phase2_delete: { deleted: number; voided: number; errors: number; details: DeleteResult[] };
   phase3_post: { posted: number; skipped: number; errors: number; details: PostResult[] };
   summary: {
     totalGrossSales: number;
@@ -569,10 +589,11 @@ export async function runRevenueJePipeline(
   // Phase 2: Delete existing
   let deleteResults: DeleteResult[] = [];
   if (!dryRun && existingJEs.length > 0) {
-    console.log(`\n🗑️  Phase 2: Deleting ${existingJEs.length} existing revenue JEs...`);
+    console.log(`\n🗑️  Phase 2: Deleting/voiding ${existingJEs.length} existing revenue JEs...`);
+    console.log(`  (JEs matched to bank transactions will be voided instead of deleted)`);
     deleteResults = await deleteRevenueJEs(existingJEs);
   } else if (dryRun) {
-    console.log(`\n🗑️  Phase 2: SKIPPED (dry run) — would delete ${existingJEs.length} JEs`);
+    console.log(`\n🗑️  Phase 2: SKIPPED (dry run) — would delete/void ${existingJEs.length} JEs`);
   } else {
     console.log(`\n🗑️  Phase 2: No existing JEs to delete`);
   }
@@ -613,6 +634,7 @@ export async function runRevenueJePipeline(
   console.log(`${"=".repeat(60)}`);
   console.log(`Existing JEs found:  ${existingJEs.length}`);
   console.log(`Deleted:             ${deleteResults.filter(r => r.status === "deleted").length}`);
+  console.log(`Voided (matched):    ${deleteResults.filter(r => r.status === "voided").length}`);
   console.log(`Delete errors:       ${deleteResults.filter(r => r.status === "error").length}`);
   console.log(`Posted:              ${posted.length}`);
   console.log(`Skipped:             ${postResults.filter(r => r.status === "skipped").length}`);
@@ -632,6 +654,7 @@ export async function runRevenueJePipeline(
     phase1_query: { totalFound: existingJEs.length, byRealm },
     phase2_delete: {
       deleted: deleteResults.filter(r => r.status === "deleted").length,
+      voided: deleteResults.filter(r => r.status === "voided").length,
       errors: deleteResults.filter(r => r.status === "error").length,
       details: deleteResults,
     },

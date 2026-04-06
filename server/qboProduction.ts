@@ -138,18 +138,54 @@ export async function getJournalEntriesByDateRange(
   return allEntries;
 }
 
-// ─── Delete Operation ───
+// ─── Delete / Void Operations ───
 
 /**
  * Delete a journal entry from QBO.
  * Requires the JE Id and SyncToken.
  * Uses POST /journalentry?operation=delete
+ * NOTE: Will fail with error 6480 if the JE is matched to a bank transaction.
  */
 export async function deleteJournalEntry(realmId: string, jeId: string, syncToken: string) {
   return await prodQboRequest(realmId, "POST", "journalentry?operation=delete", {
     Id: jeId,
     SyncToken: syncToken,
   });
+}
+
+/**
+ * Void a journal entry in QBO.
+ * This works even for JEs matched to bank transactions (error 6480 on delete).
+ * Voiding zeros out the amounts but preserves the transaction record.
+ * 
+ * QBO void requires a full update with all Line items set to Amount: 0
+ * and the special sparse update approach.
+ */
+export async function voidJournalEntry(realmId: string, jeId: string, syncToken: string) {
+  // First, read the full JE to get its current state
+  const query = `SELECT * FROM JournalEntry WHERE Id = '${jeId}'`;
+  const result = await prodQboRequest(realmId, "GET", `query?query=${encodeURIComponent(query)}`);
+  const entries = result?.QueryResponse?.JournalEntry || [];
+  if (entries.length === 0) throw new Error(`JE #${jeId} not found in realm ${realmId}`);
+
+  const je = entries[0];
+
+  // Zero out all line amounts
+  const zeroedLines = (je.Line || []).map((line: any) => ({
+    ...line,
+    Amount: 0,
+  }));
+
+  // Update with zeroed lines and add "VOID" to the private note
+  const voidPayload = {
+    Id: jeId,
+    SyncToken: je.SyncToken, // use latest SyncToken from re-read
+    sparse: true,
+    Line: zeroedLines,
+    PrivateNote: `VOIDED by Hinnawi Ops pipeline | Original: ${je.PrivateNote || je.DocNumber || ""}`,
+  };
+
+  return await prodQboRequest(realmId, "POST", "journalentry", voidPayload);
 }
 
 // ─── Create Journal Entry (Production) ───
