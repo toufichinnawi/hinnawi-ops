@@ -51,6 +51,14 @@ interface Task {
   createdAt: string;
 }
 
+// ─── Helpers ───
+
+function fmt(val: string | Date | null | undefined): string {
+  if (!val) return "";
+  if (val instanceof Date) return val.toLocaleDateString();
+  return String(val);
+}
+
 // ─── Constants ───
 
 const LOCATION_NAMES: Record<number, string> = {
@@ -466,14 +474,14 @@ function TaskCard({
               </span>
               <span className="flex items-center gap-1">
                 <Calendar className="h-3.5 w-3.5" />
-                Due: {task.dueDate}
+                Due: {fmt(task.dueDate)}
               </span>
               {task.periodStart && task.periodEnd && (
-                <span>Period: {task.periodStart} to {task.periodEnd}</span>
+                <span>Period: {fmt(task.periodStart)} to {fmt(task.periodEnd)}</span>
               )}
               {task.completedBy && (
                 <span className="text-green-600">
-                  Completed by {task.completedBy} on {task.completedAt ? new Date(task.completedAt).toLocaleDateString() : ""}
+                  Completed by {task.completedBy} on {fmt(task.completedAt)}
                 </span>
               )}
               {task.autoDetected && (
