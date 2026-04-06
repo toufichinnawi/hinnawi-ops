@@ -358,16 +358,43 @@ export async function postRevenueJEsFromPOS(
 
       let taxExemptSales = Math.round(Number(sale.taxExemptSales || 0) * 100) / 100;
       let taxableSales = Math.round(Number(sale.taxableSales || 0) * 100) / 100;
+      const posGst = Math.round(Number(sale.gstCollected || 0) * 100) / 100;
+      const posQst = Math.round(Number(sale.qstCollected || 0) * 100) / 100;
       const pettyCash = Math.round(Number((sale as any).pettyCash || 0) * 100) / 100;
       const tips = Math.round(Number(sale.tipsCollected || 0) * 100) / 100;
 
-      // ── Handle no-tax-split entries (e.g., Ontario/7shifts) ──
-      // If totalSales > 0 but both taxExempt and taxable are 0,
-      // treat the entire totalSales as tax-exempt revenue.
+      // ── Repair incomplete tax splits ──
+      // Scenario 1: No split at all (taxExempt=0 AND taxable=0 but totalSales>0)
+      //   → Treat entire totalSales as tax-exempt.
+      // Scenario 2: Partial split — 7shifts overwrote Lightspeed data
+      //   (taxExempt=0, taxable>0, GST=0, QST=0, and taxable < totalSales)
+      //   → The gap (totalSales - taxable) is the missing tax-exempt portion.
+      // Scenario 3: Full Lightspeed data (taxExempt>0, taxable>0, GST>0, QST>0)
+      //   → Use as-is.
+
       if (taxExemptSales === 0 && taxableSales === 0 && totalSales > 0) {
+        // Scenario 1: no split at all → all tax-exempt
         taxExemptSales = totalSales;
         console.log(`  ℹ️  ${locConfig.code} ${sale.saleDate}: No tax split — treating $${totalSales.toFixed(2)} as tax-exempt`);
+      } else if (taxExemptSales === 0 && taxableSales > 0 && posGst === 0 && posQst === 0) {
+        // Scenario 2: partial split (7shifts overwrote Lightspeed)
+        // taxable has a value but GST/QST are 0 → data is incomplete
+        // The gap between totalSales and taxable is the missing tax-exempt portion
+        const gap = Math.round((totalSales - taxableSales) * 100) / 100;
+        if (gap > 0) {
+          taxExemptSales = gap;
+          console.log(`  ℹ️  ${locConfig.code} ${sale.saleDate}: Partial split — recovered exempt=$${gap.toFixed(2)} from gap (total=$${totalSales.toFixed(2)} - taxable=$${taxableSales.toFixed(2)})`);
+        } else if (gap === 0) {
+          // totalSales == taxable, everything is taxable, no exempt
+          console.log(`  ℹ️  ${locConfig.code} ${sale.saleDate}: All taxable ($${taxableSales.toFixed(2)}), no exempt`);
+        } else {
+          // gap < 0 means taxable > totalSales — data inconsistency, treat all as tax-exempt to be safe
+          console.warn(`  ⚠️  ${locConfig.code} ${sale.saleDate}: Data inconsistency — taxable ($${taxableSales.toFixed(2)}) > totalSales ($${totalSales.toFixed(2)}). Treating all as tax-exempt.`);
+          taxExemptSales = totalSales;
+          taxableSales = 0;
+        }
       }
+      // Scenario 3: full data — no changes needed
 
       // ── Calculate GST/QST using QBO-matching formula ──
       // CRITICAL: Use ROUND(taxable * rate, 2) to match QBO's auto-calculation.
