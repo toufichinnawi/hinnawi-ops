@@ -490,7 +490,10 @@ export async function getDailyPnlForDate(dateStr: string) {
   
   return sales.map(s => {
     const loc = locMap.get(s.locationId);
-    const revenue = Number(s.totalSales || 0);
+    const grossRevenue = Number(s.totalSales || 0);
+    const gst = Number(s.gstCollected || 0);
+    const qst = Number(s.qstCollected || 0);
+    const revenue = Math.round((grossRevenue - gst - qst) * 100) / 100; // Net revenue excludes GST/QST
     const foodCostPct = Number(loc?.foodCostTarget || 30) / 100;
     const estimatedCogs = revenue * foodCostPct;
     const actualLabourCost = Number(s.labourCost || 0);
@@ -1486,7 +1489,10 @@ export async function getCFOProfitability(startDate: string, endDate: string) {
 
   return rows.map(r => {
     const loc = locMap.get(r.locationId);
-    const revenue = parseFloat(r.revenue || "0");
+    const grossRevenue = parseFloat(r.revenue || "0");
+    const gst = parseFloat(r.gst || "0");
+    const qst = parseFloat(r.qst || "0");
+    const revenue = Math.round((grossRevenue - gst - qst) * 100) / 100; // Net revenue excludes GST/QST
     const laborCost = parseFloat(r.laborCost || "0");
     const foodCostTarget = parseFloat(loc?.foodCostTarget || "30") / 100;
     const laborTarget = parseFloat(loc?.laborTarget || "25") / 100;
@@ -1535,7 +1541,9 @@ export async function getCFORevenueTrends(locationId?: number) {
   const rows = await db.execute(sql`
     SELECT
       DATE_FORMAT(saleDate, '%Y-%m') AS month,
-      SUM(totalSales) AS revenue,
+      SUM(totalSales) AS grossRevenue,
+      SUM(gstCollected) AS gst,
+      SUM(qstCollected) AS qst,
       SUM(labourCost) AS laborCost,
       SUM(orderCount) AS orders,
       COUNT(DISTINCT saleDate) AS days
@@ -1547,7 +1555,10 @@ export async function getCFORevenueTrends(locationId?: number) {
 
   const data = (rows as any)[0] || rows;
   return (Array.isArray(data) ? data : []).map((r: any) => {
-    const revenue = parseFloat(r.revenue || '0');
+    const grossRevenue = parseFloat(r.grossRevenue || '0');
+    const gst = parseFloat(r.gst || '0');
+    const qst = parseFloat(r.qst || '0');
+    const revenue = Math.round((grossRevenue - gst - qst) * 100) / 100; // Net revenue excludes GST/QST
     const laborCost = parseFloat(r.laborCost || '0');
     const orders = parseInt(r.orders || '0', 10);
     const days = parseInt(r.days || '0', 10);
@@ -1574,6 +1585,8 @@ export async function getCFOLaborEfficiency(startDate: string, endDate: string) 
   const salesLabor = await db.select({
     locationId: dailySales.locationId,
     revenue: sql<string>`SUM(${dailySales.totalSales})`,
+    gst: sql<string>`SUM(${dailySales.gstCollected})`,
+    qst: sql<string>`SUM(${dailySales.qstCollected})`,
     laborCost: sql<string>`SUM(${dailySales.labourCost})`,
     orders: sql<number>`SUM(${dailySales.orderCount})`,
     days: sql<number>`COUNT(DISTINCT ${dailySales.saleDate})`,
@@ -1598,7 +1611,10 @@ export async function getCFOLaborEfficiency(startDate: string, endDate: string) 
   return salesLabor.map(s => {
     const loc = locMap.get(s.locationId);
     const pay = payrollMap.get(s.locationId);
-    const revenue = parseFloat(s.revenue || "0");
+    const grossRevenue = parseFloat(s.revenue || "0");
+    const gst = parseFloat(s.gst || "0");
+    const qst = parseFloat(s.qst || "0");
+    const revenue = Math.round((grossRevenue - gst - qst) * 100) / 100; // Net revenue excludes GST/QST
     const laborCost = parseFloat(s.laborCost || "0");
     const hours = parseFloat(pay?.totalHours || "0");
     const revenuePerHour = hours > 0 ? revenue / hours : 0;
@@ -1669,7 +1685,7 @@ export async function getCashFlowForecast() {
     SELECT
       locationId,
       saleDate,
-      totalSales AS revenue,
+      (totalSales - COALESCE(gstCollected, 0) - COALESCE(qstCollected, 0)) AS revenue,
       labourCost,
       orderCount
     FROM dailySales

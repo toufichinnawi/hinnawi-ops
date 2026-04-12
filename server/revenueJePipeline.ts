@@ -13,14 +13,18 @@
  *   CT      → 123146517409489
  * 
  * Revenue JE Template (per day per location):
- *   Line 1: DEBIT  Accounts Receivable  = AR amount          (Name: MEV XX.)
- *   Line 2: CREDIT Sales                = taxExemptSales      (Tax: Zero-rated)
- *   Line 3: CREDIT Sales                = taxableSales        (Tax: GST/QST QC - 9.975)
- *   Line 4: DEBIT  Petty Cash           = pettyCash           (cash taken out)
- *   Line 5: CREDIT Tips Payable         = tipsCollected       (Tax: Zero-rated)
+ *   Line 1: DEBIT  Accounts Receivable     = AR amount          (Name: MEV XX. / Ontario SALES-12732303)
+ *   Line 2: CREDIT Sales (Zero-rated)      = taxExemptSales      (Tax: Zero-rated)
+ *   Line 3: CREDIT Sales (Taxable)         = taxableSales        (Tax: GST/QST QC)
+ *   Line 4: CREDIT GST Payable             = ROUND(taxable*0.05, 2)
+ *   Line 5: CREDIT QST Payable             = ROUND(taxable*0.09975, 2)
+ *   Line 6: DEBIT  Petty Cash              = pettyCash           (cash taken out)
+ *   Line 7: CREDIT Tips Payable            = tipsCollected       (Tax: Zero-rated)
+ *   Line 8: DEBIT/CREDIT Rounding Adj.     = balance diff        (if any, max $1.00)
  * 
- *   GST/QST are calculated automatically by QBO from the tax code on line 3.
+ *   GST/QST are posted as explicit credit lines (QBO JE tax codes are tags only).
  *   AR = taxExemptSales + taxableSales + GST + QST + tips - pettyCash
+ *   Rounding Adjustments absorbs any sub-$1 difference from POS rounding.
  */
 import * as prodQbo from "./qboProduction";
 import { getDb } from "./db";
@@ -54,6 +58,7 @@ interface RealmAccountIds {
   tipsPayable: { id: string; name: string };
   gstPayable: { id: string; name: string };
   qstPayable: { id: string; name: string };
+  roundingAdjustments: { id: string; name: string };
   taxCodeZeroRated: { id: string; name: string } | null;
   taxCodeGstQst: { id: string; name: string } | null;
 }
@@ -161,6 +166,18 @@ async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
         description: "QST (TVQ) collected on taxable sales",
       },
     ),
+    roundingAdjustments: await findAccountOrCreate(
+      [
+        "Rounding Adjustments", "Rounding", "Rounding Expense",
+        "Ajustements d'arrondissement",
+      ],
+      {
+        name: "Rounding Adjustments",
+        accountType: "Expense",
+        accountSubType: "OtherMiscellaneousExpense",
+        description: "Rounding differences on POS revenue journal entries",
+      },
+    ),
     taxCodeZeroRated,
     taxCodeGstQst,
   };
@@ -173,6 +190,7 @@ async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
     console.log(`    Tips:         ${result.tipsPayable.name} (#${result.tipsPayable.id})`);
   console.log(`    GST Payable:  ${result.gstPayable.name} (#${result.gstPayable.id})`);
   console.log(`    QST Payable:  ${result.qstPayable.name} (#${result.qstPayable.id})`);
+  console.log(`    Rounding:     ${result.roundingAdjustments.name} (#${result.roundingAdjustments.id})`);
   console.log(`    Tax Zero:     ${result.taxCodeZeroRated?.name || "NOT FOUND"} (#${result.taxCodeZeroRated?.id || "?"})`);
   console.log(`    Tax GST/QST:  ${result.taxCodeGstQst?.name || "NOT FOUND"} (#${result.taxCodeGstQst?.id || "?"})`);
   return result;
@@ -459,20 +477,28 @@ export async function postRevenueJEsFromPOS(
       }
 
       // ── Pre-flight validation: debits must equal credits ──
+      // If there's a small rounding difference, absorb it into Rounding Adjustments
       const totalDebits = arAmount + pettyCash;
       const totalCredits = taxExemptSales + taxableSales + gst + qst + tips;
       const balance = Math.round((totalDebits - totalCredits) * 100) / 100;
+      let roundingAmount = 0;
       if (balance !== 0) {
-        results.push({
-          locationId: sale.locationId,
-          locationCode: locConfig.code,
-          saleDate: String(sale.saleDate),
-          realmId: locConfig.realmId,
-          status: "error",
-          error: `Pre-flight: Debits ($${totalDebits.toFixed(2)}) ≠ Credits ($${totalCredits.toFixed(2)}), diff=$${balance.toFixed(2)}`,
-        });
-        console.error(`  ❌ ${locConfig.code} ${sale.saleDate}: Pre-flight balance check failed: diff=$${balance.toFixed(2)}`);
-        continue;
+        if (Math.abs(balance) > 1.00) {
+          // More than $1 difference is a data issue, not rounding
+          results.push({
+            locationId: sale.locationId,
+            locationCode: locConfig.code,
+            saleDate: String(sale.saleDate),
+            realmId: locConfig.realmId,
+            status: "error",
+            error: `Pre-flight: Debits ($${totalDebits.toFixed(2)}) ≠ Credits ($${totalCredits.toFixed(2)}), diff=$${balance.toFixed(2)} exceeds $1.00 threshold`,
+          });
+          console.error(`  ❌ ${locConfig.code} ${sale.saleDate}: Balance diff $${balance.toFixed(2)} exceeds $1.00 — likely data issue, not rounding`);
+          continue;
+        }
+        // Small rounding difference — will be absorbed by Rounding Adjustments line
+        roundingAmount = balance; // positive = debits > credits, negative = credits > debits
+        console.log(`  ℹ️  ${locConfig.code} ${sale.saleDate}: Rounding adjustment of $${balance.toFixed(2)} will be applied`);
       }
 
       // Resolve department/class ID for PK/MK
@@ -611,6 +637,21 @@ export async function postRevenueJEsFromPOS(
           classId,
           taxCodeId: accts.taxCodeZeroRated?.id,
           taxCodeName: accts.taxCodeZeroRated?.name,
+        });
+      }
+
+      // Line 8: Rounding Adjustments (if balance ≠ 0)
+      // If debits > credits (positive balance): add a CREDIT to Rounding Adjustments
+      // If credits > debits (negative balance): add a DEBIT to Rounding Adjustments
+      if (roundingAmount !== 0) {
+        lines.push({
+          postingType: roundingAmount > 0 ? "Credit" : "Debit",
+          amount: Math.abs(roundingAmount),
+          accountId: accts.roundingAdjustments.id,
+          accountName: accts.roundingAdjustments.name,
+          description: `${description} Rounding`,
+          className,
+          classId,
         });
       }
 

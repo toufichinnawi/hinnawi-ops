@@ -59,7 +59,7 @@ export default function Reporting() {
   const yearlyTotals = useMemo(() => {
     if (!monthly) return { sales: 0, gst: 0, qst: 0, labour: 0, orders: 0 };
     return {
-      sales: monthly.reduce((s, m) => s + Number(m.totalSales || 0), 0),
+      sales: monthly.reduce((s, m) => s + Number(m.totalSales || 0) - Number(m.totalGst || 0) - Number(m.totalQst || 0), 0),
       gst: monthly.reduce((s, m) => s + Number(m.totalGst || 0), 0),
       qst: monthly.reduce((s, m) => s + Number(m.totalQst || 0), 0),
       labour: monthly.reduce((s, m) => s + Number(m.totalLabourCost || 0), 0),
@@ -426,7 +426,7 @@ export default function Reporting() {
                   ) : (
                     <>
                       {monthly.map((m) => {
-                        const sales = Number(m.totalSales || 0);
+                        const sales = Number(m.totalSales || 0) - Number(m.totalGst || 0) - Number(m.totalQst || 0);
                         const labour = Number(m.totalLabourCost || 0);
                         const orders = Number(m.totalOrders || 0);
                         const days = Number(m.daysCount || 1);

@@ -577,10 +577,12 @@ export async function computeRevenueAllocation(
   const expense = await getSharedExpenseById(sharedExpenseId);
   if (!expense) throw new Error("Shared expense not found");
 
-  // Get revenue for each location in the period
+  // Get revenue for each location in the period (net of GST/QST)
   const salesData = await db.select({
     locationId: dailySales.locationId,
     totalRevenue: sql<string>`SUM(${dailySales.totalSales})`,
+    gst: sql<string>`SUM(${dailySales.gstCollected})`,
+    qst: sql<string>`SUM(${dailySales.qstCollected})`,
   }).from(dailySales)
     .where(and(
       gte(dailySales.saleDate, new Date(periodStart)),
@@ -589,7 +591,13 @@ export async function computeRevenueAllocation(
     ))
     .groupBy(dailySales.locationId);
 
-  const totalRevenue = salesData.reduce((sum, s) => sum + Number(s.totalRevenue || 0), 0);
+  // Net revenue = totalSales - GST - QST (tax is not revenue)
+  const totalRevenue = salesData.reduce((sum, s) => {
+    const gross = Number(s.totalRevenue || 0);
+    const gst = Number(s.gst || 0);
+    const qst = Number(s.qst || 0);
+    return sum + (gross - gst - qst);
+  }, 0);
 
   // Delete existing allocations for this expense
   await db.delete(sharedExpenseAllocations).where(eq(sharedExpenseAllocations.sharedExpenseId, sharedExpenseId));
@@ -597,7 +605,8 @@ export async function computeRevenueAllocation(
   // Compute and insert allocations
   const allocations = [];
   for (const locId of entityLocationIds) {
-    const locRevenue = Number(salesData.find(s => s.locationId === locId)?.totalRevenue || 0);
+    const locData = salesData.find(s => s.locationId === locId);
+    const locRevenue = locData ? Number(locData.totalRevenue || 0) - Number(locData.gst || 0) - Number(locData.qst || 0) : 0;
     const pct = totalRevenue > 0 ? (locRevenue / totalRevenue) * 100 : 0;
     const amount = totalRevenue > 0 ? (locRevenue / totalRevenue) * Number(expense.amount) : 0;
 

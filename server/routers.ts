@@ -50,9 +50,11 @@ export const appRouter = router({
       const invoiceCounts = await db.getInvoiceCount();
       const alerts = await db.getActiveAlerts();
 
-      const totalSales = sales.reduce((sum, s) => sum + Number(s.totalSales), 0);
-      const totalGst = sales.reduce((sum, s) => sum + Number(s.gstCollected), 0);
-      const totalQst = sales.reduce((sum, s) => sum + Number(s.qstCollected), 0);
+      const totalSalesGross = sales.reduce((sum, s) => sum + Number(s.totalSales), 0);
+      const totalGst = sales.reduce((sum, s) => sum + Number(s.gstCollected || 0), 0);
+      const totalQst = sales.reduce((sum, s) => sum + Number(s.qstCollected || 0), 0);
+      // Net revenue excludes GST/QST (tax is not revenue)
+      const totalSales = Math.round((totalSalesGross - totalGst - totalQst) * 100) / 100;
 
       return {
         totalSales,
@@ -92,7 +94,12 @@ export const appRouter = router({
 
       for (const s of sales) {
         const p = perfMap.get(s.locationId);
-        if (p) p.revenue += Number(s.totalSales);
+        if (p) {
+          const gross = Number(s.totalSales);
+          const gst = Number(s.gstCollected || 0);
+          const qst = Number(s.qstCollected || 0);
+          p.revenue += gross - gst - qst; // Net revenue excludes GST/QST
+        }
       }
 
       // Use actual labour cost from dailySales if available
@@ -134,7 +141,10 @@ export const appRouter = router({
         const d = raw instanceof Date ? raw.toISOString().split('T')[0] : String(raw).slice(0, 10);
         if (!byDate.has(d)) byDate.set(d, { total: 0, byLoc: {}, orders: 0, labor: 0 });
         const entry = byDate.get(d)!;
-        const amt = Number(s.totalSales);
+        const gross = Number(s.totalSales);
+        const gst = Number(s.gstCollected || 0);
+        const qst = Number(s.qstCollected || 0);
+        const amt = gross - gst - qst; // Net revenue excludes GST/QST
         const code = locMap.get(s.locationId) || 'UNK';
         entry.total += amt;
         entry.byLoc[code] = (entry.byLoc[code] || 0) + amt;
@@ -1955,7 +1965,10 @@ export const appRouter = router({
         ? sales.filter(s => input.locationIds!.includes(s.locationId))
         : sales;
       const combined: csvExport.CombinedRow[] = filtered.map(s => {
-        const rev = Number(s.totalSales);
+        const gross = Number(s.totalSales);
+        const gst = Number(s.gstCollected || 0);
+        const qst = Number(s.qstCollected || 0);
+        const rev = gross - gst - qst; // Net revenue excludes GST/QST
         const labor = Number(s.labourCost || 0);
         const orders = s.orderCount || 0;
         const fcPct = locFoodCost.get(s.locationId) || 0.29;
