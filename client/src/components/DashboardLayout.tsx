@@ -23,7 +23,7 @@ import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import {
   LayoutDashboard, FileText, Receipt, Package, ShoppingCart,
-  Users, BarChart3, Plug, LogOut, PanelLeft, ChefHat, Upload, ClipboardList, UtensilsCrossed, TrendingUp, LineChart, Mail, DollarSign, ListChecks, Landmark, Store, BookOpen, BookMarked
+  Users, BarChart3, Plug, LogOut, PanelLeft, ChefHat, Upload, ClipboardList, UtensilsCrossed, TrendingUp, LineChart, Mail, DollarSign, ListChecks, Landmark, Store, BookOpen, BookMarked, Timer
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -48,6 +48,7 @@ const menuItems = [
   { icon: Mail, label: "Email Inbox", path: "/email" },
   { icon: DollarSign, label: "Cost Pipeline", path: "/cost-pipeline" },
   { icon: BookMarked, label: "Revenue Pipeline", path: "/revenue-pipeline" },
+  { icon: Timer, label: "AP Aging", path: "/ap-aging" },
   { icon: FileText, label: "Financial Statements", path: "/financial-statements" },
   { icon: ListChecks, label: "Accountant Tasks", path: "/accountant-tasks" },
   { icon: Landmark, label: "Reconciliation", path: "/reconciliation" },

@@ -3792,5 +3792,337 @@ If a field cannot be determined, use null. Always return valid JSON.`,
       return coaCleanup.deactivateAccount(input.realmId, input.accountId);
     }),
   }),
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AP AGING SUMMARY
+  // ═══════════════════════════════════════════════════════════════════════════
+  apAging: router({
+    // Fetch AP Aging Summary from QBO for all production realms
+    summary: protectedProcedure.input(z.object({
+      asOfDate: z.string().optional(),
+    }).optional()).query(async ({ input }) => {
+      const asOf = input?.asOfDate || new Date().toISOString().split("T")[0];
+      const prodQbo = await import("./qboProduction");
+      const fDb = await import("./financialDb");
+
+      // Get all active QBO entities
+      const entities = await fDb.getQboEntities();
+      const activeEntities = entities.filter(e => e.isActive);
+
+      // Deduplicate by realmId (PK/MK share a realm)
+      const realmMap = new Map<string, { realmId: string; companyName: string; entities: typeof activeEntities }>(); 
+      for (const ent of activeEntities) {
+        if (!realmMap.has(ent.realmId)) {
+          realmMap.set(ent.realmId, { realmId: ent.realmId, companyName: ent.companyName || "Unknown", entities: [] });
+        }
+        realmMap.get(ent.realmId)!.entities.push(ent);
+      }
+
+      const results: Array<{
+        realmId: string;
+        companyName: string;
+        locationNames: string[];
+        totalAP: number;
+        current: number;
+        days1to30: number;
+        days31to60: number;
+        days61to90: number;
+        over90: number;
+        vendors: Array<{
+          vendorName: string;
+          vendorId: string;
+          total: number;
+          current: number;
+          days1to30: number;
+          days31to60: number;
+          days61to90: number;
+          over90: number;
+          transactions: Array<{
+            txnType: string;
+            txnId: string;
+            txnDate: string;
+            dueDate: string;
+            amount: number;
+            openBalance: number;
+            aging: string;
+          }>;
+        }>;
+        error?: string;
+      }> = [];
+
+      for (const [realmId, realm] of realmMap) {
+        try {
+          // Fetch AP Aging Summary report from QBO
+          const reportData = await prodQbo.prodQboRequest(
+            realmId, "GET",
+            `reports/AgedPayableDetail?report_date=${asOf}&aging_method=Report_Date`
+          );
+
+          const locationNames = realm.entities.map(e => e.companyName || "Unknown");
+          const vendorMap = new Map<string, {
+            vendorName: string;
+            vendorId: string;
+            total: number;
+            current: number;
+            days1to30: number;
+            days31to60: number;
+            days61to90: number;
+            over90: number;
+            transactions: Array<any>;
+          }>();
+
+          // Parse the QBO AP Aging report
+          function parseRows(rows: any[], currentVendor?: string, currentVendorId?: string) {
+            if (!rows) return;
+            for (const row of rows) {
+              if (row.Header?.ColData) {
+                // This is a vendor header row
+                const vendorName = row.Header.ColData[0]?.value || "Unknown";
+                const vendorId = row.Header.ColData[0]?.id || "";
+                if (row.Rows?.Row) {
+                  parseRows(row.Rows.Row, vendorName, vendorId);
+                }
+                // Summary row for vendor
+                if (row.Summary?.ColData) {
+                  const cols = row.Summary.ColData;
+                  if (!vendorMap.has(vendorName)) {
+                    vendorMap.set(vendorName, {
+                      vendorName, vendorId,
+                      total: 0, current: 0, days1to30: 0, days31to60: 0, days61to90: 0, over90: 0,
+                      transactions: [],
+                    });
+                  }
+                  const v = vendorMap.get(vendorName)!;
+                  // The summary columns typically are: name, txnType, date, num, dueDate, amount, openBalance, current, 1-30, 31-60, 61-90, 91+
+                  // But column order depends on report config; parse by column index
+                  const numCols = cols.length;
+                  if (numCols >= 6) {
+                    v.current = parseFloat(cols[numCols - 5]?.value || "0") || 0;
+                    v.days1to30 = parseFloat(cols[numCols - 4]?.value || "0") || 0;
+                    v.days31to60 = parseFloat(cols[numCols - 3]?.value || "0") || 0;
+                    v.days61to90 = parseFloat(cols[numCols - 2]?.value || "0") || 0;
+                    v.over90 = parseFloat(cols[numCols - 1]?.value || "0") || 0;
+                    v.total = v.current + v.days1to30 + v.days31to60 + v.days61to90 + v.over90;
+                  }
+                }
+              } else if (row.ColData) {
+                // This is a transaction row
+                const cols = row.ColData;
+                if (currentVendor && cols.length >= 6) {
+                  if (!vendorMap.has(currentVendor)) {
+                    vendorMap.set(currentVendor, {
+                      vendorName: currentVendor, vendorId: currentVendorId || "",
+                      total: 0, current: 0, days1to30: 0, days31to60: 0, days61to90: 0, over90: 0,
+                      transactions: [],
+                    });
+                  }
+                  const v = vendorMap.get(currentVendor)!;
+                  const txnType = cols[0]?.value || "";
+                  const txnDate = cols[1]?.value || "";
+                  const txnNum = cols[2]?.value || "";
+                  const dueDate = cols[3]?.value || "";
+                  const amount = parseFloat(cols[4]?.value || "0") || 0;
+                  const openBalance = parseFloat(cols[5]?.value || "0") || 0;
+                  const txnId = cols[0]?.id || "";
+                  // Determine aging bucket
+                  let aging = "current";
+                  const numCols = cols.length;
+                  if (numCols >= 10) {
+                    if (parseFloat(cols[numCols - 1]?.value || "0") !== 0) aging = "over90";
+                    else if (parseFloat(cols[numCols - 2]?.value || "0") !== 0) aging = "61-90";
+                    else if (parseFloat(cols[numCols - 3]?.value || "0") !== 0) aging = "31-60";
+                    else if (parseFloat(cols[numCols - 4]?.value || "0") !== 0) aging = "1-30";
+                  }
+                  v.transactions.push({ txnType, txnId, txnDate, dueDate, amount, openBalance, aging });
+                }
+              }
+            }
+          }
+
+          if (reportData?.Rows?.Row) {
+            parseRows(reportData.Rows.Row);
+          }
+
+          const vendors = Array.from(vendorMap.values()).sort((a, b) => b.total - a.total);
+          const totals = vendors.reduce((acc, v) => ({
+            total: acc.total + v.total,
+            current: acc.current + v.current,
+            days1to30: acc.days1to30 + v.days1to30,
+            days31to60: acc.days31to60 + v.days31to60,
+            days61to90: acc.days61to90 + v.days61to90,
+            over90: acc.over90 + v.over90,
+          }), { total: 0, current: 0, days1to30: 0, days31to60: 0, days61to90: 0, over90: 0 });
+
+          results.push({
+            realmId,
+            companyName: realm.companyName,
+            locationNames,
+            totalAP: totals.total,
+            ...totals,
+            vendors,
+          });
+        } catch (err: any) {
+          results.push({
+            realmId,
+            companyName: realm.companyName,
+            locationNames: realm.entities.map(e => e.companyName || "Unknown"),
+            totalAP: 0, current: 0, days1to30: 0, days31to60: 0, days61to90: 0, over90: 0,
+            vendors: [],
+            error: err.message,
+          });
+        }
+      }
+
+      // Calculate grand totals
+      const grandTotal = results.reduce((acc, r) => ({
+        total: acc.total + r.totalAP,
+        current: acc.current + r.current,
+        days1to30: acc.days1to30 + r.days1to30,
+        days31to60: acc.days31to60 + r.days31to60,
+        days61to90: acc.days61to90 + r.days61to90,
+        over90: acc.over90 + r.over90,
+      }), { total: 0, current: 0, days1to30: 0, days31to60: 0, days61to90: 0, over90: 0 });
+
+      return {
+        asOfDate: asOf,
+        companies: results,
+        grandTotal,
+      };
+    }),
+  }),
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // VENDOR JE TEMPLATES
+  // ═══════════════════════════════════════════════════════════════════════════
+  vendorJeTemplates: router({
+    list: protectedProcedure.query(async () => {
+      const dbConn = await db.getDb();
+      if (!dbConn) return [];
+      const { vendorJeTemplates, suppliers: suppliersTable, locations: locsTable } = await import("../drizzle/schema");
+      const { desc } = await import("drizzle-orm");
+      const templates = await dbConn.select().from(vendorJeTemplates).orderBy(desc(vendorJeTemplates.createdAt));
+      const allSuppliers = await dbConn.select().from(suppliersTable);
+      const allLocs = await dbConn.select().from(locsTable);
+      const supMap = new Map(allSuppliers.map(s => [s.id, s.name]));
+      const locMap = new Map(allLocs.map(l => [l.id, l.name]));
+      return templates.map(t => ({
+        ...t,
+        supplierName: supMap.get(t.supplierId) || "Unknown",
+        locationName: t.locationId ? (locMap.get(t.locationId) || "Unknown") : "All",
+      }));
+    }),
+
+    create: protectedProcedure.input(z.object({
+      supplierId: z.number(),
+      templateName: z.string(),
+      locationId: z.number().optional(),
+      defaultGlAccount: z.string().optional(),
+      defaultDescription: z.string().optional(),
+      lineItems: z.array(z.object({
+        description: z.string(),
+        amount: z.number(),
+        glAccount: z.string().optional(),
+      })).optional(),
+      frequency: z.enum(["one-time", "weekly", "biweekly", "monthly", "quarterly"]).optional(),
+    })).mutation(async ({ input }) => {
+      const dbConn = await db.getDb();
+      if (!dbConn) throw new Error("Database not available");
+      const { vendorJeTemplates } = await import("../drizzle/schema");
+      const result = await dbConn.insert(vendorJeTemplates).values({
+        supplierId: input.supplierId,
+        templateName: input.templateName,
+        locationId: input.locationId || null,
+        defaultGlAccount: input.defaultGlAccount || null,
+        defaultDescription: input.defaultDescription || null,
+        lineItems: input.lineItems ? JSON.stringify(input.lineItems) : null,
+        frequency: input.frequency || "monthly",
+      } as any);
+      return { success: true, id: result[0].insertId };
+    }),
+
+    update: protectedProcedure.input(z.object({
+      id: z.number(),
+      templateName: z.string().optional(),
+      locationId: z.number().optional(),
+      defaultGlAccount: z.string().optional(),
+      defaultDescription: z.string().optional(),
+      lineItems: z.array(z.object({
+        description: z.string(),
+        amount: z.number(),
+        glAccount: z.string().optional(),
+      })).optional(),
+      frequency: z.enum(["one-time", "weekly", "biweekly", "monthly", "quarterly"]).optional(),
+      isActive: z.boolean().optional(),
+    })).mutation(async ({ input }) => {
+      const dbConn = await db.getDb();
+      if (!dbConn) throw new Error("Database not available");
+      const { vendorJeTemplates } = await import("../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      const updates: Record<string, unknown> = {};
+      if (input.templateName !== undefined) updates.templateName = input.templateName;
+      if (input.locationId !== undefined) updates.locationId = input.locationId;
+      if (input.defaultGlAccount !== undefined) updates.defaultGlAccount = input.defaultGlAccount;
+      if (input.defaultDescription !== undefined) updates.defaultDescription = input.defaultDescription;
+      if (input.lineItems !== undefined) updates.lineItems = JSON.stringify(input.lineItems);
+      if (input.frequency !== undefined) updates.frequency = input.frequency;
+      if (input.isActive !== undefined) updates.isActive = input.isActive;
+      await dbConn.update(vendorJeTemplates).set(updates).where(eq(vendorJeTemplates.id, input.id));
+      return { success: true };
+    }),
+
+    delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+      const dbConn = await db.getDb();
+      if (!dbConn) throw new Error("Database not available");
+      const { vendorJeTemplates } = await import("../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      await dbConn.delete(vendorJeTemplates).where(eq(vendorJeTemplates.id, input.id));
+      return { success: true };
+    }),
+
+    // Create invoice from a template
+    createInvoiceFromTemplate: protectedProcedure.input(z.object({
+      templateId: z.number(),
+      invoiceDate: z.string(),
+      dueDate: z.string().optional(),
+      total: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      const dbConn = await db.getDb();
+      if (!dbConn) throw new Error("Database not available");
+      const { vendorJeTemplates } = await import("../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+
+      const [template] = await dbConn.select().from(vendorJeTemplates).where(eq(vendorJeTemplates.id, input.templateId));
+      if (!template) throw new Error("Template not found");
+
+      // Calculate total from line items if not provided
+      let total = input.total ? parseFloat(input.total) : 0;
+      const lineItems = template.lineItems ? (typeof template.lineItems === "string" ? JSON.parse(template.lineItems) : template.lineItems) : [];
+      if (!input.total && lineItems.length > 0) {
+        total = lineItems.reduce((sum: number, li: any) => sum + (li.amount || 0), 0);
+      }
+      const gst = +(total * 0.05).toFixed(2);
+      const qst = +(total * 0.09975).toFixed(2);
+      const grandTotal = +(total + gst + qst).toFixed(2);
+
+      const invoiceId = await db.createInvoice({
+        supplierId: template.supplierId,
+        locationId: template.locationId || undefined,
+        invoiceDate: input.invoiceDate,
+        dueDate: input.dueDate || undefined,
+        subtotal: total.toFixed(2),
+        gst: gst.toFixed(2),
+        qst: qst.toFixed(2),
+        total: grandTotal.toFixed(2),
+        glAccount: template.defaultGlAccount || undefined,
+        notes: `Created from template: ${template.templateName}`,
+        status: "pending",
+      });
+
+      // Mark template as used
+      await dbConn.update(vendorJeTemplates).set({ lastUsedAt: new Date() }).where(eq(vendorJeTemplates.id, input.templateId));
+
+      return { success: true, invoiceId };
+    }),
+  }),
 });
 export type AppRouter = typeof appRouter;

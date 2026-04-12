@@ -29,6 +29,7 @@ import ReconciliationDashboard from "./pages/ReconciliationDashboard";
 import VendorCatalogPage from "./pages/VendorCatalog";
 import CoACleanupPage from "./pages/CoACleanup";
 import RevenuePipeline from "./pages/RevenuePipeline";
+import APAgingSummary from "./pages/APAgingSummary";
 
 function Router() {
   return (
@@ -58,6 +59,7 @@ function Router() {
         <Route path="/vendor-catalog" component={VendorCatalogPage} />
         <Route path="/coa-cleanup" component={CoACleanupPage} />
         <Route path="/revenue-pipeline" component={RevenuePipeline} />
+        <Route path="/ap-aging" component={APAgingSummary} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

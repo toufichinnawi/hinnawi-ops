@@ -792,3 +792,19 @@ export const orderRecommendations = mysqlTable("orderRecommendations", {
   purchaseOrderId: int("recoPurchaseOrderId"),
   generatedAt: timestamp("recoGeneratedAt").defaultNow().notNull(),
 });
+
+// ─── Vendor JE Templates (recurring vendor bill patterns) ───
+export const vendorJeTemplates = mysqlTable("vendorJeTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  supplierId: int("vjtSupplierId").notNull(),
+  templateName: varchar("vjtTemplateName", { length: 256 }).notNull(),
+  locationId: int("vjtLocationId"),
+  defaultGlAccount: varchar("vjtDefaultGlAccount", { length: 128 }),
+  defaultDescription: text("vjtDefaultDescription"),
+  lineItems: json("vjtLineItems"), // JSON array of { description, amount, glAccount }
+  frequency: mysqlEnum("vjtFrequency", ["one-time", "weekly", "biweekly", "monthly", "quarterly"]).default("monthly"),
+  isActive: boolean("vjtIsActive").default(true),
+  lastUsedAt: timestamp("vjtLastUsedAt"),
+  createdAt: timestamp("vjtCreatedAt").defaultNow().notNull(),
+  updatedAt: timestamp("vjtUpdatedAt").defaultNow().onUpdateNow().notNull(),
+});
