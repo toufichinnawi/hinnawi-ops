@@ -664,7 +664,7 @@ export async function postRevenueJEsFromPOS(
 
       const jeId = result?.JournalEntry?.Id;
 
-      // Track in database
+      // Track in database with full line details
       try {
         await db.insert(revenueJournalEntries).values({
           locationId: sale.locationId,
@@ -676,6 +676,13 @@ export async function postRevenueJEsFromPOS(
           netRevenue: String(taxExemptSales + taxableSales),
           gst: String(gst),
           qst: String(qst),
+          taxExemptSales: String(taxExemptSales),
+          taxableSales: String(taxableSales),
+          tips: String(tips),
+          pettyCash: String(pettyCash),
+          arAmount: String(arAmount),
+          roundingAdj: String(roundingAdj),
+          jeLineDetails: JSON.stringify(lines),
           status: "posted",
           environment: "production",
         });
@@ -707,6 +714,32 @@ export async function postRevenueJEsFromPOS(
       await new Promise(r => setTimeout(r, 200));
 
     } catch (err: any) {
+      // Record failed entry in database so it can be reviewed and reposted
+      try {
+        await db.insert(revenueJournalEntries).values({
+          locationId: sale.locationId,
+          saleDate: String(sale.saleDate),
+          realmId: locConfig.realmId,
+          docNumber,
+          totalSales: String(totalSales),
+          netRevenue: String(taxExemptSales + taxableSales),
+          gst: String(gst),
+          qst: String(qst),
+          taxExemptSales: String(taxExemptSales),
+          taxableSales: String(taxableSales),
+          tips: String(tips),
+          pettyCash: String(pettyCash),
+          arAmount: String(arAmount),
+          roundingAdj: String(roundingAdj),
+          jeLineDetails: JSON.stringify(lines),
+          status: "failed",
+          errorMessage: err.message,
+          environment: "production",
+        });
+      } catch (trackErr: any) {
+        // Ignore tracking errors
+      }
+
       results.push({
         locationId: sale.locationId,
         locationCode: locConfig.code,

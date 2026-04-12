@@ -28,6 +28,7 @@ import ProcurementHub from "./pages/ProcurementHub";
 import ReconciliationDashboard from "./pages/ReconciliationDashboard";
 import VendorCatalogPage from "./pages/VendorCatalog";
 import CoACleanupPage from "./pages/CoACleanup";
+import RevenuePipeline from "./pages/RevenuePipeline";
 
 function Router() {
   return (
@@ -56,6 +57,7 @@ function Router() {
         <Route path="/reconciliation" component={ReconciliationDashboard} />
         <Route path="/vendor-catalog" component={VendorCatalogPage} />
         <Route path="/coa-cleanup" component={CoACleanupPage} />
+        <Route path="/revenue-pipeline" component={RevenuePipeline} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

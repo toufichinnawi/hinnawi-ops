@@ -3532,6 +3532,226 @@ If a field cannot be determined, use null. Always return valid JSON.`,
   }),
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // REVENUE JOURNAL ENTRIES MANAGEMENT
+  // ═══════════════════════════════════════════════════════════════════════════
+  revenueJE: router({
+    // List all revenue JEs with filtering
+    list: protectedProcedure.input(z.object({
+      status: z.enum(["all", "posted", "failed", "pending", "voided", "deleted"]).default("all"),
+      locationId: z.number().optional(),
+      startDate: z.string().optional(),
+      endDate: z.string().optional(),
+      page: z.number().default(1),
+      pageSize: z.number().default(50),
+    }).optional()).query(async ({ input }) => {
+      const dbConn = await db.getDb();
+      if (!dbConn) throw new Error("Database not available");
+      const { revenueJournalEntries, locations } = await import("../drizzle/schema");
+      const { eq, and, gte, lte, desc, count } = await import("drizzle-orm");
+
+      const filters: any[] = [];
+      if (input?.status && input.status !== "all") {
+        filters.push(eq(revenueJournalEntries.status, input.status as any));
+      }
+      if (input?.locationId) {
+        filters.push(eq(revenueJournalEntries.locationId, input.locationId));
+      }
+      if (input?.startDate) {
+        filters.push(gte(revenueJournalEntries.saleDate, input.startDate));
+      }
+      if (input?.endDate) {
+        filters.push(lte(revenueJournalEntries.saleDate, input.endDate));
+      }
+
+      const whereClause = filters.length > 0 ? and(...filters) : undefined;
+      const page = input?.page || 1;
+      const pageSize = input?.pageSize || 50;
+
+      const [entries, totalResult, locs] = await Promise.all([
+        dbConn.select().from(revenueJournalEntries)
+          .where(whereClause)
+          .orderBy(desc(revenueJournalEntries.saleDate))
+          .limit(pageSize)
+          .offset((page - 1) * pageSize),
+        dbConn.select({ total: count() }).from(revenueJournalEntries).where(whereClause),
+        dbConn.select().from(locations),
+      ]);
+
+      const locationMap = Object.fromEntries(locs.map(l => [l.id, l.name]));
+
+      const [statusCounts] = await Promise.all([
+        dbConn.select({
+          status: revenueJournalEntries.status,
+          cnt: count(),
+        }).from(revenueJournalEntries).groupBy(revenueJournalEntries.status),
+      ]);
+
+      const summary = { posted: 0, failed: 0, pending: 0, voided: 0, deleted: 0, total: 0 };
+      for (const row of statusCounts) {
+        (summary as any)[row.status] = Number(row.cnt);
+        summary.total += Number(row.cnt);
+      }
+
+      return {
+        entries: entries.map(e => ({
+          ...e,
+          locationName: locationMap[e.locationId] || `Location ${e.locationId}`,
+        })),
+        total: Number(totalResult[0]?.total || 0),
+        page,
+        pageSize,
+        summary,
+      };
+    }),
+
+    // Get a single revenue JE by ID
+    getById: protectedProcedure.input(z.object({
+      id: z.number(),
+    })).query(async ({ input }) => {
+      const dbConn = await db.getDb();
+      if (!dbConn) throw new Error("Database not available");
+      const { revenueJournalEntries, locations } = await import("../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+
+      const [entry] = await dbConn.select().from(revenueJournalEntries)
+        .where(eq(revenueJournalEntries.id, input.id));
+      if (!entry) throw new Error("Entry not found");
+
+      const [loc] = await dbConn.select().from(locations)
+        .where(eq(locations.id, entry.locationId));
+
+      return { ...entry, locationName: loc?.name || `Location ${entry.locationId}` };
+    }),
+
+    // Update a failed/pending JE and repost to QBO
+    updateAndRepost: protectedProcedure.input(z.object({
+      id: z.number(),
+      arAmount: z.string(),
+      taxExemptSales: z.string(),
+      taxableSales: z.string(),
+      gst: z.string(),
+      qst: z.string(),
+      tips: z.string(),
+      pettyCash: z.string(),
+    })).mutation(async ({ input }) => {
+      const dbConn = await db.getDb();
+      if (!dbConn) throw new Error("Database not available");
+      const { revenueJournalEntries } = await import("../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      const prodQbo = await import("./qboProduction");
+
+      const [entry] = await dbConn.select().from(revenueJournalEntries)
+        .where(eq(revenueJournalEntries.id, input.id));
+      if (!entry) throw new Error("Entry not found");
+      if (entry.status === "posted") throw new Error("Cannot edit a posted entry — void it first");
+
+      const ar = parseFloat(input.arAmount);
+      const exempt = parseFloat(input.taxExemptSales);
+      const taxable = parseFloat(input.taxableSales);
+      const gst = parseFloat(input.gst);
+      const qst = parseFloat(input.qst);
+      const tips = parseFloat(input.tips);
+      const petty = parseFloat(input.pettyCash);
+
+      const totalDebits = ar + petty;
+      const totalCredits = exempt + taxable + gst + qst + tips;
+      const diff = totalDebits - totalCredits;
+
+      const lines: any[] = [];
+      if (ar > 0) lines.push({ postingType: "Debit", amount: ar, accountName: "Accounts Receivable", description: `Daily revenue ${entry.saleDate}` });
+      if (exempt > 0) lines.push({ postingType: "Credit", amount: exempt, accountName: "Sales", description: `Tax-exempt sales ${entry.saleDate}` });
+      if (taxable > 0) lines.push({ postingType: "Credit", amount: taxable, accountName: "Sales", description: `Taxable sales ${entry.saleDate}` });
+      if (gst > 0) lines.push({ postingType: "Credit", amount: gst, accountName: "GST Payable", description: `GST collected ${entry.saleDate}` });
+      if (qst > 0) lines.push({ postingType: "Credit", amount: qst, accountName: "QST Payable", description: `QST collected ${entry.saleDate}` });
+      if (petty > 0) lines.push({ postingType: "Debit", amount: petty, accountName: "Petty Cash", description: `Petty cash ${entry.saleDate}` });
+      if (tips > 0) lines.push({ postingType: "Credit", amount: tips, accountName: "Tips Payable", description: `Tips ${entry.saleDate}` });
+
+      // Rounding adjustment
+      if (Math.abs(diff) > 0.001) {
+        lines.push({
+          postingType: diff > 0 ? "Credit" : "Debit",
+          amount: Math.abs(Math.round(diff * 10000) / 10000),
+          accountName: "Rounding Adjustments",
+          description: `Rounding ${entry.saleDate}`,
+        });
+      }
+
+      try {
+        const result = await prodQbo.createProductionJournalEntry(entry.realmId, {
+          txnDate: String(entry.saleDate),
+          docNumber: entry.docNumber || `REV${String(entry.saleDate).replace(/-/g, '')}`,
+          privateNote: `Daily revenue entry for ${entry.saleDate} | Reposted from Hinnawi Ops`,
+          lines,
+        });
+
+        const jeId = result?.JournalEntry?.Id;
+        await dbConn.update(revenueJournalEntries)
+          .set({
+            status: "posted",
+            qboJeId: jeId || null,
+            errorMessage: null,
+            arAmount: input.arAmount,
+            taxExemptSales: input.taxExemptSales,
+            taxableSales: input.taxableSales,
+            gst: input.gst,
+            qst: input.qst,
+            tips: input.tips,
+            pettyCash: input.pettyCash,
+            roundingAdj: String(Math.abs(diff) > 0.001 ? diff : 0),
+            jeLineDetails: JSON.stringify(lines),
+            postedAt: new Date(),
+          })
+          .where(eq(revenueJournalEntries.id, input.id));
+
+        return { success: true, qboJeId: jeId };
+      } catch (err: any) {
+        await dbConn.update(revenueJournalEntries)
+          .set({
+            status: "failed",
+            errorMessage: err.message,
+            arAmount: input.arAmount,
+            taxExemptSales: input.taxExemptSales,
+            taxableSales: input.taxableSales,
+            gst: input.gst,
+            qst: input.qst,
+            tips: input.tips,
+            pettyCash: input.pettyCash,
+            jeLineDetails: JSON.stringify(lines),
+          })
+          .where(eq(revenueJournalEntries.id, input.id));
+
+        return { success: false, error: err.message };
+      }
+    }),
+
+    // Void a posted JE
+    void: protectedProcedure.input(z.object({
+      id: z.number(),
+    })).mutation(async ({ input }) => {
+      const dbConn = await db.getDb();
+      if (!dbConn) throw new Error("Database not available");
+      const { revenueJournalEntries } = await import("../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      const prodQbo = await import("./qboProduction");
+
+      const [entry] = await dbConn.select().from(revenueJournalEntries)
+        .where(eq(revenueJournalEntries.id, input.id));
+      if (!entry) throw new Error("Entry not found");
+      if (!entry.qboJeId) throw new Error("No QBO JE ID — cannot void");
+
+      try {
+        await prodQbo.voidJournalEntry(entry.realmId, entry.qboJeId);
+        await dbConn.update(revenueJournalEntries)
+          .set({ status: "voided", voidedAt: new Date() })
+          .where(eq(revenueJournalEntries.id, input.id));
+        return { success: true };
+      } catch (err: any) {
+        return { success: false, error: err.message };
+      }
+    }),
+  }),
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // CHART OF ACCOUNTS CLEANUP
   // ═══════════════════════════════════════════════════════════════════════════
   coaCleanup: router({
