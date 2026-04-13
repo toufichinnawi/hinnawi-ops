@@ -31,6 +31,24 @@ import { getDb } from "./db";
 import { dailySales, locations, revenueJournalEntries } from "../drizzle/schema";
 import { eq, and, gte, lte, inArray } from "drizzle-orm";
 
+/**
+ * Safely convert a Date or string to YYYY-MM-DD without timezone shift.
+ * MySQL `date` columns come back as JS Date objects at midnight UTC.
+ * Using String() or toISOString() can shift the date by -1 day in EDT/EST.
+ */
+function toDateStr(d: Date | string | null | undefined): string {
+  if (!d) return "";
+  if (typeof d === "string") {
+    // Already a string — just take the first 10 chars (YYYY-MM-DD)
+    return d.slice(0, 10);
+  }
+  // It's a Date object — use UTC components to avoid timezone shift
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 // ─── Location → QBO Realm Mapping ───
 
 interface LocationQboConfig {
@@ -40,19 +58,30 @@ interface LocationQboConfig {
   realmId: string;
   departmentFilter?: string; // PK or MK for the shared company
   mevName?: string; // Name column in QBO (e.g., "MEV MK.", "MEV PK.")
+  taxProvince?: "QC" | "ON"; // Province for tax calculation — QC = GST+QST, ON = HST
+  /**
+   * When true, the POS totalSales is TAX-INCLUSIVE (i.e., it includes GST+QST).
+   * The pipeline will back-calculate the tax from totalSales.
+   * This is needed for locations like Ontario cafe (in QC) where 7shifts
+   * reports gross receipts including tax but doesn't break down GST/QST.
+   */
+  taxInclusive?: boolean;
 }
 
 const LOCATION_QBO_MAP: LocationQboConfig[] = [
-  { locationId: 1, code: "PK", name: "President Kennedy", realmId: "9130346671806126", departmentFilter: "PK", mevName: "MEV PK." },
-  { locationId: 2, code: "MK", name: "Mackay", realmId: "9130346671806126", departmentFilter: "MK", mevName: "MEV MK." },
-  { locationId: 3, code: "ONT", name: "Ontario", realmId: "123146517406139", mevName: "Ontario SALES-12732303" },
-  { locationId: 4, code: "CT", name: "Cathcart Tunnel", realmId: "123146517409489", mevName: "MEV CT." },
+  { locationId: 1, code: "PK", name: "President Kennedy", realmId: "9130346671806126", departmentFilter: "PK", mevName: "MEV PK.", taxProvince: "QC" },
+  { locationId: 2, code: "MK", name: "Mackay", realmId: "9130346671806126", departmentFilter: "MK", mevName: "MEV MK.", taxProvince: "QC" },
+  { locationId: 3, code: "ONT", name: "Ontario", realmId: "123146517406139", mevName: "Ontario SALES-12732303", taxProvince: "QC", taxInclusive: true },
+  { locationId: 4, code: "CT", name: "Cathcart Tunnel", realmId: "123146517409489", mevName: "MEV CT.", taxProvince: "QC" },
 ];
 
 // ─── Account ID Cache (per realm) ───
 
 interface RealmAccountIds {
   accountsReceivable: { id: string; name: string };
+  undepositedFunds: { id: string; name: string };
+  cashOnHand: { id: string; name: string };
+  discountsPromotions: { id: string; name: string };
   salesRevenue: { id: string; name: string };
   pettyCash: { id: string; name: string };
   tipsPayable: { id: string; name: string };
@@ -122,6 +151,42 @@ async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
       "Accounts Receivable", "1200 Accounts Receivable", "Accounts Receivable (A/R)",
       "Comptes clients", "A/R",
     ]),
+    undepositedFunds: await findAccountOrCreate(
+      [
+        "Undeposited Funds", "1050 Undeposited Funds",
+        "Fonds non d\u00e9pos\u00e9s",
+      ],
+      {
+        name: "Undeposited Funds",
+        accountType: "Other Current Asset",
+        accountSubType: "UndepositedFunds",
+        description: "Electronic payments (credit/debit) not yet deposited",
+      },
+    ),
+    cashOnHand: await findAccountOrCreate(
+      [
+        "Cash on Hand", "1060 Cash on Hand", "Petty Cash", "1051 Petty Cash",
+        "Petite caisse", "Cash",
+      ],
+      {
+        name: "Cash on Hand",
+        accountType: "Bank",
+        accountSubType: "CashOnHand",
+        description: "Cash payments collected at POS",
+      },
+    ),
+    discountsPromotions: await findAccountOrCreate(
+      [
+        "Discounts & Promotions", "Discounts", "Promotions",
+        "Rabais et promotions", "Discount",
+      ],
+      {
+        name: "Discounts & Promotions",
+        accountType: "Income",
+        accountSubType: "DiscountsRefundsGiven",
+        description: "Discounts and promotions given at POS",
+      },
+    ),
     salesRevenue: findAccount([
       "Sales", "Sales Revenue", "4200 Sales", "Sales MK", "Sales PK",
       "Revenue", "Sales of Product Income", "Ventes",
@@ -185,6 +250,9 @@ async function getRealmAccountIds(realmId: string): Promise<RealmAccountIds> {
   accountIdCache.set(realmId, result);
   console.log(`  Realm ${realmId} accounts resolved:`);
   console.log(`    AR:           ${result.accountsReceivable.name} (#${result.accountsReceivable.id})`);
+  console.log(`    Undeposited:  ${result.undepositedFunds.name} (#${result.undepositedFunds.id})`);
+  console.log(`    Cash on Hand: ${result.cashOnHand.name} (#${result.cashOnHand.id})`);
+  console.log(`    Discounts:    ${result.discountsPromotions.name} (#${result.discountsPromotions.id})`);
   console.log(`    Sales:        ${result.salesRevenue.name} (#${result.salesRevenue.id})`);
   console.log(`    Petty Cash:   ${result.pettyCash.name} (#${result.pettyCash.id})`);
     console.log(`    Tips:         ${result.tipsPayable.name} (#${result.tipsPayable.id})`);
@@ -378,7 +446,7 @@ export async function postRevenueJEsFromPOS(
       results.push({
         locationId: sale.locationId,
         locationCode: "UNK",
-        saleDate: String(sale.saleDate),
+        saleDate: toDateStr(sale.saleDate),
         realmId: "",
         status: "skipped",
         error: "Location not mapped to QBO realm",
@@ -391,7 +459,7 @@ export async function postRevenueJEsFromPOS(
       results.push({
         locationId: sale.locationId,
         locationCode: locConfig.code,
-        saleDate: String(sale.saleDate),
+        saleDate: toDateStr(sale.saleDate),
         realmId: locConfig.realmId,
         status: "skipped",
         error: "Zero sales (store closed)",
@@ -407,9 +475,34 @@ export async function postRevenueJEsFromPOS(
       const posGst = Math.round(Number(sale.gstCollected || 0) * 100) / 100;
       const posQst = Math.round(Number(sale.qstCollected || 0) * 100) / 100;
       const pettyCash = Math.round(Number((sale as any).pettyCash || 0) * 100) / 100;
+      const discounts = Math.round(Number((sale as any).discounts || 0) * 100) / 100;
       const tips = Math.round(Number(sale.tipsCollected || 0) * 100) / 100;
 
-      // ── Repair incomplete tax splits ──
+      // ── Scenario 0: Tax-inclusive POS (e.g., Ontario cafe via 7shifts) ──
+      // When taxInclusive=true, the POS totalSales INCLUDES GST+QST.
+      // We must back-calculate the net revenue from the gross total.
+      // Formula: netSales = totalSales / (1 + GST_RATE + QST_RATE)
+      //          GST = ROUND(netSales * 0.05, 2)
+      //          QST = ROUND(netSales * 0.09975, 2)
+      // This ensures revenue reports show actual net revenue, not gross receipts.
+      if (locConfig.taxInclusive && posGst === 0 && posQst === 0 && totalSales > 0) {
+        if (locConfig.taxProvince === "QC") {
+          // QC: GST 5% + QST 9.975% = 14.975% combined
+          const netSales = Math.round(totalSales / 1.14975 * 100) / 100;
+          const backGst = Math.round(netSales * 5) / 100;
+          const backQst = Math.round(netSales * 9.975) / 100;
+          // Assign: all net sales are taxable (Ontario has no tax-exempt split from 7shifts)
+          taxableSales = netSales;
+          taxExemptSales = 0;
+          // Override the POS GST/QST with back-calculated values
+          // (We'll use these below instead of posGst/posQst)
+          (sale as any)._backCalcGst = backGst;
+          (sale as any)._backCalcQst = backQst;
+          console.log(`  💰 ${locConfig.code} ${sale.saleDate}: Tax-inclusive POS — gross=$${totalSales.toFixed(2)}, net=$${netSales.toFixed(2)}, GST=$${backGst.toFixed(2)}, QST=$${backQst.toFixed(2)}`);
+        }
+      }
+
+      // ── Repair incomplete tax splits (for non-taxInclusive locations) ──
       // Scenario 1: No split at all (taxExempt=0 AND taxable=0 but totalSales>0)
       //   → Treat entire totalSales as tax-exempt.
       // Scenario 2: Partial split — 7shifts overwrote Lightspeed data
@@ -418,7 +511,7 @@ export async function postRevenueJEsFromPOS(
       // Scenario 3: Full Lightspeed data (taxExempt>0, taxable>0, GST>0, QST>0)
       //   → Use as-is.
 
-      if (taxExemptSales === 0 && taxableSales === 0 && totalSales > 0) {
+      if (!locConfig.taxInclusive && taxExemptSales === 0 && taxableSales === 0 && totalSales > 0) {
         // Scenario 1: no split at all → all tax-exempt
         taxExemptSales = totalSales;
         console.log(`  ℹ️  ${locConfig.code} ${sale.saleDate}: No tax split — treating $${totalSales.toFixed(2)} as tax-exempt`);
@@ -442,32 +535,50 @@ export async function postRevenueJEsFromPOS(
       }
       // Scenario 3: full data — no changes needed
 
-      // ── Calculate GST/QST using QBO-matching formula ──
-      // CRITICAL: Use ROUND(taxable * rate, 2) to match QBO's auto-calculation.
-      // Do NOT use POS-recorded gstCollected/qstCollected — they may round differently.
-      const gst = Math.round(taxableSales * 5) / 100;       // ROUND(taxable * 0.05, 2)
-      const qst = Math.round(taxableSales * 9.975) / 100;   // ROUND(taxable * 0.09975, 2)
+      // ── Calculate GST/QST ──
+      // For taxInclusive locations: use the back-calculated values from Scenario 0
+      // For other locations: use ROUND(taxable * rate, 2) to match QBO's auto-calculation
+      let gst: number;
+      let qst: number;
+      if ((sale as any)._backCalcGst !== undefined) {
+        gst = (sale as any)._backCalcGst;
+        qst = (sale as any)._backCalcQst;
+      } else {
+        gst = Math.round(taxableSales * 5) / 100;       // ROUND(taxable * 0.05, 2)
+        qst = Math.round(taxableSales * 9.975) / 100;   // ROUND(taxable * 0.09975, 2)
+      }
 
-      // ── AR = sum of all credits (including QBO auto-tax) minus petty cash ──
-      // Credits: taxExemptSales + taxableSales + gst(auto) + qst(auto) + tips
-      // Debits: AR + pettyCash
-      // So: AR = taxExemptSales + taxableSales + gst + qst + tips - pettyCash
-      const arAmount = Math.round((taxExemptSales + taxableSales + gst + qst + tips - pettyCash) * 100) / 100;
+      // ── Debit/Credit structure (matching QBO template) ──
+      // DEBITS:
+      //   Undeposited Funds = totalSales - pettyCash - discounts (electronic payments)
+      //   Cash on Hand      = pettyCash (cash payments)
+      //   Discounts & Promo = discounts (discounts given, reduces revenue)
+      // CREDITS:
+      //   Sales - Tax Exempt = taxExemptSales
+      //   Sales - Taxable    = taxableSales
+      //   GST Payable        = gst
+      //   QST Payable        = qst
+      //   Tips Payable       = tips
+      //   Rounding Adj       = balance difference
+      const undepositedFundsAmount = Math.round((taxExemptSales + taxableSales + gst + qst + tips - pettyCash - discounts) * 100) / 100;
+      const arAmount = undepositedFundsAmount; // For backward compat in DB tracking
 
       // ── Pre-flight validation: ensure at least 2 lines ──
-      let lineCount = 1; // AR always present
+      let lineCount = 0;
+      if (undepositedFundsAmount > 0) lineCount++;
+      if (pettyCash > 0) lineCount++;
+      if (discounts > 0) lineCount++;
       if (taxExemptSales > 0) lineCount++;
       if (taxableSales > 0) lineCount++;
       if (gst > 0) lineCount++;
       if (qst > 0) lineCount++;
-      if (pettyCash > 0) lineCount++;
       if (tips > 0) lineCount++;
 
       if (lineCount < 2) {
         results.push({
           locationId: sale.locationId,
           locationCode: locConfig.code,
-          saleDate: String(sale.saleDate),
+          saleDate: toDateStr(sale.saleDate),
           realmId: locConfig.realmId,
           status: "skipped",
           error: `Only ${lineCount} line(s) — need at least 2 for QBO`,
@@ -478,7 +589,7 @@ export async function postRevenueJEsFromPOS(
 
       // ── Pre-flight validation: debits must equal credits ──
       // If there's a small rounding difference, absorb it into Rounding Adjustments
-      const totalDebits = arAmount + pettyCash;
+      const totalDebits = undepositedFundsAmount + pettyCash + discounts;
       const totalCredits = taxExemptSales + taxableSales + gst + qst + tips;
       const balance = Math.round((totalDebits - totalCredits) * 100) / 100;
       let roundingAmount = 0;
@@ -488,7 +599,7 @@ export async function postRevenueJEsFromPOS(
           results.push({
             locationId: sale.locationId,
             locationCode: locConfig.code,
-            saleDate: String(sale.saleDate),
+            saleDate: toDateStr(sale.saleDate),
             realmId: locConfig.realmId,
             status: "error",
             error: `Pre-flight: Debits ($${totalDebits.toFixed(2)}) ≠ Credits ($${totalCredits.toFixed(2)}), diff=$${balance.toFixed(2)} exceeds $1.00 threshold`,
@@ -524,7 +635,7 @@ export async function postRevenueJEsFromPOS(
       }
 
       // DocNumber max 21 chars in QBO. Format: REVPK250405
-      const dateStr = String(sale.saleDate);
+      const dateStr = toDateStr(sale.saleDate);
       const shortDate = dateStr.replace(/-/g, "").slice(2); // 250405 from 2025-04-05
       const docNumber = `REV${locConfig.code}${shortDate}`;
       const description = `${shortDate.slice(2)}${locConfig.code} Revenue`;
@@ -543,20 +654,48 @@ export async function postRevenueJEsFromPOS(
         entityName?: string;
       }> = [];
 
-      // Line 1: DEBIT Accounts Receivable = AR amount (with MEV Name)
-      lines.push({
-        postingType: "Debit",
-        amount: arAmount,
-        accountId: accts.accountsReceivable.id,
-        accountName: accts.accountsReceivable.name,
-        description: "",
-        className,
-        classId,
-        entityId,
-        entityName,
-      });
+      // Line 1: DEBIT Undeposited Funds = electronic payments (with MEV Name)
+      if (undepositedFundsAmount > 0) {
+        lines.push({
+          postingType: "Debit",
+          amount: undepositedFundsAmount,
+          accountId: accts.undepositedFunds.id,
+          accountName: accts.undepositedFunds.name,
+          description: `Daily Sales - ${locConfig.name} - ${dateStr}`,
+          className,
+          classId,
+          entityId,
+          entityName,
+        });
+      }
 
-      // Line 2: CREDIT Sales = taxExemptSales (Tax: Zero-rated)
+      // Line 2: DEBIT Cash on Hand = cash payments
+      if (pettyCash > 0) {
+        lines.push({
+          postingType: "Debit",
+          amount: pettyCash,
+          accountId: accts.cashOnHand.id,
+          accountName: accts.cashOnHand.name,
+          description: `Daily Sales - ${locConfig.name} - ${dateStr}`,
+          className,
+          classId,
+        });
+      }
+
+      // Line 3: DEBIT Discounts & Promotions = discounts given
+      if (discounts > 0) {
+        lines.push({
+          postingType: "Debit",
+          amount: discounts,
+          accountId: accts.discountsPromotions.id,
+          accountName: accts.discountsPromotions.name,
+          description: `Daily Sales - ${locConfig.name} - ${dateStr}`,
+          className,
+          classId,
+        });
+      }
+
+      // Line 4: CREDIT Sales = taxExemptSales (Tax: Zero-rated)
       if (taxExemptSales > 0) {
         lines.push({
           postingType: "Credit",
@@ -612,20 +751,7 @@ export async function postRevenueJEsFromPOS(
         });
       }
 
-      // Line 6: DEBIT Petty Cash (if > 0)
-      if (pettyCash > 0) {
-        lines.push({
-          postingType: "Debit",
-          amount: pettyCash,
-          accountId: accts.pettyCash.id,
-          accountName: accts.pettyCash.name,
-          description: `${description}`,
-          className,
-          classId,
-        });
-      }
-
-      // Line 7: CREDIT Tips Payable (if > 0)
+      // Line 8: CREDIT Tips Payable (if > 0)
       if (tips > 0) {
         lines.push({
           postingType: "Credit",
@@ -656,7 +782,7 @@ export async function postRevenueJEsFromPOS(
       }
 
       const result = await prodQbo.createProductionJournalEntry(locConfig.realmId, {
-        txnDate: String(sale.saleDate),
+        txnDate: toDateStr(sale.saleDate),
         docNumber,
         privateNote: `Daily revenue entry for ${locConfig.name} - ${sale.saleDate} | Source: POS (Hinnawi Ops)`,
         lines,
@@ -668,7 +794,7 @@ export async function postRevenueJEsFromPOS(
       try {
         await db.insert(revenueJournalEntries).values({
           locationId: sale.locationId,
-          saleDate: String(sale.saleDate),
+          saleDate: toDateStr(sale.saleDate),
           realmId: locConfig.realmId,
           qboJeId: jeId || null,
           docNumber,
@@ -681,7 +807,7 @@ export async function postRevenueJEsFromPOS(
           tips: String(tips),
           pettyCash: String(pettyCash),
           arAmount: String(arAmount),
-          roundingAdj: String(roundingAdj),
+          roundingAdj: String(roundingAmount),
           jeLineDetails: JSON.stringify(lines),
           status: "posted",
           environment: "production",
@@ -693,7 +819,7 @@ export async function postRevenueJEsFromPOS(
       results.push({
         locationId: sale.locationId,
         locationCode: locConfig.code,
-        saleDate: String(sale.saleDate),
+        saleDate: toDateStr(sale.saleDate),
         realmId: locConfig.realmId,
         status: "posted",
         qboJeId: jeId,
@@ -718,7 +844,7 @@ export async function postRevenueJEsFromPOS(
       try {
         await db.insert(revenueJournalEntries).values({
           locationId: sale.locationId,
-          saleDate: String(sale.saleDate),
+          saleDate: toDateStr(sale.saleDate),
           realmId: locConfig.realmId,
           docNumber,
           totalSales: String(totalSales),
@@ -730,7 +856,7 @@ export async function postRevenueJEsFromPOS(
           tips: String(tips),
           pettyCash: String(pettyCash),
           arAmount: String(arAmount),
-          roundingAdj: String(roundingAdj),
+          roundingAdj: String(roundingAmount),
           jeLineDetails: JSON.stringify(lines),
           status: "failed",
           errorMessage: err.message,
@@ -743,7 +869,7 @@ export async function postRevenueJEsFromPOS(
       results.push({
         locationId: sale.locationId,
         locationCode: locConfig.code,
-        saleDate: String(sale.saleDate),
+        saleDate: toDateStr(sale.saleDate),
         realmId: locConfig.realmId,
         status: "error",
         error: err.message,

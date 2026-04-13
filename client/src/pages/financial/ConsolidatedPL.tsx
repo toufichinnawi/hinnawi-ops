@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,6 @@ function getFiscalYearDates(year: number) {
   return { start: `${year}-09-01`, end: `${year + 1}-08-31` };
 }
 
-/** Fiscal quarters based on Sep 1 fiscal year start */
 function getFiscalQuarterDates(fiscalYear: number, quarter: 1 | 2 | 3 | 4) {
   switch (quarter) {
     case 1: return { start: `${fiscalYear}-09-01`, end: `${fiscalYear}-11-30` };
@@ -33,7 +32,7 @@ function getFiscalQuarterDates(fiscalYear: number, quarter: 1 | 2 | 3 | 4) {
 }
 
 function getCurrentFiscalQuarter(): 1 | 2 | 3 | 4 {
-  const month = new Date().getMonth() + 1; // 1-12
+  const month = new Date().getMonth() + 1;
   if (month >= 9 && month <= 11) return 1;
   if (month >= 12 || month <= 2) return 2;
   if (month >= 3 && month <= 5) return 3;
@@ -117,7 +116,6 @@ export default function ConsolidatedPL() {
     if (isRefreshing) return;
     setIsRefreshing(true);
     try {
-      // Clear ALL entity caches (consolidated spans all entities)
       await clearCacheMutation.mutateAsync({});
       await utils.financialStatements.consolidated.invalidate();
       await utils.financialStatements.reports.invalidate();
@@ -131,7 +129,6 @@ export default function ConsolidatedPL() {
     }
   }, [isRefreshing, clearCacheMutation, utils, refetch]);
 
-  // Auto-refresh every 5 minutes
   useEffect(() => {
     const interval = setInterval(() => {
       utils.financialStatements.consolidated.invalidate();
@@ -194,6 +191,12 @@ export default function ConsolidatedPL() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+
+  /* ── Compute column count for proper alignment ── */
+  const entityCols = showEntityBreakdown ? (report?.entityBreakdown?.length ?? 0) : 0;
+  const icCols = eliminateIC ? 2 : 0; // Eliminations + Net
+  // Total data columns (excluding Account): Consolidated + IC cols + entity cols + Prior + Var$ + Var%
+  const dataCols = 1 + icCols + entityCols + 3;
 
   if (isLoading) {
     return (
@@ -321,7 +324,6 @@ export default function ConsolidatedPL() {
 
             <Separator orientation="vertical" className="h-8" />
 
-            {/* Intercompany elimination toggle */}
             <div className="flex items-center gap-2">
               <Switch checked={eliminateIC} onCheckedChange={setEliminateIC} id="ic-toggle" />
               <label htmlFor="ic-toggle" className="text-xs font-medium cursor-pointer">
@@ -329,7 +331,6 @@ export default function ConsolidatedPL() {
               </label>
             </div>
 
-            {/* Entity breakdown toggle */}
             <div className="flex items-center gap-2">
               <Switch checked={showEntityBreakdown} onCheckedChange={setShowEntityBreakdown} id="breakdown-toggle" />
               <label htmlFor="breakdown-toggle" className="text-xs font-medium cursor-pointer">
@@ -339,7 +340,6 @@ export default function ConsolidatedPL() {
 
             <div className="flex-1" />
 
-            {/* Actions */}
             <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing || isLoading} className="gap-1 h-8">
               <RefreshCw className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`} /> {isRefreshing ? "Refreshing..." : "Refresh"}
             </Button>
@@ -407,7 +407,11 @@ export default function ConsolidatedPL() {
         </Card>
       )}
 
-      {/* Consolidated P&L Table */}
+      {/* ═══════════════════════════════════════════════════════════
+           Consolidated P&L Table — FIXED column alignment
+           Uses table-fixed layout with explicit col widths so
+           header cells and data cells always line up perfectly.
+         ═══════════════════════════════════════════════════════════ */}
       {report && (
         <Card>
           <CardHeader className="py-3">
@@ -419,21 +423,34 @@ export default function ConsolidatedPL() {
             </CardTitle>
           </CardHeader>
           <CardContent className="py-0 pb-4 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
+            <table className="w-full text-sm border-collapse" style={{ tableLayout: "fixed" }}>
+              {/* ── colgroup: explicit widths keep headers + data aligned ── */}
+              <colgroup>
+                <col style={{ width: "220px", minWidth: "180px" }} /> {/* Account */}
+                <col style={{ width: "110px" }} /> {/* Consolidated */}
+                {eliminateIC && <col style={{ width: "100px" }} />} {/* Eliminations */}
+                {eliminateIC && <col style={{ width: "110px" }} />} {/* Net */}
+                {showEntityBreakdown && report.entityBreakdown?.map((e: any) => (
+                  <col key={e.entityId} style={{ width: "105px" }} />
+                ))}
+                <col style={{ width: "105px" }} /> {/* Prior Period */}
+                <col style={{ width: "95px" }} />  {/* Variance $ */}
+                <col style={{ width: "75px" }} />  {/* Variance % */}
+              </colgroup>
+              <thead className="sticky top-0 z-10 bg-white">
                 <tr className="border-b-2 text-xs text-muted-foreground">
-                  <th className="text-left py-2 font-medium min-w-[250px]">Account</th>
-                  <th className="text-right py-2 font-medium w-[120px]">Consolidated</th>
-                  {eliminateIC && <th className="text-right py-2 font-medium w-[100px]">Eliminations</th>}
-                  {eliminateIC && <th className="text-right py-2 font-medium w-[120px]">Net</th>}
+                  <th className="text-left py-2 px-2 font-medium">Account</th>
+                  <th className="text-right py-2 px-2 font-medium">Consolidated</th>
+                  {eliminateIC && <th className="text-right py-2 px-2 font-medium">Eliminations</th>}
+                  {eliminateIC && <th className="text-right py-2 px-2 font-medium">Net</th>}
                   {showEntityBreakdown && report.entityBreakdown?.map((e: any) => (
-                    <th key={e.entityId} className="text-right py-2 font-medium w-[100px] text-xs">
+                    <th key={e.entityId} className="text-right py-2 px-2 font-medium truncate" title={e.entityName}>
                       {e.entityName}
                     </th>
                   ))}
-                  <th className="text-right py-2 font-medium w-[110px]">Prior Period</th>
-                  <th className="text-right py-2 font-medium w-[100px]">Variance $</th>
-                  <th className="text-right py-2 font-medium w-[80px]">Variance %</th>
+                  <th className="text-right py-2 px-2 font-medium">Prior Period</th>
+                  <th className="text-right py-2 px-2 font-medium">Variance $</th>
+                  <th className="text-right py-2 px-2 font-medium">% Rev</th>
                 </tr>
               </thead>
               <tbody>
@@ -446,9 +463,8 @@ export default function ConsolidatedPL() {
                   const isExpanded = expandedRows.has(key);
 
                   return (
-                    <>
+                    <React.Fragment key={idx}>
                       <tr
-                        key={idx}
                         className={`border-b transition-colors ${
                           isTotal ? "bg-gray-100 font-bold border-t-2" :
                           isSubtotal ? "bg-gray-50 font-semibold" :
@@ -457,46 +473,46 @@ export default function ConsolidatedPL() {
                         } ${hasAccounts ? "cursor-pointer" : ""}`}
                         onClick={() => hasAccounts && toggleRow(key)}
                       >
-                        <td className={`py-1.5 ${line.lineType === "detail" ? "pl-6" : ""}`}>
+                        <td className={`py-1.5 px-2 truncate ${line.lineType === "detail" ? "pl-6" : ""}`}>
                           <div className="flex items-center gap-1">
                             {hasAccounts && (
                               isExpanded ?
-                                <ChevronDown className="h-3 w-3 text-muted-foreground" /> :
-                                <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                                <ChevronDown className="h-3 w-3 flex-shrink-0 text-muted-foreground" /> :
+                                <ChevronRight className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
                             )}
-                            {line.label}
+                            <span className="truncate">{line.label}</span>
                           </div>
                         </td>
-                        <td className="text-right py-1.5 font-mono text-xs">
+                        <td className="text-right py-1.5 px-2 font-mono text-xs">
                           {fmt(eliminateIC ? line.netAmount : line.consolidatedAmount)}
                         </td>
                         {eliminateIC && (
-                          <td className={`text-right py-1.5 font-mono text-xs ${
+                          <td className={`text-right py-1.5 px-2 font-mono text-xs ${
                             line.eliminationAmount ? "text-amber-600" : "text-muted-foreground"
                           }`}>
                             {line.eliminationAmount ? fmt(line.eliminationAmount) : "—"}
                           </td>
                         )}
                         {eliminateIC && (
-                          <td className="text-right py-1.5 font-mono text-xs font-medium">
+                          <td className="text-right py-1.5 px-2 font-mono text-xs font-medium">
                             {fmt(line.netAmount)}
                           </td>
                         )}
                         {showEntityBreakdown && report.entityBreakdown?.map((e: any) => (
-                          <td key={e.entityId} className="text-right py-1.5 font-mono text-xs">
+                          <td key={e.entityId} className="text-right py-1.5 px-2 font-mono text-xs">
                             {fmt(line.entityAmounts?.[e.entityId.toString()] || 0)}
                           </td>
                         ))}
-                        <td className="text-right py-1.5 font-mono text-xs text-muted-foreground">
+                        <td className="text-right py-1.5 px-2 font-mono text-xs text-muted-foreground">
                           {fmt(line.priorAmount)}
                         </td>
-                        <td className={`text-right py-1.5 font-mono text-xs ${
+                        <td className={`text-right py-1.5 px-2 font-mono text-xs ${
                           (line.varianceDollar ?? 0) > 0 ? "text-green-600" :
                           (line.varianceDollar ?? 0) < 0 ? "text-red-600" : ""
                         }`}>
                           {fmtVar(line.varianceDollar)}
                         </td>
-                        <td className={`text-right py-1.5 font-mono text-xs ${
+                        <td className={`text-right py-1.5 px-2 font-mono text-xs ${
                           (line.variancePct ?? 0) > 0 ? "text-green-600" :
                           (line.variancePct ?? 0) < 0 ? "text-red-600" : ""
                         }`}>
@@ -506,25 +522,25 @@ export default function ConsolidatedPL() {
                       {/* Expanded account details */}
                       {isExpanded && hasAccounts && line.accounts.map((acct: any, ai: number) => (
                         <tr key={`${idx}-${ai}`} className={`border-b text-xs ${acct.isEliminated ? "bg-amber-50/50 line-through text-amber-600" : "bg-muted/20"}`}>
-                          <td className="py-1 pl-12 text-muted-foreground">
+                          <td className="py-1 pl-10 px-2 text-muted-foreground truncate">
                             {acct.accountName}
                             <span className="ml-2 text-[10px] opacity-60">({acct.entityName})</span>
                             {acct.isEliminated && (
                               <Badge variant="outline" className="ml-2 text-[9px] px-1 py-0 border-amber-300 text-amber-600">IC</Badge>
                             )}
                           </td>
-                          <td className="text-right py-1 font-mono">{fmt(acct.amount)}</td>
-                          {eliminateIC && <td></td>}
-                          {eliminateIC && <td></td>}
+                          <td className="text-right py-1 px-2 font-mono">{fmt(acct.amount)}</td>
+                          {eliminateIC && <td className="px-2"></td>}
+                          {eliminateIC && <td className="px-2"></td>}
                           {showEntityBreakdown && report.entityBreakdown?.map((e: any) => (
-                            <td key={e.entityId} className="text-right py-1 font-mono">
+                            <td key={e.entityId} className="text-right py-1 px-2 font-mono">
                               {e.entityId === acct.entityId ? fmt(acct.amount) : ""}
                             </td>
                           ))}
-                          <td></td><td></td><td></td>
+                          <td className="px-2"></td><td className="px-2"></td><td className="px-2"></td>
                         </tr>
                       ))}
-                    </>
+                    </React.Fragment>
                   );
                 })}
               </tbody>

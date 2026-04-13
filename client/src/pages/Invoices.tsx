@@ -514,6 +514,7 @@ export default function Invoices() {
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(null);
   const [newInv, setNewInv] = useState({ invoiceNumber: '', supplierId: '', locationId: '', invoiceDate: '', dueDate: '', subtotal: '', glAccount: '', notes: '' });
+  const [newInvFile, setNewInvFile] = useState<File | null>(null);
 
   const { data: invoices, isLoading, refetch } = trpc.invoices.list.useQuery(
     filter === "all" ? undefined : { status: filter }
@@ -523,7 +524,28 @@ export default function Invoices() {
   const { data: locationsList } = trpc.locations.list.useQuery();
 
   const createInvoice = trpc.invoices.create.useMutation({
-    onSuccess: () => { refetch(); setCreateOpen(false); setNewInv({ invoiceNumber: '', supplierId: '', locationId: '', invoiceDate: '', dueDate: '', subtotal: '', glAccount: '', notes: '' }); toast.success("Invoice created"); },
+    onSuccess: (data: any) => {
+      // If a file was attached, upload it immediately after creation
+      if (newInvFile && data?.id) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = (reader.result as string).split(',')[1];
+          uploadFile.mutate({
+            invoiceId: data.id,
+            fileType: 'invoice',
+            fileData: base64,
+            fileName: newInvFile.name,
+            contentType: newInvFile.type || 'application/pdf',
+          });
+        };
+        reader.readAsDataURL(newInvFile);
+      }
+      refetch();
+      setCreateOpen(false);
+      setNewInv({ invoiceNumber: '', supplierId: '', locationId: '', invoiceDate: '', dueDate: '', subtotal: '', glAccount: '', notes: '' });
+      setNewInvFile(null);
+      toast.success('Invoice created' + (newInvFile ? ' — PDF uploading...' : ''));
+    },
     onError: (err) => toast.error(`Failed: ${err.message}`),
   });
 
@@ -703,6 +725,58 @@ export default function Invoices() {
                 <div><Label className="text-xs">Subtotal (before tax)</Label><Input type="number" step="0.01" value={newInv.subtotal} onChange={e => setNewInv(p => ({...p, subtotal: e.target.value}))} placeholder="0.00" /></div>
                 <div><Label className="text-xs">GL Account</Label><Input value={newInv.glAccount} onChange={e => setNewInv(p => ({...p, glAccount: e.target.value}))} placeholder="5100 - COGS" /></div>
                 <div className="col-span-2"><Label className="text-xs">Notes</Label><Input value={newInv.notes} onChange={e => setNewInv(p => ({...p, notes: e.target.value}))} placeholder="Optional notes" /></div>
+                {/* PDF Upload Area */}
+                <div className="col-span-2">
+                  <Label className="text-xs">Invoice PDF</Label>
+                  <div
+                    className={`mt-1 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+                      newInvFile ? 'border-emerald-300 bg-emerald-50/50' : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30'
+                    }`}
+                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const file = e.dataTransfer.files?.[0];
+                      if (file && (file.type === 'application/pdf' || file.type.startsWith('image/'))) {
+                        setNewInvFile(file);
+                      } else {
+                        toast.error('Please upload a PDF or image file');
+                      }
+                    }}
+                    onClick={() => document.getElementById('create-invoice-file-input')?.click()}
+                  >
+                    <input
+                      id="create-invoice-file-input"
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setNewInvFile(file);
+                      }}
+                    />
+                    {newInvFile ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <FileText className="h-5 w-5 text-emerald-600" />
+                        <span className="text-sm font-medium text-emerald-700">{newInvFile.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                          onClick={(e) => { e.stopPropagation(); setNewInvFile(null); }}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div>
+                        <Upload className="h-6 w-6 mx-auto mb-1 text-muted-foreground/50" />
+                        <p className="text-xs font-medium text-muted-foreground">Drag & drop invoice PDF here, or click to browse</p>
+                        <p className="text-[10px] text-muted-foreground/70 mt-0.5">PDF, JPG, PNG (max 10MB)</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 {newInv.subtotal && <div className="col-span-2 bg-muted/50 rounded-lg p-3 text-sm">
                   <div className="flex justify-between"><span>Subtotal:</span><span>{formatCurrency(parseFloat(newInv.subtotal) || 0)}</span></div>
                   <div className="flex justify-between text-muted-foreground"><span>GST (5%):</span><span>{formatCurrency((parseFloat(newInv.subtotal) || 0) * 0.05)}</span></div>

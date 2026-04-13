@@ -51,8 +51,20 @@ export const appRouter = router({
       const alerts = await db.getActiveAlerts();
 
       const totalSalesGross = sales.reduce((sum, s) => sum + Number(s.totalSales), 0);
-      const totalGst = sales.reduce((sum, s) => sum + Number(s.gstCollected || 0), 0);
-      const totalQst = sales.reduce((sum, s) => sum + Number(s.qstCollected || 0), 0);
+      // Back-calculate GST/QST for Ontario (locationId 3) where POS reports tax-inclusive totals
+      let totalGst = 0;
+      let totalQst = 0;
+      for (const s of sales) {
+        let gst = Number(s.gstCollected || 0);
+        let qst = Number(s.qstCollected || 0);
+        if (s.locationId === 3 && gst === 0 && qst === 0 && Number(s.totalSales) > 0) {
+          const netSales = Math.round(Number(s.totalSales) / 1.14975 * 100) / 100;
+          gst = Math.round(netSales * 5) / 100;
+          qst = Math.round(netSales * 9.975) / 100;
+        }
+        totalGst += gst;
+        totalQst += qst;
+      }
       // Net revenue excludes GST/QST (tax is not revenue)
       const totalSales = Math.round((totalSalesGross - totalGst - totalQst) * 100) / 100;
 
@@ -96,8 +108,14 @@ export const appRouter = router({
         const p = perfMap.get(s.locationId);
         if (p) {
           const gross = Number(s.totalSales);
-          const gst = Number(s.gstCollected || 0);
-          const qst = Number(s.qstCollected || 0);
+          let gst = Number(s.gstCollected || 0);
+          let qst = Number(s.qstCollected || 0);
+          // Ontario cafe (locationId 3): POS totalSales is tax-inclusive
+          if (s.locationId === 3 && gst === 0 && qst === 0 && gross > 0) {
+            const netSales = Math.round(gross / 1.14975 * 100) / 100;
+            gst = Math.round(netSales * 5) / 100;
+            qst = Math.round(netSales * 9.975) / 100;
+          }
           p.revenue += gross - gst - qst; // Net revenue excludes GST/QST
         }
       }
@@ -138,12 +156,27 @@ export const appRouter = router({
       const byDate = new Map<string, { total: number; byLoc: Record<string, number>; orders: number; labor: number }>();
       for (const s of sales) {
         const raw = s.saleDate;
-        const d = raw instanceof Date ? raw.toISOString().split('T')[0] : String(raw).slice(0, 10);
+        let d: string;
+        if (raw instanceof Date) {
+          const yr = raw.getUTCFullYear();
+          const mo = String(raw.getUTCMonth() + 1).padStart(2, '0');
+          const dy = String(raw.getUTCDate()).padStart(2, '0');
+          d = `${yr}-${mo}-${dy}`;
+        } else {
+          d = String(raw).slice(0, 10);
+        }
         if (!byDate.has(d)) byDate.set(d, { total: 0, byLoc: {}, orders: 0, labor: 0 });
         const entry = byDate.get(d)!;
         const gross = Number(s.totalSales);
-        const gst = Number(s.gstCollected || 0);
-        const qst = Number(s.qstCollected || 0);
+        let gst = Number(s.gstCollected || 0);
+        let qst = Number(s.qstCollected || 0);
+        // Ontario cafe (locationId 3): POS totalSales is tax-inclusive but GST/QST are 0
+        // Back-calculate tax from gross to get true net revenue
+        if (s.locationId === 3 && gst === 0 && qst === 0 && gross > 0) {
+          const netSales = Math.round(gross / 1.14975 * 100) / 100;
+          gst = Math.round(netSales * 5) / 100;
+          qst = Math.round(netSales * 9.975) / 100;
+        }
         const amt = gross - gst - qst; // Net revenue excludes GST/QST
         const code = locMap.get(s.locationId) || 'UNK';
         entry.total += amt;
@@ -1326,8 +1359,14 @@ export const appRouter = router({
       const locCode = loc?.code || "UNK";
 
       const totalSales = Math.round(Number(sale.totalSales) * 100) / 100;
-      const gst = Math.round(Number(sale.gstCollected || 0) * 100) / 100;
-      const qst = Math.round(Number(sale.qstCollected || 0) * 100) / 100;
+      let gst = Math.round(Number(sale.gstCollected || 0) * 100) / 100;
+      let qst = Math.round(Number(sale.qstCollected || 0) * 100) / 100;
+      // Ontario cafe (locationId 3): POS totalSales is tax-inclusive
+      if (input.locationId === 3 && gst === 0 && qst === 0 && totalSales > 0) {
+        const netSales = Math.round(totalSales / 1.14975 * 100) / 100;
+        gst = Math.round(netSales * 5) / 100;
+        qst = Math.round(netSales * 9.975) / 100;
+      }
       const netRevenue = Math.round((totalSales - gst - qst) * 100) / 100;
 
       // Balanced Revenue JE:
@@ -1966,15 +2005,29 @@ export const appRouter = router({
         : sales;
       const combined: csvExport.CombinedRow[] = filtered.map(s => {
         const gross = Number(s.totalSales);
-        const gst = Number(s.gstCollected || 0);
-        const qst = Number(s.qstCollected || 0);
+        let gst = Number(s.gstCollected || 0);
+        let qst = Number(s.qstCollected || 0);
+        // Ontario cafe (locationId 3): POS totalSales is tax-inclusive
+        if (s.locationId === 3 && gst === 0 && qst === 0 && gross > 0) {
+          const netSales = Math.round(gross / 1.14975 * 100) / 100;
+          gst = Math.round(netSales * 5) / 100;
+          qst = Math.round(netSales * 9.975) / 100;
+        }
         const rev = gross - gst - qst; // Net revenue excludes GST/QST
         const labor = Number(s.labourCost || 0);
         const orders = s.orderCount || 0;
         const fcPct = locFoodCost.get(s.locationId) || 0.29;
         const cogs = rev * fcPct;
         const raw = s.saleDate;
-        const dateStr = raw instanceof Date ? raw.toISOString().split('T')[0] : String(raw).slice(0, 10);
+        let dateStr: string;
+        if (raw instanceof Date) {
+          const yr = raw.getUTCFullYear();
+          const mo = String(raw.getUTCMonth() + 1).padStart(2, '0');
+          const dy = String(raw.getUTCDate()).padStart(2, '0');
+          dateStr = `${yr}-${mo}-${dy}`;
+        } else {
+          dateStr = String(raw).slice(0, 10);
+        }
         return {
           date: dateStr,
           storeCode: locMap.get(s.locationId) || String(s.locationId),
@@ -3592,9 +3645,20 @@ If a field cannot be determined, use null. Always return valid JSON.`,
         summary.total += Number(row.cnt);
       }
 
+      // Convert saleDate from Date object to YYYY-MM-DD string to avoid timezone shift
+      function toDateStr(d: Date | string | null | undefined): string {
+        if (!d) return "";
+        if (typeof d === "string") return d.slice(0, 10);
+        const year = d.getUTCFullYear();
+        const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const day = String(d.getUTCDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
       return {
         entries: entries.map(e => ({
           ...e,
+          saleDate: toDateStr(e.saleDate),
           locationName: locationMap[e.locationId] || `Location ${e.locationId}`,
         })),
         total: Number(totalResult[0]?.total || 0),
@@ -3620,9 +3684,17 @@ If a field cannot be determined, use null. Always return valid JSON.`,
       const [loc] = await dbConn.select().from(locations)
         .where(eq(locations.id, entry.locationId));
 
-      return { ...entry, locationName: loc?.name || `Location ${entry.locationId}` };
+       // Convert saleDate to string to avoid timezone shift
+      function toDateStr2(d: Date | string | null | undefined): string {
+        if (!d) return "";
+        if (typeof d === "string") return d.slice(0, 10);
+        const year = d.getUTCFullYear();
+        const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const day = String(d.getUTCDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+      return { ...entry, saleDate: toDateStr2(entry.saleDate), locationName: loc?.name || `Location ${entry.locationId}` };
     }),
-
     // Update a failed/pending JE and repost to QBO
     updateAndRepost: protectedProcedure.input(z.object({
       id: z.number(),

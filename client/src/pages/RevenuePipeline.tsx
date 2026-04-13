@@ -24,8 +24,12 @@ function formatCurrency(val: number | string) {
 
 function formatDate(d: string | Date | null) {
   if (!d) return "—";
-  const str = typeof d === "string" ? d : d.toISOString();
-  return str.slice(0, 10);
+  if (typeof d === "string") return d.slice(0, 10);
+  // Use UTC components to avoid timezone shift (MySQL date at midnight UTC → EDT shows previous day)
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function statusBadge(status: string) {
