@@ -79,6 +79,7 @@ export default function ConsolidatedPL() {
   const [showEntityBreakdown, setShowEntityBreakdown] = useState(false);
   const [showEliminations, setShowEliminations] = useState(false);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [compareWithPrior, setCompareWithPrior] = useState(true);
 
   const dateRange = useMemo(() => {
     if (periodMode === "monthly") {
@@ -99,12 +100,28 @@ export default function ConsolidatedPL() {
     return { startDate: format(subMonths(new Date(), 1), "yyyy-MM-01"), endDate: format(new Date(), "yyyy-MM-dd") };
   }, [periodMode, selectedMonth, selectedFY, selectedQuarter, selectedQuarterFY, customStart, customEnd]);
 
+  // Compute prior period label for the comparison
+  const priorPeriodLabel = useMemo(() => {
+    if (periodMode === "monthly") {
+      const [y, m] = selectedMonth.split("-").map(Number);
+      const d = new Date(y, m - 2, 1); // previous month
+      return format(d, "MMMM yyyy");
+    } else if (periodMode === "quarterly") {
+      const prevQ = selectedQuarter === 1 ? 4 : (selectedQuarter - 1) as 1 | 2 | 3 | 4;
+      const prevFY = selectedQuarter === 1 ? selectedQuarterFY - 1 : selectedQuarterFY;
+      return `FY ${prevFY}/${prevFY + 1} Q${prevQ}`;
+    } else if (periodMode === "yearly") {
+      return `Year ${selectedFY - 1}/${selectedFY}`;
+    }
+    return "Prior Period";
+  }, [periodMode, selectedMonth, selectedFY, selectedQuarter, selectedQuarterFY]);
+
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data: report, isLoading, error, refetch } = trpc.financialStatements.consolidated.profitAndLoss.useQuery({
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
-    includeComparison: true,
+    includeComparison: compareWithPrior,
     eliminateIntercompany: eliminateIC,
     forceRefresh: isRefreshing,
   });
@@ -196,7 +213,8 @@ export default function ConsolidatedPL() {
   const entityCols = showEntityBreakdown ? (report?.entityBreakdown?.length ?? 0) : 0;
   const icCols = eliminateIC ? 2 : 0; // Eliminations + Net
   // Total data columns (excluding Account): Consolidated + IC cols + entity cols + Prior + Var$ + Var%
-  const dataCols = 1 + icCols + entityCols + 3;
+  const compareCols = compareWithPrior ? 3 : 0;
+  const dataCols = 1 + icCols + entityCols + compareCols;
 
   if (isLoading) {
     return (
@@ -263,7 +281,7 @@ export default function ConsolidatedPL() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {[currentFY, currentFY - 1, currentFY - 2].map((y) => (
+                      {Array.from({ length: currentFY - 2019 + 1 }, (_, i) => currentFY - i).map((y) => (
                         <SelectItem key={y} value={y.toString()}>FY {y}/{y + 1}</SelectItem>
                       ))}
                     </SelectContent>
@@ -283,12 +301,12 @@ export default function ConsolidatedPL() {
               )}
               {periodMode === "yearly" && (
                 <Select value={selectedFY.toString()} onValueChange={(v) => setSelectedFY(Number(v))}>
-                  <SelectTrigger className="w-[200px] h-8 text-xs">
+                  <SelectTrigger className="w-[280px] h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {[currentFY, currentFY - 1, currentFY - 2].map((y) => (
-                      <SelectItem key={y} value={y.toString()}>FY {y}/{y + 1} (Sep {y} – Aug {y + 1})</SelectItem>
+                    {Array.from({ length: currentFY - 2019 + 1 }, (_, i) => currentFY - i).map((y) => (
+                      <SelectItem key={y} value={y.toString()}>Year {y}/{y + 1} (Sep {y} – Aug {y + 1})</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -335,6 +353,13 @@ export default function ConsolidatedPL() {
               <Switch checked={showEntityBreakdown} onCheckedChange={setShowEntityBreakdown} id="breakdown-toggle" />
               <label htmlFor="breakdown-toggle" className="text-xs font-medium cursor-pointer">
                 Show Entity Breakdown
+              </label>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Switch checked={compareWithPrior} onCheckedChange={setCompareWithPrior} id="compare-toggle" />
+              <label htmlFor="compare-toggle" className="text-xs font-medium cursor-pointer">
+                Compare with Previous Period
               </label>
             </div>
 
@@ -433,9 +458,9 @@ export default function ConsolidatedPL() {
                 {showEntityBreakdown && report.entityBreakdown?.map((e: any) => (
                   <col key={e.entityId} style={{ width: "105px" }} />
                 ))}
-                <col style={{ width: "105px" }} /> {/* Prior Period */}
-                <col style={{ width: "95px" }} />  {/* Variance $ */}
-                <col style={{ width: "75px" }} />  {/* Variance % */}
+                {compareWithPrior && <col style={{ width: "105px" }} />} {/* Prior Period */}
+                {compareWithPrior && <col style={{ width: "95px" }} />}  {/* Variance $ */}
+                {compareWithPrior && <col style={{ width: "75px" }} />}  {/* Variance % */}
               </colgroup>
               <thead className="sticky top-0 z-10 bg-white">
                 <tr className="border-b-2 text-xs text-muted-foreground">
@@ -448,9 +473,9 @@ export default function ConsolidatedPL() {
                       {e.entityName}
                     </th>
                   ))}
-                  <th className="text-right py-2 px-2 font-medium">Prior Period</th>
-                  <th className="text-right py-2 px-2 font-medium">Variance $</th>
-                  <th className="text-right py-2 px-2 font-medium">% Rev</th>
+                  {compareWithPrior && <th className="text-right py-2 px-2 font-medium">{priorPeriodLabel}</th>}
+                  {compareWithPrior && <th className="text-right py-2 px-2 font-medium">Variance $</th>}
+                  {compareWithPrior && <th className="text-right py-2 px-2 font-medium">% Rev</th>}
                 </tr>
               </thead>
               <tbody>
@@ -503,21 +528,27 @@ export default function ConsolidatedPL() {
                             {fmt(line.entityAmounts?.[e.entityId.toString()] || 0)}
                           </td>
                         ))}
-                        <td className="text-right py-1.5 px-2 font-mono text-xs text-muted-foreground">
-                          {fmt(line.priorAmount)}
-                        </td>
-                        <td className={`text-right py-1.5 px-2 font-mono text-xs ${
-                          (line.varianceDollar ?? 0) > 0 ? "text-green-600" :
-                          (line.varianceDollar ?? 0) < 0 ? "text-red-600" : ""
-                        }`}>
-                          {fmtVar(line.varianceDollar)}
-                        </td>
-                        <td className={`text-right py-1.5 px-2 font-mono text-xs ${
-                          (line.variancePct ?? 0) > 0 ? "text-green-600" :
-                          (line.variancePct ?? 0) < 0 ? "text-red-600" : ""
-                        }`}>
-                          {fmtPct(line.variancePct)}
-                        </td>
+                        {compareWithPrior && (
+                          <td className="text-right py-1.5 px-2 font-mono text-xs text-muted-foreground">
+                            {fmt(line.priorAmount)}
+                          </td>
+                        )}
+                        {compareWithPrior && (
+                          <td className={`text-right py-1.5 px-2 font-mono text-xs ${
+                            (line.varianceDollar ?? 0) > 0 ? "text-green-600" :
+                            (line.varianceDollar ?? 0) < 0 ? "text-red-600" : ""
+                          }`}>
+                            {fmtVar(line.varianceDollar)}
+                          </td>
+                        )}
+                        {compareWithPrior && (
+                          <td className={`text-right py-1.5 px-2 font-mono text-xs ${
+                            (line.variancePct ?? 0) > 0 ? "text-green-600" :
+                            (line.variancePct ?? 0) < 0 ? "text-red-600" : ""
+                          }`}>
+                            {fmtPct(line.variancePct)}
+                          </td>
+                        )}
                       </tr>
                       {/* Expanded account details */}
                       {isExpanded && hasAccounts && line.accounts.map((acct: any, ai: number) => (
@@ -537,7 +568,7 @@ export default function ConsolidatedPL() {
                               {e.entityId === acct.entityId ? fmt(acct.amount) : ""}
                             </td>
                           ))}
-                          <td className="px-2"></td><td className="px-2"></td><td className="px-2"></td>
+                          {compareWithPrior && <><td className="px-2"></td><td className="px-2"></td><td className="px-2"></td></>}
                         </tr>
                       ))}
                     </React.Fragment>
